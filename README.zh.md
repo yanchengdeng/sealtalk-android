@@ -1,4 +1,7 @@
 # sealtalk-android
+[![API](https://img.shields.io/badge/API-9%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=9)<br/>
+
+
 [The English Version](https://github.com/sealtalk/sealtalk-android/blob/master/README.md)  <br/>
 Android 应用 SealTalk 由 融云 RongCloud 出品
 
