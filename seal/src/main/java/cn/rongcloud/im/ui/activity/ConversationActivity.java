@@ -38,6 +38,7 @@ import cn.rongcloud.im.R;
 import cn.rongcloud.im.SealAppContext;
 import cn.rongcloud.im.model.RongEvent;
 import cn.rongcloud.im.server.network.http.HttpException;
+import cn.rongcloud.im.server.response.GetGroupMemberResponse;
 import cn.rongcloud.im.server.response.GetUserInfoByIdResponse;
 import cn.rongcloud.im.server.utils.NLog;
 import cn.rongcloud.im.server.utils.NToast;
@@ -62,6 +63,7 @@ import io.rong.imlib.location.RealTimeLocationConstant;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.Discussion;
 import io.rong.imlib.model.PublicServiceProfile;
+import io.rong.imlib.model.UserInfo;
 import io.rong.message.InformationNotificationMessage;
 import io.rong.message.TextMessage;
 import io.rong.message.VoiceMessage;
@@ -76,6 +78,7 @@ import io.rong.message.VoiceMessage;
 public class ConversationActivity extends BaseActivity implements RongIMClient.RealTimeLocationListener {
 
     private static final int GETUSERINFO = 111;
+    private static final int GETGROUPMEMBER = 100;
     private String TAG = ConversationActivity.class.getSimpleName();
     /**
      * 对方id
@@ -106,6 +109,7 @@ public class ConversationActivity extends BaseActivity implements RongIMClient.R
     private final String VoiceTypingTitle = "对方正在讲话...";
 
     private Handler mHandler;
+    private RongIM.IGroupMemberCallback mMentionMemberCallback;
 
     public static final int SET_TEXT_TYPING_TITLE = 1;
     public static final int SET_VOICE_TYPING_TITLE = 2;
@@ -140,9 +144,6 @@ public class ConversationActivity extends BaseActivity implements RongIMClient.R
         title = intent.getData().getQueryParameter("title");
 
         setActionBarTitle(mConversationType, mTargetId);
-
-        //讨论组 @ 消息
-        checkTextInputEditTextChanged();
 
         isPushMessage(intent);
 
@@ -244,17 +245,15 @@ public class ConversationActivity extends BaseActivity implements RongIMClient.R
                 return null;
             }
         });
+
+        RongIM.getInstance().setGroupMembersProvider(new RongIM.IGroupMembersProvider() {
+            @Override
+            public void getGroupMembers(String groupId, RongIM.IGroupMemberCallback callback) {
+                request(GETGROUPMEMBER);
+                mMentionMemberCallback = callback;
+            }
+        });
         //CallKit end 2
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-
-        if (intent == null || intent.getData() == null)
-            return;
-        enterFragment(Conversation.ConversationType.valueOf(intent.getData().getLastPathSegment().toUpperCase(Locale.getDefault())), intent.getData().getQueryParameter("targetId"));
-        setActionBarTitle(mConversationType, mTargetId);
     }
 
 
@@ -343,7 +342,7 @@ public class ConversationActivity extends BaseActivity implements RongIMClient.R
                 if (mDialog != null && !mDialog.isShowing()) {
                     mDialog.show();
                 }
-                new android.os.Handler().postDelayed(new Runnable() {
+                new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         enterActivity();
@@ -574,8 +573,6 @@ public class ConversationActivity extends BaseActivity implements RongIMClient.R
             getSupportActionBar().setTitle("讨论组");
         }
     }
-
-
 
 
     /**
@@ -923,6 +920,8 @@ public class ConversationActivity extends BaseActivity implements RongIMClient.R
         //CallKit start 3
         RongCallKit.setGroupMemberProvider(null);
         //CallKit end 3
+
+        RongIM.getInstance().setGroupMembersProvider(null);
         super.onDestroy();
     }
 
@@ -1012,6 +1011,8 @@ public class ConversationActivity extends BaseActivity implements RongIMClient.R
         switch (requsetCode) {
             case GETUSERINFO:
                 return action.getUserInfoById(locationid);
+            case GETGROUPMEMBER:
+                return action.getGroupMember(mTargetId);
         }
         return super.doInBackground(requsetCode, id);
     }
@@ -1027,6 +1028,19 @@ public class ConversationActivity extends BaseActivity implements RongIMClient.R
                         textView.setText(res.getResult().getNickname() + " 正在共享位置");
                     }
                     break;
+                case GETGROUPMEMBER:
+                    GetGroupMemberResponse response = (GetGroupMemberResponse) result;
+                    if (response.getCode() == 200) {
+                        List<GetGroupMemberResponse.ResultEntity> list = response.getResult();
+                        List<UserInfo> userInfos = new ArrayList<>();
+                        for (GetGroupMemberResponse.ResultEntity entity : list) {
+                            GetGroupMemberResponse.ResultEntity.UserEntity user = entity.getUser();
+                            if (user != null) {
+                                userInfos.add(new UserInfo(user.getId(), user.getNickname(), Uri.parse(user.getPortraitUri())));
+                            }
+                        }
+                        mMentionMemberCallback.onGetGroupMembersResult(userInfos);
+                    }
             }
 
         }

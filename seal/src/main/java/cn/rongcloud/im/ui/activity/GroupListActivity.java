@@ -49,7 +49,7 @@ public class GroupListActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.de_fr_group_list);
+        setContentView(R.layout.fr_group_list);
         getSupportActionBar().setTitle(R.string.my_groups);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.de_actionbar_back);

@@ -111,6 +111,8 @@
 
                 <TextView
                     android:layout_width="0dp"
+                    android:ellipsize="end"
+                    android:singleLine="true"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_marginBottom="10dp"
@@ -155,8 +157,7 @@
                 android:layout_height="48dp"
                 android:background="@drawable/btn_list_item_bg"
                 android:clickable="true"
-                android:orientation="horizontal"
-                android:visibility="gone">
+                android:orientation="horizontal">
 
 
                 <TextView

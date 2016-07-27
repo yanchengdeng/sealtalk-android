@@ -59,7 +59,7 @@ public class SelectFriendsActivity extends BaseActivity {
 
     private static final int ADDGROUPMEMBER = 21;
     private static final int DELEGROUPMEMBER = 23;
-    public static final java.lang.String DISCUSSIONUPDATE = "DISCUSSIONUPDATE";
+    public static final String DISCUSSIONUPDATE = "DISCUSSIONUPDATE";
     /**
      * 好友列表的 ListView
      */
@@ -149,7 +149,11 @@ public class SelectFriendsActivity extends BaseActivity {
             getSupportActionBar().setTitle("移除讨论组成员");
         } else {
             getSupportActionBar().setTitle(R.string.select_contact);
-            isStartPrivateChat = true;
+            if (getSharedPreferences("config", MODE_PRIVATE).getBoolean("isDebug", false)) {
+                isStartPrivateChat = false;
+            } else {
+                isStartPrivateChat = true;
+            }
         }
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

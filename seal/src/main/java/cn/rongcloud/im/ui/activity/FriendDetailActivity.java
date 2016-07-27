@@ -52,7 +52,7 @@ public class FriendDetailActivity extends BaseActivity implements View.OnClickLi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.de_fr_friend_detail);
+        setContentView(R.layout.fr_friend_detail);
         getSupportActionBar().setTitle(R.string.user_details);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.de_actionbar_back);

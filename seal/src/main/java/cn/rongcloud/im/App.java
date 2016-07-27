@@ -54,6 +54,7 @@ public class App extends Application {
          */
         //RongIM.setServerInfo("nav.cn.ronghub.com", "img.cn.ronghub.com");
         RongIM.init(this);
+        NLog.setDebug(true);//Seal Module Log 开关
         SealAppContext.init(this);
         SharedPreferencesContext.init(this);
         Thread.setDefaultUncaughtExceptionHandler(new RongExceptionHandler(this));
@@ -63,10 +64,6 @@ public class App extends Application {
             RongIM.registerMessageTemplate(new ContactNotificationMessageProvider());
             RongIM.registerMessageTemplate(new RealTimeLocationMessageProvider());
             RongIM.registerMessageTemplate(new GroupNotificationMessageProvider());
-            //@ 消息模板展示
-            if (RongContext.getInstance() != null) {
-                RongContext.getInstance().registerConversationTemplate(new NewDiscussionConversationProvider());
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }

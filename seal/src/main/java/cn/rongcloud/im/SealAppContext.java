@@ -56,7 +56,7 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener, 
 
 
     public static final String UPDATEFRIEND = "updatefriend";
-    public static final java.lang.String UPDATEREDDOT = "updatereddot";
+    public static final String UPDATEREDDOT = "updatereddot";
     private Context mContext;
 
     private static SealAppContext mRongCloudInstance;

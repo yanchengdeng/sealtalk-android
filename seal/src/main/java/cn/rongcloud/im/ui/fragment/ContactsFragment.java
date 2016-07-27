@@ -107,6 +107,8 @@ public class ContactsFragment extends Fragment implements View.OnClickListener {
 
     private String id;
     private String cacheName;
+
+    private View headView;
 //    private String deleteId;
 //    private AsyncTaskManager atm = AsyncTaskManager.getInstance(getActivity());
 
@@ -133,8 +135,8 @@ public class ContactsFragment extends Fragment implements View.OnClickListener {
         Collections.sort(sourceDataList, pinyinComparator);
 
         infalter = LayoutInflater.from(getActivity());
-        View headView = infalter.inflate(R.layout.item_contact_list_header,
-                                         null);
+        headView = infalter.inflate(R.layout.item_contact_list_header,
+                                    null);
         unread = (TextView) headView.findViewById(R.id.tv_unread);
         RelativeLayout re_newfriends = (RelativeLayout) headView.findViewById(R.id.re_newfriends);
         RelativeLayout re_group = (RelativeLayout) headView.findViewById(R.id.re_chatroom);
@@ -145,7 +147,7 @@ public class ContactsFragment extends Fragment implements View.OnClickListener {
         SharedPreferences sp = getActivity().getSharedPreferences("config", Context.MODE_PRIVATE);
         id = sp.getString("loginid", "");
         cacheName = sp.getString("loginnickname", "");
-        String header = sp.getString("loginPortrait", "");
+        final String header = sp.getString("loginPortrait", "");
         name.setText(cacheName);
         ImageLoader.getInstance().displayImage(TextUtils.isEmpty(header) ? RongGenerate.generateDefaultAvatar(cacheName, id) : header, img, App.getOptions());
 
@@ -196,7 +198,11 @@ public class ContactsFragment extends Fragment implements View.OnClickListener {
 
             @Override
             public void afterTextChanged(Editable s) {
-
+//                if (s.length() == 0) {
+//                    headView.setVisibility(View.VISIBLE);
+//                } else {
+//                    headView.setVisibility(View.GONE);
+//                }
             }
         });
         refreshUIListener();
