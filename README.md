@@ -34,6 +34,12 @@ Read Android [Android Dev Doc](http://www.rongcloud.cn/docs/android.html), Learn
  - [Knowledge Base](http://support.rongcloud.cn/)
  - [Dev Repair Order](https://developer.rongcloud.cn/signin?returnUrl=%2Fticket), Need to log in
  - [Android Video Tutorial](http://www.rongcloud.cn/docs/android_video_tutorials.html)
+ 
+## Thanks
+- [androidone](https://github.com/devinhu/androidone)
+- [android-async-http](https://github.com/loopj/android-async-http)
+- [greendao](https://github.com/greenrobot/greenDAO)
+- [fastjson](https://github.com/alibaba/fastjson)
 
 ### Stronger than what you can imagine, Upgrades on the way.
 
