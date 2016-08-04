@@ -69,9 +69,9 @@ public class App extends Application {
         }
 
         options = new DisplayImageOptions.Builder()
-        .showImageForEmptyUri(cn.rongcloud.im.R.drawable.de_default_portrait)
-        .showImageOnFail(cn.rongcloud.im.R.drawable.de_default_portrait)
-        .showImageOnLoading(cn.rongcloud.im.R.drawable.de_default_portrait)
+        .showImageForEmptyUri(R.drawable.de_default_portrait)
+        .showImageOnFail(R.drawable.de_default_portrait)
+        .showImageOnLoading(R.drawable.de_default_portrait)
         .displayer(new FadeInBitmapDisplayer(300))
         .cacheInMemory(true)
         .cacheOnDisk(true)

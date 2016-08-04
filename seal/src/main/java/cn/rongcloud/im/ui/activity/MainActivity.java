@@ -264,16 +264,16 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.seal_chat:
-                mViewPager.setCurrentItem(0);
+                mViewPager.setCurrentItem(0, false);
                 break;
             case R.id.seal_contact_list:
-                mViewPager.setCurrentItem(1);
+                mViewPager.setCurrentItem(1, false);
                 break;
             case R.id.seal_find:
-                mViewPager.setCurrentItem(2);
+                mViewPager.setCurrentItem(2, false);
                 break;
             case R.id.seal_me:
-                mViewPager.setCurrentItem(3);
+                mViewPager.setCurrentItem(3, false);
                 mMineRed.setVisibility(View.GONE);
                 break;
             case R.id.seal_more:

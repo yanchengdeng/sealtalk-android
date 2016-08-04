@@ -17,12 +17,14 @@ import cn.rongcloud.im.App;
 import cn.rongcloud.im.R;
 import cn.rongcloud.im.server.pinyin.Friend;
 import cn.rongcloud.im.server.utils.RongGenerate;
+import cn.rongcloud.im.ui.widget.SinglePopWindow;
 //VoIP start 1
 import io.rong.calllib.RongCallClient;
 import io.rong.calllib.RongCallSession;
 import io.rong.imkit.RongCallAction;
 import io.rong.imkit.RongVoIPIntent;
 //VoIP end 1
+import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
 import io.rong.imkit.RongIM;
 
@@ -30,11 +32,13 @@ import io.rong.imkit.RongIM;
  * Created by AMing on 16/7/12.
  * Company RongCloud
  */
-public class SingleContactActivity extends BaseActivity {
+public class SingleContactActivity extends BaseActivity implements View.OnClickListener {
 
     private TextView mContactName;
 
     private ImageView mContactHeader;
+
+    private ImageView mMore;
 
     private Friend friend;
 
@@ -45,6 +49,8 @@ public class SingleContactActivity extends BaseActivity {
         getSupportActionBar().hide();
         mContactName = (TextView) findViewById(R.id.contact_name);
         mContactHeader = (ImageView) findViewById(R.id.contact_header);
+        mMore = (ImageView) findViewById(R.id.contact_more);
+        mMore.setOnClickListener(this);
         friend = (Friend) getIntent().getSerializableExtra("FriendDetails");
         if (friend != null) {
             mContactName.setText(friend.getName());
@@ -104,5 +110,11 @@ public class SingleContactActivity extends BaseActivity {
 
     public void finishPage(View view) {
         this.finish();
+    }
+
+    @Override
+    public void onClick(View v) {
+//        SinglePopWindow morePopWindow = new SinglePopWindow(SingleContactActivity.this, friend);
+//        morePopWindow.showPopupWindow(mMore);
     }
 }

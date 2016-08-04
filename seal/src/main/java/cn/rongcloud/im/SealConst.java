@@ -12,7 +12,7 @@ public class SealConst {
     public static final int PERSONALPROFILEFROMGROUP = 4;
     public static final String EXIT = "EXIT";
     public static final String CHANGEINFO = "CHANGEINFO";
-    public static final String SEALTALKVERSION = "1.0.6";
+    public static final String SEALTALKVERSION = "1.0.7";
     public static final String GETVERSION = "http://downloads.rongcloud.cn/SealTalk_Update.json";
 
 }

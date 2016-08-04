@@ -42,6 +42,7 @@ import cn.rongcloud.im.ui.widget.linkpreview.TextCrawler;
 import io.rong.imkit.RongIM;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
+import io.rong.message.RichContentMessage;
 import io.rong.message.TextMessage;
 
 /**
@@ -192,10 +193,12 @@ public class SharedReceiverActivity extends BaseActivity {
                                 });
                             }
                             NLog.e("share", "分享:" + titleString + "\n" + finalUri + "\n" + "来自:" + fromString);
-                            RongIM.getInstance().sendMessage(conversationType, targetId, TextMessage.obtain("分享:" + titleString + "\n" + finalUri + "\n" + "来自:" + fromString), null, null, new RongIMClient.SendMessageCallback() {
+                            RichContentMessage richContentMessage = RichContentMessage.obtain(titleString, description, imageString, finalUri);
+                            RongIM.getInstance().sendMessage(conversationType, targetId, richContentMessage , null, null, new RongIMClient.SendMessageCallback() {
                                 @Override
                                 public void onError(Integer messageId, RongIMClient.ErrorCode e) {
-
+                                    NToast.shortToast(mContext, "分享成功");
+                                    NLog.e("share", e.getValue());
                                 }
 
                                 @Override
