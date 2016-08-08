@@ -20,6 +20,10 @@ Android App of SealTalk powered by RongCloud.
 ![image](https://github.com/sealtalk/sealtalk-android/blob/master/screenshots/image2.png)<br/>
 ![image](https://github.com/sealtalk/sealtalk-android/blob/master/screenshots/image3.png)<br/>
 
+## UML
+ #### LoginClassDiagram
+ ![image](https://github.com/sealtalk/sealtalk-android/blob/master/screenshots/LoginClassDiagram.png)<br/>
+
 ## Uses
 #### Step 1:
 [Download RongCloud SDK](http://rongcloud.cn/downloads) Android IMKit SDK Package
