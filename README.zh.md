@@ -23,6 +23,10 @@ Android 应用 SealTalk 由 融云 RongCloud 出品
 ![image](https://github.com/sealtalk/sealtalk-android/blob/master/screenshots/image2.png)<br/>
 ![image](https://github.com/sealtalk/sealtalk-android/blob/master/screenshots/image3.png)<br/>
 
+## UML
+ #### 登录类图
+ ![image](https://github.com/sealtalk/sealtalk-android/blob/master/screenshots/LoginClassDiagram.png)<br/>
+
 ## 使用
 #### Step 1:
 [下载融云 SDK](http://rongcloud.cn/downloads) Android IMKit SDK包
