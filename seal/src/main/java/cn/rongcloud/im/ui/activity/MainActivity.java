@@ -259,7 +259,6 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
     }
 
 
-
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -283,6 +282,13 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
         }
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if (intent.getBooleanExtra("systemconversation", false)) {
+            mViewPager.setCurrentItem(0, false);
+        }
+    }
 
     protected void initData() {
 
@@ -309,6 +315,7 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
             public void onReceive(Context context, Intent intent) {
                 SharedPreferences.Editor editor = getSharedPreferences("config", MODE_PRIVATE).edit();
                 editor.putBoolean("exit", true);
+                editor.putString("loginToken", "");
                 editor.apply();
 
                 RongIM.getInstance().logout();
@@ -429,9 +436,9 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         BroadcastManager.getInstance(mContext).destroy(SealConst.EXIT);
         BroadcastManager.getInstance(mContext).destroy(MineFragment.SHOWRED);
+        super.onDestroy();
     }
 
     @Override

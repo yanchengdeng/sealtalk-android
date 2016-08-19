@@ -243,7 +243,8 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
                 }
                 dataLsit.add(new Friend(deleDisList.get(i).getUserId(),
                                         deleDisList.get(i).getName(),
-                                        deleDisList.get(i).getPortraitUri().toString()
+                                        deleDisList.get(i).getPortraitUri().toString(),
+                                        null //TODO displayName 需要处理 暂为 null
                                        ));
             }
         } else if (deleteGroupMemberList != null && deleteGroupMemberList.size() > 0) {
@@ -253,7 +254,8 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
                 }
                 dataLsit.add(new Friend(deleteGroupMemberList.get(i).getUser().getId(),
                                         deleteGroupMemberList.get(i).getUser().getNickname(),
-                                        deleteGroupMemberList.get(i).getUser().getPortraitUri()
+                                        deleteGroupMemberList.get(i).getUser().getPortraitUri(),
+                                        null //TODO displayName 需要处理 暂为 null
                                        ));
             }
         } else {
@@ -395,7 +397,13 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
                 });
             }
             viewHolder.isSelect.setChecked(mCBFlag.get(position));
-            viewHolder.tvTitle.setText(adapterList.get(position).getName());
+
+            if (TextUtils.isEmpty(adapterList.get(position).getDisplayName())) {
+                viewHolder.tvTitle.setText(adapterList.get(position).getName());
+            } else {
+                viewHolder.tvTitle.setText(adapterList.get(position).getDisplayName());
+            }
+
             String url = adapterList.get(position).getPortraitUri();
             if (!TextUtils.isEmpty(url)) {
                 ImageLoader.getInstance().displayImage(url, viewHolder.mImageView, App.getOptions());
@@ -480,7 +488,7 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
                         selectedList.add(sourceDataList.get(i));
                     }
                 }
-                mSelectedListView.setVisibility(View.GONE);
+                mSelectedListView.setVisibility(View.VISIBLE);
                 selectAdapter.updateListView(selectedList);
             }
         }

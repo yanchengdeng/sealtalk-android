@@ -23,6 +23,8 @@ import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,6 +70,8 @@ public class SharedReceiverActivity extends BaseActivity {
 
     private TextCrawler textCrawler;
 
+    private String mTitle;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,7 +108,9 @@ public class SharedReceiverActivity extends BaseActivity {
         Intent intent = getIntent();
         if (intent != null) {
             /** 截获 Intent 部分 **/
-
+            String linkInfo = getIntent().getClipData().toString();
+            String titleInfo = linkInfo.substring(linkInfo.indexOf("T:"), linkInfo.indexOf("http://")).trim();
+            mTitle = titleInfo.substring(3, titleInfo.length());
             textCrawler = new TextCrawler();
 
             /** --- From ShareVia Intent */
@@ -146,14 +152,17 @@ public class SharedReceiverActivity extends BaseActivity {
                     window.setContentView(R.layout.share_dialog);
                     Button ok = (Button) window.findViewById(R.id.share_ok);
                     Button cancel = (Button) window.findViewById(R.id.share_cancel);
-                    TextView title = (TextView) window.findViewById(R.id.share_title);
+                    final TextView title = (TextView) window.findViewById(R.id.share_title);
                     TextView content = (TextView) window.findViewById(R.id.share_cotent);
                     ImageView image = (ImageView) window.findViewById(R.id.share_image);
-                    TextView  from = (TextView) window.findViewById(R.id.share_from);
+                    TextView from = (TextView) window.findViewById(R.id.share_from);
                     final EditText say = (EditText) window.findViewById(R.id.share_say);
 
-                    if (!TextUtils.isEmpty(titleString)) {
+
+                    if (TextUtils.isEmpty(mTitle)) {
                         title.setText(titleString);
+                    } else {
+                        title.setText(mTitle);
                     }
 
                     if (!TextUtils.isEmpty(imageString)) {
@@ -169,7 +178,6 @@ public class SharedReceiverActivity extends BaseActivity {
                     } else {
                         from.setVisibility(View.GONE);
                     }
-
 
 
                     ok.setOnClickListener(new View.OnClickListener() {
@@ -193,8 +201,14 @@ public class SharedReceiverActivity extends BaseActivity {
                                 });
                             }
                             NLog.e("share", "分享:" + titleString + "\n" + finalUri + "\n" + "来自:" + fromString);
-                            RichContentMessage richContentMessage = RichContentMessage.obtain(titleString, description, imageString, finalUri);
-                            RongIM.getInstance().sendMessage(conversationType, targetId, richContentMessage , null, null, new RongIMClient.SendMessageCallback() {
+                            RichContentMessage richContentMessage = null;
+                            if (TextUtils.isEmpty(mTitle)) {
+                                richContentMessage = RichContentMessage.obtain(titleString, TextUtils.isEmpty(description) ? finalUri : description, imageString, finalUri);
+                            } else {
+                                richContentMessage = RichContentMessage.obtain(mTitle, TextUtils.isEmpty(description) ? finalUri : description, imageString, finalUri);
+                            }
+
+                            RongIM.getInstance().sendMessage(conversationType, targetId, richContentMessage, null, null, new RongIMClient.SendMessageCallback() {
                                 @Override
                                 public void onError(Integer messageId, RongIMClient.ErrorCode e) {
                                     NToast.shortToast(mContext, "分享成功");
@@ -208,7 +222,6 @@ public class SharedReceiverActivity extends BaseActivity {
                                     NToast.shortToast(mContext, "分享成功");
                                 }
                             });
-
 
 
                             dlg.cancel();
@@ -354,7 +367,7 @@ public class SharedReceiverActivity extends BaseActivity {
 
                     if (tempList.size() > 0) {
                         for (Conversation conversation : tempList) {
-                            if (conversation.getConversationType().equals(Conversation.ConversationType.PRIVATE)) {
+                            if (conversation.getConversationType().equals(Conversation.ConversationType.PRIVATE)) {//TODO 会话中包含自己本身会 crash
                                 newConversationsList.add(new NewConversation(Conversation.ConversationType.PRIVATE, conversation.getTargetId(), TextUtils.isEmpty(getUserInfoById(conversation.getTargetId()).getUser().getPortraitUri()) ? RongGenerate.generateDefaultAvatar(getUserInfoById(conversation.getTargetId()).getUser().getNickname(), getUserInfoById(conversation.getTargetId()).getUser().getId()) : getUserInfoById(conversation.getTargetId()).getUser().getPortraitUri(), getUserInfoById(conversation.getTargetId()).getUser().getNickname()));
                             } else {
                                 newConversationsList.add(new NewConversation(Conversation.ConversationType.GROUP, conversation.getTargetId(), TextUtils.isEmpty(getGroupInfoById(conversation.getTargetId()).getGroup().getPortraitUri()) ? RongGenerate.generateDefaultAvatar(getGroupInfoById(conversation.getTargetId()).getGroup().getName(), getGroupInfoById(conversation.getTargetId()).getGroup().getId()) : getGroupInfoById(conversation.getTargetId()).getGroup().getPortraitUri(), getGroupInfoById(conversation.getTargetId()).getGroup().getName()));

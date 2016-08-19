@@ -122,7 +122,7 @@
     <string name="chatroom3">聊天室 III</string>
     <string name="chatroom4">聊天室 IV</string>
     <string name="agreed_friend">已同意好友关系</string>
-    <string name="agree">接受</string>
+    <string name="agree">接&#160;&#160;&#160;受</string>
     <string name="request">已请求</string>
     <string name="ignore">已忽略</string>
     <string name="added">已添加</string>
@@ -247,4 +247,8 @@
     <string name="group_notice_exist_confirm">退出本次编辑</string>
     <string name="group_notice_post_confirm">该公告会通知全部群成员，是否发布？</string>
     <string name="group_notice_prefix">\@所有人\n</string>
+    <string name="search_friend">添加好友</string>
+    <string name="setdisplayname">设置备注</string>
+    <string name="new_and_old_password">新旧密码一致</string>
+    <string name="nickname_show">昵称:</string>
 </resources>

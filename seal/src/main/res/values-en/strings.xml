@@ -212,4 +212,8 @@
     <string name="group_notice_exist_confirm">退出本次编辑</string>
     <string name="group_notice_post_confirm">All members will be notified of this notice. Post it now?</string>
     <string name="group_notice_prefix">\@ all people\n</string>
+    <string name="search_friend">Add Friend</string>
+    <string name="setdisplayname">设置备注</string>
+    <string name="new_and_old_password">The old and new password consistent</string>
+    <string name="nickname_show">nickname:</string>
 </resources>

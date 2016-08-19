@@ -8,8 +8,8 @@ android {
         applicationId "cn.rongcloud.im"
         minSdkVersion 11
         targetSdkVersion 23
-        versionCode 2016072620 
-        versionName "2.6.9 Dev"
+        versionCode 2016081820  
+        versionName "2.7.0 Dev"
     }
 
     signingConfigs {
@@ -49,6 +49,7 @@ android {
     }
 }
 
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:19.1.0'
@@ -59,6 +60,6 @@ dependencies {
     // org.apache.http.legacy.jar 为适配 Android tagetId 22 以上 jar
     compile files('libs/org.apache.http.legacy.jar')
     compile files('libs/jsoup-1.8.3.jar')
-    compile project(':Rong_Cloud_Android_IMKit_SDK_v2_6_9_stable_with_CallKit')
+    compile project(':Rong_Cloud_Android_IMKit_SDK_v2_7_0_dev_with_CallKit')
 }
 apply plugin: 'com.google.gms.google-services'

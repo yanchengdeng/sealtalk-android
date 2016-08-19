@@ -31,6 +31,7 @@ import io.rong.imkit.RongIM;
 import io.rong.imkit.model.GroupUserInfo;
 import io.rong.imkit.model.UIConversation;
 import io.rong.imkit.widget.AlterDialogFragment;
+import io.rong.imkit.widget.provider.FileInputProvider;
 import io.rong.imkit.widget.provider.ImageInputProvider;
 import io.rong.imkit.widget.provider.InputProvider;
 import io.rong.imkit.widget.provider.LocationInputProvider;
@@ -55,8 +56,8 @@ import io.rong.message.LocationMessage;
 public class SealAppContext implements RongIM.ConversationListBehaviorListener, RongIMClient.OnReceiveMessageListener, RongIM.UserInfoProvider, RongIM.GroupInfoProvider, RongIM.GroupUserInfoProvider, RongIMClient.ConnectionStatusListener, RongIM.LocationProvider, RongIM.ConversationBehaviorListener {
 
 
-    public static final String UPDATEFRIEND = "updatefriend";
-    public static final String UPDATEREDDOT = "updatereddot";
+    public static final String UPDATE_FRIEND = "update_friend";
+    public static final String UPDATE_RED_DOT = "update_red_dot";
     private Context mContext;
 
     private static SealAppContext mRongCloudInstance;
@@ -143,7 +144,17 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener, 
         RongIM.setLocationProvider(this);//设置地理位置提供者,不用位置的同学可以注掉此行代码
         setInputProvider();
         setUserInfoEngineListener();
+        setReadReceiptConversationType();
 //        RongIM.setGroupUserInfoProvider(this, true);
+    }
+
+    private void setReadReceiptConversationType() {
+        Conversation.ConversationType[] types = new Conversation.ConversationType[] {
+            Conversation.ConversationType.PRIVATE,
+            Conversation.ConversationType.GROUP,
+            Conversation.ConversationType.DISCUSSION
+        };
+        RongIM.getInstance().setReadReceiptConversationTypeList(types);
     }
 
     private void setInputProvider() {
@@ -151,14 +162,16 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener, 
         RongIM.setOnReceiveMessageListener(this);
         RongIM.setConnectionStatusListener(this);
 
-        InputProvider.ExtendProvider[] singleProvider = {
+        InputProvider.ExtendProvider[] singleProvider =  {
             new ImageInputProvider(RongContext.getInstance()),
-            new RealTimeLocationInputProvider(RongContext.getInstance()) //带位置共享的地理位置
+            new RealTimeLocationInputProvider(RongContext.getInstance()), //带位置共享的地理位置
+            new FileInputProvider(RongContext.getInstance())//文件消息
         };
 
         InputProvider.ExtendProvider[] muiltiProvider = {
             new ImageInputProvider(RongContext.getInstance()),
             new LocationInputProvider(RongContext.getInstance()),//地理位置
+            new FileInputProvider(RongContext.getInstance())//文件消息
         };
 
         RongIM.resetInputExtensionProvider(Conversation.ConversationType.PRIVATE, singleProvider);
@@ -246,7 +259,7 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener, 
             ContactNotificationMessage contactNotificationMessage = (ContactNotificationMessage) messageContent;
             if (contactNotificationMessage.getOperation().equals("Request")) {
                 //对方发来好友邀请
-                BroadcastManager.getInstance(mContext).sendBroadcast(SealAppContext.UPDATEREDDOT);
+                BroadcastManager.getInstance(mContext).sendBroadcast(SealAppContext.UPDATE_RED_DOT);
             } else if (contactNotificationMessage.getOperation().equals("AcceptResponse")) {
                 //对方同意我的好友请求
                 ContactNotificationMessageData c = null;
@@ -258,11 +271,11 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener, 
                 if (c != null) {
                     DBManager.getInstance(mContext).getDaoSession().getFriendDao().insertOrReplace(new Friend(contactNotificationMessage.getSourceUserId(), c.getSourceUserNickname(), null, null, null, null));
                 }
-                BroadcastManager.getInstance(mContext).sendBroadcast(UPDATEFRIEND);
-                BroadcastManager.getInstance(mContext).sendBroadcast(SealAppContext.UPDATEREDDOT);
+                BroadcastManager.getInstance(mContext).sendBroadcast(UPDATE_FRIEND);
+                BroadcastManager.getInstance(mContext).sendBroadcast(SealAppContext.UPDATE_RED_DOT);
             }
 //                // 发广播通知更新好友列表
-//            BroadcastManager.getInstance(mContext).sendBroadcast(UPDATEREDDOT);
+//            BroadcastManager.getInstance(mContext).sendBroadcast(UPDATE_RED_DOT);
 //            }
         } else if (messageContent instanceof GroupNotificationMessage) {
             GroupNotificationMessage groupNotificationMessage = (GroupNotificationMessage) messageContent;
@@ -282,13 +295,11 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener, 
 
     @Override
     public UserInfo getUserInfo(String s) {
-        NLog.e("Rongcloudevent : getUserInfo:" + s);
         return UserInfoEngine.getInstance(mContext).startEngine(s);
     }
 
     @Override
     public Group getGroupInfo(String s) {
-        NLog.e("Rongcloudevent : getGroupInfo:" + s);
         return GroupInfoEngine.getInstance(mContext).startEngine(s);
     }
 

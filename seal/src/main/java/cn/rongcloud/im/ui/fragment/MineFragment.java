@@ -89,7 +89,7 @@ public class MineFragment extends Fragment implements View.OnClickListener {
         AsyncTaskManager.getInstance(getActivity()).request(COMPAREVERSION, new OnDataListener() {
             @Override
             public Object doInBackground(int requsetCode, String parameter) throws HttpException {
-                return new SealAction(getActivity()).getSealTalkVersion(SealConst.GETVERSION);
+                return new SealAction(getActivity()).getSealTalkVersion();
             }
 
             @Override

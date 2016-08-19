@@ -61,6 +61,7 @@ public class FriendDetailActivity extends BaseActivity implements View.OnClickLi
         if (!TextUtils.isEmpty(fromConversationId)) {
             isFromConversation = true;
             LoadDialog.show(mContext);
+            //TODO 后续需要将网络获取 更改为 去数据库获取 再 设置备注
             request(GETUSERINFO);
         } else {
             //好友界面进入详情界面

@@ -232,6 +232,14 @@ public class ConversationActivity extends BaseActivity implements RongIMClient.R
 
         SealAppContext.getInstance().pushActivity(mConversationType, mTargetId, this);
 
+        RongIM.getInstance().setGroupMembersProvider(new RongIM.IGroupMembersProvider() {
+            @Override
+            public void getGroupMembers(String groupId, RongIM.IGroupMemberCallback callback) {
+                request(GETGROUPMEMBER);
+                mMentionMemberCallback = callback;
+            }
+        });
+
         //CallKit start 2
         RongCallKit.setGroupMemberProvider(new RongCallKit.GroupMembersProvider() {
             @Override
@@ -243,14 +251,6 @@ public class ConversationActivity extends BaseActivity implements RongIMClient.R
                     }
                 });
                 return null;
-            }
-        });
-
-        RongIM.getInstance().setGroupMembersProvider(new RongIM.IGroupMembersProvider() {
-            @Override
-            public void getGroupMembers(String groupId, RongIM.IGroupMemberCallback callback) {
-                request(GETGROUPMEMBER);
-                mMentionMemberCallback = callback;
             }
         });
         //CallKit end 2
@@ -332,8 +332,22 @@ public class ConversationActivity extends BaseActivity implements RongIMClient.R
                 if (mDialog != null && !mDialog.isShowing()) {
                     mDialog.show();
                 }
+                if (intent.getData().getPath().toString().contains("conversation/system")) {
+                    Intent intent1 = new Intent(mContext, MainActivity.class);
+                    intent1.putExtra("systemconversation", true);
+                    startActivity(intent1);
+                    finish();
+                    return;
+                }
                 enterActivity();
             } else {
+                if (intent.getData().getPath().toString().contains("conversation/system")) {
+                    Intent intent1 = new Intent(mContext, MainActivity.class);
+                    intent1.putExtra("systemconversation", true);
+                    startActivity(intent1);
+                    finish();
+                    return;
+                }
                 enterFragment(mConversationType, mTargetId);
             }
 
@@ -618,7 +632,7 @@ public class ConversationActivity extends BaseActivity implements RongIMClient.R
                     return true;
 
                 enterSettingActivity();
-                break;
+                return true;
             case android.R.id.home:
                 if (!closeRealTimeLocation()) {
                     hintKbTwo();
@@ -630,7 +644,7 @@ public class ConversationActivity extends BaseActivity implements RongIMClient.R
                     }
                     finish();
                 }
-                break;
+                return true;
         }
 
         return super.onOptionsItemSelected(item);

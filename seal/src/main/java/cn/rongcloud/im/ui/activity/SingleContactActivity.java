@@ -2,6 +2,7 @@ package cn.rongcloud.im.ui.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -36,6 +37,8 @@ public class SingleContactActivity extends BaseActivity implements View.OnClickL
 
     private TextView mContactName;
 
+    private TextView mDisplayName;
+
     private ImageView mContactHeader;
 
     private ImageView mMore;
@@ -48,12 +51,22 @@ public class SingleContactActivity extends BaseActivity implements View.OnClickL
         setContentView(R.layout.activity_single_contact);
         getSupportActionBar().hide();
         mContactName = (TextView) findViewById(R.id.contact_name);
+        mDisplayName = (TextView) findViewById(R.id.contact_dispalyname);
         mContactHeader = (ImageView) findViewById(R.id.contact_header);
         mMore = (ImageView) findViewById(R.id.contact_more);
         mMore.setOnClickListener(this);
         friend = (Friend) getIntent().getSerializableExtra("FriendDetails");
         if (friend != null) {
-            mContactName.setText(friend.getName());
+            if (friend.isExitsDisplayName()) {
+                mDisplayName.setVisibility(View.VISIBLE);
+                mDisplayName.setText(friend.getDisplayName());
+                mContactName.setText(getString(R.string.nickname_show) + friend.getName());
+                mContactName.setTextSize(14);
+            } else {
+                mContactName.setTextSize(16);
+                mContactName.setTextColor(Color.parseColor("#000000"));
+                mContactName.setText(friend.getName());
+            }
             ImageLoader.getInstance().displayImage(TextUtils.isEmpty(friend.getPortraitUri()) ? RongGenerate.generateDefaultAvatar(friend.getName(), friend.getUserId()) : friend.getPortraitUri(), mContactHeader, App.getOptions());
         }
     }
@@ -112,9 +125,37 @@ public class SingleContactActivity extends BaseActivity implements View.OnClickL
         this.finish();
     }
 
+    public void setDisplayName(View view) {
+        Intent intent = new Intent(mContext, NoteInformationActivity.class);
+        intent.putExtra("friend", friend);
+        startActivityForResult(intent, 99);
+    }
+
     @Override
     public void onClick(View v) {
-//        SinglePopWindow morePopWindow = new SinglePopWindow(SingleContactActivity.this, friend);
-//        morePopWindow.showPopupWindow(mMore);
+        RongIM.getInstance().getBlacklistStatus(friend.getUserId(), new RongIMClient.ResultCallback<RongIMClient.BlacklistStatus>() {
+            @Override
+            public void onSuccess(RongIMClient.BlacklistStatus blacklistStatus) {
+                SinglePopWindow morePopWindow = new SinglePopWindow(SingleContactActivity.this, friend, blacklistStatus);
+                morePopWindow.showPopupWindow(mMore);
+            }
+
+            @Override
+            public void onError(RongIMClient.ErrorCode e) {
+
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == 155 && data != null) {
+            String displayName = data.getStringExtra("displayName");
+            mContactName.setTextSize(14);
+            mContactName.setTextColor(Color.parseColor("#999999"));
+            mContactName.setText(getString(R.string.nickname_show) + friend.getName());
+            mDisplayName.setText(displayName);
+            mDisplayName.setVisibility(View.VISIBLE);
+        }
     }
 }

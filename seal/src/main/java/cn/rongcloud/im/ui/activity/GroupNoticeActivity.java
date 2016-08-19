@@ -15,6 +15,7 @@ import cn.rongcloud.im.server.widget.DialogWithYesOrNoUtils;
 import io.rong.imkit.RongContext;
 import io.rong.imkit.RongIM;
 import io.rong.imkit.utils.AndroidEmoji;
+import io.rong.imlib.IRongCallback;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.MentionedInfo;
@@ -79,17 +80,22 @@ public class GroupNoticeActivity extends Activity implements View.OnClickListene
                         MentionedInfo mentionedInfo = new MentionedInfo(MentionedInfo.MentionedType.ALL, null, null);
                         textMessage.setMentionedInfo(mentionedInfo);
 
-                        RongIM.getInstance().sendMessage(Message.obtain(mTargetId, mConversationType, textMessage), null, null, new RongIMClient.SendMessageCallback() {
+                        RongIM.getInstance().sendMessage(Message.obtain(mTargetId, mConversationType, textMessage), null, null, new IRongCallback.ISendMessageCallback() {
                             @Override
-                            public void onError(Integer messageId, RongIMClient.ErrorCode e) {
+                            public void onAttached(Message message) {
 
                             }
 
                             @Override
-                            public void onSuccess(Integer integer) {
+                            public void onSuccess(Message message) {
 
                             }
-                        }, null);
+
+                            @Override
+                            public void onError(Message message, RongIMClient.ErrorCode errorCode) {
+
+                            }
+                        });
 
                         finish();
                     }
