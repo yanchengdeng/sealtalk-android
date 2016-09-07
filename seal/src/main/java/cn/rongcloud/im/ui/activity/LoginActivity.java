@@ -26,7 +26,6 @@ import cn.rongcloud.im.server.response.GetGroupResponse;
 import cn.rongcloud.im.server.response.GetTokenResponse;
 import cn.rongcloud.im.server.response.GetUserInfoByIdResponse;
 import cn.rongcloud.im.server.response.LoginResponse;
-import cn.rongcloud.im.server.response.SyncTotalDataResponse;
 import cn.rongcloud.im.server.response.UserRelationshipResponse;
 import cn.rongcloud.im.server.utils.AMUtils;
 import cn.rongcloud.im.server.utils.CommonUtils;
@@ -50,7 +49,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     private static final int SYNC_GROUP = 17;
     private static final int AUTO_LOGIN = 19;
     private static final int SYNC_FRIEND = 14;
-    private static final int SYNC_TOTAL_DATA = 20;
 
 
     private ImageView mImg_Background;
@@ -222,8 +220,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 return action.getGroups();
             case SYNC_FRIEND:
                 return action.getAllUserRelationship();
-            case SYNC_TOTAL_DATA:
-                return action.syncTotalData("0");
         }
         return null;
     }
@@ -332,7 +328,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                         if (groupList.size() > 0) {
                             for (GetGroupResponse.ResultEntity g : groupList) {
                                 DBManager.getInstance(mContext).getDaoSession().getGroupsDao().insertOrReplace(
-                                    new Groups(g.getGroup().getId(), g.getGroup().getName(), g.getGroup().getPortraitUri(), String.valueOf(g.getRole()))
+                                        new Groups(g.getGroup().getId(), g.getGroup().getName(), g.getGroup().getPortraitUri(), String.valueOf(g.getRole()))
                                 );
                             }
                         }
@@ -347,18 +343,21 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                             for (UserRelationshipResponse.ResultEntity friend : list) {
                                 if (friend.getStatus() == 20) {
                                     DBManager.getInstance(mContext).getDaoSession().getFriendDao().insertOrReplace(new Friend(
-                                                friend.getUser().getId(),
-                                                friend.getUser().getNickname(),
-                                                friend.getUser().getPortraitUri(),
-                                                friend.getDisplayName(),
-                                                null,
-                                                null
-                                            ));
+                                            friend.getUser().getId(),
+                                            friend.getUser().getNickname(),
+                                            friend.getUser().getPortraitUri(),
+                                            friend.getDisplayName(),
+                                            null,
+                                            null
+                                    ));
                                 }
                             }
 
                         }
-                        request(SYNC_TOTAL_DATA);
+                        LoadDialog.dismiss(mContext);
+                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                        NToast.shortToast(mContext, R.string.login_success);
+                        finish();
                     }
                     break;
                 case GET_TOKEN:
@@ -390,26 +389,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                         }
                     }
 
-                    break;
-                case SYNC_TOTAL_DATA:
-                    SyncTotalDataResponse syncTotalDataResponse = (SyncTotalDataResponse) result;
-                    if (syncTotalDataResponse.getCode() == 200) {
-                        List<SyncTotalDataResponse.ResultEntity.GroupMembersEntity> groupMembersEntityList = syncTotalDataResponse.getResult().getGroup_members();
-                        if (groupMembersEntityList.size() > 0) {
-
-                        }
-                        List<SyncTotalDataResponse.ResultEntity.FriendsEntity> friendsEntityList = syncTotalDataResponse.getResult().getFriends();
-                        if (friendsEntityList.size() > 0) {
-
-                        }
-                        List<SyncTotalDataResponse.ResultEntity.GroupsEntity> groupsEntityList = syncTotalDataResponse.getResult().getGroups();
-                        if (groupsEntityList.size() > 0) {
-                        }
-                        LoadDialog.dismiss(mContext);
-                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                        NToast.shortToast(mContext, R.string.login_success);
-                        finish();
-                    }
                     break;
             }
         }
