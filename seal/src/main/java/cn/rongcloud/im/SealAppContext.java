@@ -9,9 +9,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Stack;
+import java.util.ArrayList;
 
 import cn.rongcloud.im.db.DBManager;
 import cn.rongcloud.im.db.Friend;
@@ -64,12 +62,12 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener, 
 
     private RongIM.LocationProvider.LocationCallback mLastLocationCallback;
 
-    private Stack<Map<String, Activity>> mActivityStack;
+    private static ArrayList<Activity> mActivities;
 
     public SealAppContext(Context mContext) {
         this.mContext = mContext;
         initListener();
-        mActivityStack = new Stack<>();
+        mActivities = new ArrayList<>();
     }
 
     /**
@@ -89,39 +87,6 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener, 
             }
         }
 
-    }
-
-    public boolean pushActivity(Conversation.ConversationType conversationType, String targetId, Activity activity) {
-        if (conversationType == null || targetId == null || activity == null)
-            return false;
-
-        String key = conversationType.getName() + targetId;
-        Map<String, Activity> map = new HashMap<>();
-        map.put(key, activity);
-        mActivityStack.push(map);
-        return true;
-    }
-
-    public boolean popActivity(Conversation.ConversationType conversationType, String targetId) {
-        if (conversationType == null || targetId == null)
-            return false;
-
-        String key = conversationType.getName() + targetId;
-        Map<String, Activity> map = mActivityStack.peek();
-        if (map.containsKey(key)) {
-            mActivityStack.pop();
-            return true;
-        }
-        return false;
-    }
-
-    public boolean containsInQue(Conversation.ConversationType conversationType, String targetId) {
-        if (conversationType == null || targetId == null)
-            return false;
-
-        String key = conversationType.getName() + targetId;
-        Map<String, Activity> map = mActivityStack.peek();
-        return map.containsKey(key);
     }
 
     /**
@@ -162,7 +127,7 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener, 
         RongIM.setOnReceiveMessageListener(this);
         RongIM.setConnectionStatusListener(this);
 
-        InputProvider.ExtendProvider[] singleProvider =  {
+        InputProvider.ExtendProvider[] singleProvider = {
             new ImageInputProvider(RongContext.getInstance()),
             new RealTimeLocationInputProvider(RongContext.getInstance()), //带位置共享的地理位置
             new FileInputProvider(RongContext.getInstance())//文件消息
@@ -330,6 +295,9 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener, 
 
     @Override
     public boolean onUserPortraitClick(Context context, Conversation.ConversationType conversationType, UserInfo userInfo) {
+        if (conversationType == Conversation.ConversationType.CUSTOMER_SERVICE || conversationType == Conversation.ConversationType.PUBLIC_SERVICE || conversationType == Conversation.ConversationType.APP_PUBLIC_SERVICE) {
+            return false;
+        }
         if (userInfo != null) {
             Intent intent = new Intent(context, PersonalProfileActivity.class);
             intent.putExtra("conversationType", conversationType.getValue());
@@ -446,5 +414,29 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener, 
 
     public void setLastLocationCallback(RongIM.LocationProvider.LocationCallback lastLocationCallback) {
         this.mLastLocationCallback = lastLocationCallback;
+    }
+
+    public void pushActivity(Activity activity) {
+        mActivities.add(activity);
+    }
+
+    public void popActivity(Activity activity) {
+        if (mActivities.contains(activity)) {
+            activity.finish();
+            mActivities.remove(activity);
+        }
+    }
+
+    public void popAllActivity() {
+        try {
+            for (Activity activity : mActivities) {
+                if (activity != null) {
+                    activity.finish();
+                }
+            }
+            mActivities.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

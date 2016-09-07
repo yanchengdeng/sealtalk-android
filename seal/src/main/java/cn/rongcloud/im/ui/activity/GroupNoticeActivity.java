@@ -22,9 +22,9 @@ import io.rong.imlib.model.MentionedInfo;
 import io.rong.imlib.model.Message;
 import io.rong.message.TextMessage;
 
-
+@SuppressWarnings("deprecation")
 public class GroupNoticeActivity extends Activity implements View.OnClickListener, TextWatcher {
-    TextView mCancleButton;
+    TextView mCancelButton;
     TextView mDoneButton;
     EditText mEdit;
     Conversation.ConversationType mConversationType;
@@ -35,19 +35,15 @@ public class GroupNoticeActivity extends Activity implements View.OnClickListene
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_group_notice);
-        mCancleButton = (TextView) findViewById(R.id.cancel);
+        mCancelButton = (TextView) findViewById(R.id.cancel);
         mDoneButton = (TextView) findViewById(R.id.done);
         mEdit = (EditText) findViewById(R.id.edit_area);
-
         Intent intent = getIntent();
         mConversationType = Conversation.ConversationType.setValue(intent.getIntExtra("conversationType", 0));
         mTargetId = getIntent().getStringExtra("targetId");
-
-        mCancleButton.setOnClickListener(this);
-
+        mCancelButton.setOnClickListener(this);
         mDoneButton.setOnClickListener(this);
         mDoneButton.setClickable(false);
-
         mEdit.addTextChangedListener(this);
     }
 
@@ -57,12 +53,12 @@ public class GroupNoticeActivity extends Activity implements View.OnClickListene
             case R.id.cancel:
                 DialogWithYesOrNoUtils.getInstance().showDialog(this, getString(R.string.group_notice_exist_confirm), new DialogWithYesOrNoUtils.DialogCallBack() {
                     @Override
-                    public void exectEvent() {
+                    public void executeEvent() {
                         finish();
                     }
 
                     @Override
-                    public void exectEditEvent(String editText) {
+                    public void executeEditEvent(String editText) {
 
                     }
 
@@ -75,7 +71,7 @@ public class GroupNoticeActivity extends Activity implements View.OnClickListene
             case R.id.done:
                 DialogWithYesOrNoUtils.getInstance().showDialog(this, getString(R.string.group_notice_post_confirm), new DialogWithYesOrNoUtils.DialogCallBack() {
                     @Override
-                    public void exectEvent() {
+                    public void executeEvent() {
                         TextMessage textMessage = TextMessage.obtain(RongContext.getInstance().getString(R.string.group_notice_prefix) + mEdit.getText().toString());
                         MentionedInfo mentionedInfo = new MentionedInfo(MentionedInfo.MentionedType.ALL, null, null);
                         textMessage.setMentionedInfo(mentionedInfo);
@@ -101,7 +97,7 @@ public class GroupNoticeActivity extends Activity implements View.OnClickListene
                     }
 
                     @Override
-                    public void exectEditEvent(String editText) {
+                    public void executeEditEvent(String editText) {
 
                     }
 

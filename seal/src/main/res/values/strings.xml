@@ -52,7 +52,7 @@
 
 
 
-    <!-- friend list -->
+    <!-- friendInfo list -->
     <string name="de_item_delete_friend">"删除"</string>
 
 
@@ -169,7 +169,7 @@
     <string name="invitation">邀请</string>
     <string name="remove_group_before_str">将</string>
     <string name="remove_group_after_str">移出了群组</string>
-    <string name="my_groups">我的群组</string>
+    <string name="my_groups">群组</string>
     <string name="code_is_null">验证码为空</string>
     <string name="name_is_null">昵称不能为空</string>
     <string name="name_contain_spaces">昵称不能包含空格</string>
@@ -230,7 +230,7 @@
     <string name="all_group_member">全部群成员</string>
     <string name="group_announcement">群公告</string>
     <string name="group_code">群二维码</string>
-    <string name="total_member">全部群成员</string>
+    <string name="total_member">群成员</string>
     <string name="select_contact">选择联系人</string>
     <string name="current_password">原密码</string>
     <string name="password_hint">6-16个字符,区分大小写</string>

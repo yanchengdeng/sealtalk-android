@@ -22,7 +22,6 @@ import io.rong.push.RongPushClient;
 import io.rong.push.common.RongException;
 
 
-
 public class App extends Application {
 
     private static DisplayImageOptions options;
@@ -32,7 +31,7 @@ public class App extends Application {
 
         super.onCreate();
 
-
+//        LeakCanary.install(this);//内存泄露检测
         RongPushClient.registerHWPush(this);
         RongPushClient.registerMiPush(this, "2882303761517473625", "5451747338625");
         try {
@@ -51,7 +50,6 @@ public class App extends Application {
          */
         //RongIM.setServerInfo("nav.cn.ronghub.com", "img.cn.ronghub.com");
         RongIM.init(this);
-        NLog.setDebug(true);//Seal Module Log 开关
         SealAppContext.init(this);
         SharedPreferencesContext.init(this);
         Thread.setDefaultUncaughtExceptionHandler(new RongExceptionHandler(this));

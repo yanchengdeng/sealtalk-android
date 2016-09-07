@@ -23,8 +23,6 @@ import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,25 +49,16 @@ import io.rong.message.TextMessage;
  * Created by AMing on 16/7/12.
  * Company RongCloud
  */
+@SuppressWarnings("deprecation")
 public class SharedReceiverActivity extends BaseActivity {
 
-    private static final int GROUPALL = 911;  // 网络请求数据后期可换成数据库拿数据
-    private static final int FRIENDALL = 912;// 网络请求数据后期可换成数据库拿数据
-
+    private static final int GROUP_ALL = 911;  // 网络请求数据后期可换成数据库拿数据
+    private static final int FRIEND_ALL = 912;// 网络请求数据后期可换成数据库拿数据
     private List<Conversation> conversationsList;
-
-    private List<GetGroupResponse.ResultEntity> mGroupDatas;
-
-    private List<UserRelationshipResponse.ResultEntity> mFriendDatas;
-
+    private List<GetGroupResponse.ResultEntity> mGroupData;
+    private List<UserRelationshipResponse.ResultEntity> mFriendData;
     private List<NewConversation> newConversationsList = new ArrayList<>();
-
     private ListView shareListView;
-
-    private BaseAdapter ShareAdapter;
-
-    private TextCrawler textCrawler;
-
     private String mTitle;
 
 
@@ -111,7 +100,7 @@ public class SharedReceiverActivity extends BaseActivity {
             String linkInfo = getIntent().getClipData().toString();
             String titleInfo = linkInfo.substring(linkInfo.indexOf("T:"), linkInfo.indexOf("http://")).trim();
             mTitle = titleInfo.substring(3, titleInfo.length());
-            textCrawler = new TextCrawler();
+            TextCrawler textCrawler = new TextCrawler();
 
             /** --- From ShareVia Intent */
             if (getIntent().getExtras() != null) {
@@ -201,7 +190,7 @@ public class SharedReceiverActivity extends BaseActivity {
                                 });
                             }
                             NLog.e("share", "分享:" + titleString + "\n" + finalUri + "\n" + "来自:" + fromString);
-                            RichContentMessage richContentMessage = null;
+                            RichContentMessage richContentMessage;
                             if (TextUtils.isEmpty(mTitle)) {
                                 richContentMessage = RichContentMessage.obtain(titleString, TextUtils.isEmpty(description) ? finalUri : description, imageString, finalUri);
                             } else {
@@ -307,7 +296,7 @@ public class SharedReceiverActivity extends BaseActivity {
                 @Override
                 public void onSuccess(List<Conversation> conversations) {
                     conversationsList = conversations;
-                    request(GROUPALL);
+                    request(GROUP_ALL);
 
                 }
 
@@ -322,11 +311,11 @@ public class SharedReceiverActivity extends BaseActivity {
 
 
     @Override
-    public Object doInBackground(int requsetCode, String id) throws HttpException {
-        switch (requsetCode) {
-            case GROUPALL:
+    public Object doInBackground(int requestCode, String id) throws HttpException {
+        switch (requestCode) {
+            case GROUP_ALL:
                 return action.getGroups();
-            case FRIENDALL:
+            case FRIEND_ALL:
                 return action.getAllUserRelationship();
         }
         return null;
@@ -336,25 +325,25 @@ public class SharedReceiverActivity extends BaseActivity {
     @Override
     public void onSuccess(int requestCode, Object result) {
         switch (requestCode) {
-            case GROUPALL:
+            case GROUP_ALL:
                 GetGroupResponse response = (GetGroupResponse) result;
                 if (response.getCode() == 200) {
-                    mGroupDatas = response.getResult();
-                    if (mGroupDatas != null) {
-                        request(FRIENDALL);
+                    mGroupData = response.getResult();
+                    if (mGroupData != null) {
+                        request(FRIEND_ALL);
                     }
                 }
                 break;
-            case FRIENDALL:
+            case FRIEND_ALL:
                 UserRelationshipResponse urRes = (UserRelationshipResponse) result;
                 if (urRes.getCode() == 200) {
-                    mFriendDatas = urRes.getResult();
+                    mFriendData = urRes.getResult();
 
                     /** Start 双重循环过滤已经被解散或者退出的群组数据  **/
                     List<Conversation> tempList = new ArrayList<>();
                     for (Conversation c : conversationsList) {
                         if (c.getConversationType().equals(Conversation.ConversationType.GROUP)) {
-                            for (GetGroupResponse.ResultEntity gr : mGroupDatas) {
+                            for (GetGroupResponse.ResultEntity gr : mGroupData) {
                                 if (gr.getGroup().getId().equals(c.getTargetId())) {
                                     tempList.add(c);
                                 }
@@ -374,8 +363,8 @@ public class SharedReceiverActivity extends BaseActivity {
                             }
                         }
                         if (newConversationsList != null && newConversationsList.size() > 0) {
-                            ShareAdapter = new ShareAdapter(newConversationsList, mContext);
-                            shareListView.setAdapter(ShareAdapter);
+                            ShareAdapter shareAdapter = new ShareAdapter(newConversationsList, mContext);
+                            shareListView.setAdapter(shareAdapter);
                             LoadDialog.dismiss(mContext);
                         }
                     }
@@ -400,10 +389,6 @@ public class SharedReceiverActivity extends BaseActivity {
 
         public Conversation.ConversationType getmConversationType() {
             return mConversationType;
-        }
-
-        public void setmConversationType(Conversation.ConversationType mConversationType) {
-            this.mConversationType = mConversationType;
         }
 
         public String getTargetId() {
@@ -433,8 +418,8 @@ public class SharedReceiverActivity extends BaseActivity {
 
 
     private UserRelationshipResponse.ResultEntity getUserInfoById(String userId) {
-        if (mFriendDatas != null) {
-            for (UserRelationshipResponse.ResultEntity ur : mFriendDatas) {
+        if (mFriendData != null) {
+            for (UserRelationshipResponse.ResultEntity ur : mFriendData) {
                 if (ur.getUser().getId().equals(userId)) {
                     return ur;
                 }
@@ -444,8 +429,8 @@ public class SharedReceiverActivity extends BaseActivity {
     }
 
     private GetGroupResponse.ResultEntity getGroupInfoById(String groupId) {
-        if (mGroupDatas != null) {
-            for (GetGroupResponse.ResultEntity gr : mGroupDatas) {
+        if (mGroupData != null) {
+            for (GetGroupResponse.ResultEntity gr : mGroupData) {
                 if (gr.getGroup().getId().equals(groupId)) {
                     return gr;
                 }

@@ -16,10 +16,9 @@ import cn.rongcloud.im.server.SealAction;
 import cn.rongcloud.im.server.network.async.AsyncTaskManager;
 import cn.rongcloud.im.server.network.async.OnDataListener;
 import cn.rongcloud.im.server.network.http.HttpException;
-import cn.rongcloud.im.server.pinyin.Friend;
+import cn.rongcloud.im.server.pinyin.FriendInfo;
 import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.server.widget.DialogWithYesOrNoUtils;
-import cn.rongcloud.im.server.widget.LoadDialog;
 import io.rong.imkit.RongIM;
 import io.rong.imlib.RongIMClient;
 
@@ -35,7 +34,7 @@ public class SinglePopWindow extends PopupWindow {
 
 
     @SuppressLint("InflateParams")
-    public SinglePopWindow(final Activity context, final Friend friend, final RongIMClient.BlacklistStatus blacklistStatus) {
+    public SinglePopWindow(final Activity context, final FriendInfo friendInfo, final RongIMClient.BlacklistStatus blacklistStatus) {
         LayoutInflater inflater = (LayoutInflater) context
                                   .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         conentView = inflater.inflate(R.layout.popupwindow_more, null);
@@ -73,13 +72,13 @@ public class SinglePopWindow extends PopupWindow {
             @Override
             public void onClick(View v) {
                 if (blacklistStatus == RongIMClient.BlacklistStatus.IN_BLACK_LIST) {
-                    RongIM.getInstance().removeFromBlacklist(friend.getUserId(), new RongIMClient.OperationCallback() {
+                    RongIM.getInstance().removeFromBlacklist(friendInfo.getUserId(), new RongIMClient.OperationCallback() {
                         @Override
                         public void onSuccess() {
                             asyncTaskManager.request(ADDBLACKLIST, new OnDataListener() {
                                 @Override
-                                public Object doInBackground(int requsetCode, String parameter) throws HttpException {
-                                    return new SealAction(context).removeFromBlackList(friend.getUserId());
+                                public Object doInBackground(int requestCode, String parameter) throws HttpException {
+                                    return new SealAction(context).removeFromBlackList(friendInfo.getUserId());
                                 }
 
                                 @Override
@@ -102,15 +101,15 @@ public class SinglePopWindow extends PopupWindow {
                 } else {
                     DialogWithYesOrNoUtils.getInstance().showDialog(context, "加入黑名单,你将不再受到对方的消息。", new DialogWithYesOrNoUtils.DialogCallBack() {
                         @Override
-                        public void exectEvent() {
-                            RongIM.getInstance().addToBlacklist(friend.getUserId(), new RongIMClient.OperationCallback() {
+                        public void executeEvent() {
+                            RongIM.getInstance().addToBlacklist(friendInfo.getUserId(), new RongIMClient.OperationCallback() {
                                 @Override
                                 public void onSuccess() {
 
                                     asyncTaskManager.request(REMOVEBLACKLIST, new OnDataListener() {
                                         @Override
-                                        public Object doInBackground(int requsetCode, String parameter) throws HttpException {
-                                            return new SealAction(context).addToBlackList(friend.getUserId());
+                                        public Object doInBackground(int requestCode, String parameter) throws HttpException {
+                                            return new SealAction(context).addToBlackList(friendInfo.getUserId());
                                         }
 
                                         @Override
@@ -133,7 +132,7 @@ public class SinglePopWindow extends PopupWindow {
                         }
 
                         @Override
-                        public void exectEditEvent(String editText) {
+                        public void executeEditEvent(String editText) {
 
                         }
 

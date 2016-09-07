@@ -1,7 +1,6 @@
 package cn.rongcloud.im.ui.activity;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -20,45 +19,32 @@ import cn.rongcloud.im.server.widget.LoadDialog;
  */
 public class UpdatePasswordActivity extends BaseActivity implements View.OnClickListener {
 
-    private static final int UPDATEPASSWORD = 15;
+    private static final int UPDATE_PASSWORD = 15;
 
-    private EditText oldPasswordEdit, newPasswrodEdit, newPassword2Edit;
-
-    private Button confirm;
-
+    private EditText oldPasswordEdit, newPasswordEdit, newPassword2Edit;
     private String mOldPassword, mNewPassword;
-
-
-    private SharedPreferences sp;
-
-    private SharedPreferences.Editor editor;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_update_pswd);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.de_actionbar_back);
-        getSupportActionBar().setTitle(R.string.change_password);
-        sp = getSharedPreferences("config", MODE_PRIVATE);
-        editor = sp.edit();
-
+        setTitle(R.string.change_password);
         initViews();
     }
 
     private void initViews() {
         oldPasswordEdit = (EditText) findViewById(R.id.old_password);
-        newPasswrodEdit = (EditText) findViewById(R.id.new_password);
+        newPasswordEdit = (EditText) findViewById(R.id.new_password);
         newPassword2Edit = (EditText) findViewById(R.id.new_password2);
-        confirm = (Button) findViewById(R.id.update_pswd_confirm);
+        Button confirm = (Button) findViewById(R.id.update_pswd_confirm);
         confirm.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
         String old = oldPasswordEdit.getText().toString().trim();
-        String new1 = newPasswrodEdit.getText().toString().trim();
+        String new1 = newPasswordEdit.getText().toString().trim();
         String new2 = newPassword2Edit.getText().toString().trim();
         String cachePassword = getSharedPreferences("config", Context.MODE_PRIVATE).getString("loginpassword", "");
         if (TextUtils.isEmpty(old)) {
@@ -91,13 +77,13 @@ public class UpdatePasswordActivity extends BaseActivity implements View.OnClick
         mOldPassword = old;
         mNewPassword = new1;
         LoadDialog.show(mContext);
-        request(UPDATEPASSWORD, true);
+        request(UPDATE_PASSWORD, true);
 
     }
 
 
     @Override
-    public Object doInBackground(int requsetCode, String id) throws HttpException {
+    public Object doInBackground(int requestCode, String id) throws HttpException {
         return action.changePassword(mOldPassword, mNewPassword);
     }
 

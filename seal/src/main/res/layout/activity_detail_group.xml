@@ -84,6 +84,7 @@
                     android:layout_marginTop="10dp"
                     android:layout_weight="1"
                     android:text="@string/group_portrait"
+                    android:textColor="@color/text_color"
                     android:textSize="16dp" />
 
                 <cn.rongcloud.im.server.widget.SelectableRoundedImageView
@@ -132,6 +133,7 @@
                     android:ellipsize="end"
                     android:singleLine="true"
                     android:text="@string/group_name"
+                    android:textColor="@color/text_color"
                     android:textSize="16dp" />
 
                 <TextView
@@ -155,10 +157,10 @@
 
 
             <LinearLayout
-                android:visibility="gone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="#fff">
+                android:background="#fff"
+                android:visibility="gone">
 
                 <View
                     android:layout_width="match_parent"
@@ -186,6 +188,7 @@
                     android:layout_marginTop="10dp"
                     android:layout_weight="1"
                     android:text="@string/group_announcement"
+                    android:textColor="@color/text_color"
                     android:textSize="16dp" />
 
 
@@ -245,6 +248,7 @@
                     android:layout_marginTop="10dp"
                     android:layout_weight="1"
                     android:text="@string/messsage_notice"
+                    android:textColor="@color/text_color"
                     android:textSize="16dp" />
 
                 <cn.rongcloud.im.ui.widget.switchbutton.SwitchButton
@@ -292,6 +296,7 @@
                     android:layout_marginTop="10dp"
                     android:layout_weight="1"
                     android:text="@string/set_top"
+                    android:textColor="@color/text_color"
                     android:textSize="16dp" />
 
                 <cn.rongcloud.im.ui.widget.switchbutton.SwitchButton
@@ -341,6 +346,7 @@
                     android:layout_marginTop="10dp"
                     android:layout_weight="1"
                     android:text="@string/clean_message"
+                    android:textColor="@color/text_color"
                     android:textSize="16dp" />
 
 

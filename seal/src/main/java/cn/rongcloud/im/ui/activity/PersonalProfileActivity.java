@@ -6,7 +6,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -18,6 +17,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 
 import cn.rongcloud.im.App;
 import cn.rongcloud.im.R;
+import cn.rongcloud.im.SealAppContext;
 import cn.rongcloud.im.db.DBManager;
 import cn.rongcloud.im.db.FriendDao;
 import cn.rongcloud.im.server.network.http.HttpException;
@@ -42,45 +42,32 @@ import io.rong.imlib.model.UserInfo;
  */
 public class PersonalProfileActivity extends BaseActivity implements View.OnClickListener {
 
-    private static final int ADDFRIEND = 10086;
+    private static final int ADD_FRIEND = 10086;
     private ImageView mPersonalPortrait;
-
     private TextView mPersonalName;
-
     private Button mAddFriend;
-
     private UserInfo userInfo;
-
-    private String mySelf, addMessage;
-
-    private Conversation.ConversationType mConversationType;
-
+    private String addMessage;
     private GetGroupInfoResponse.ResultEntity mGroup;
-
     private LinearLayout mChatGroupBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_personal);
-        getSupportActionBar().setTitle(R.string.user_details);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.de_actionbar_back);
+        setTitle(R.string.user_details);
         initViews();
         userInfo = getIntent().getParcelableExtra("userinfo");
         mGroup = (GetGroupInfoResponse.ResultEntity) getIntent().getSerializableExtra("groupinfo");
-        int type = getIntent().getIntExtra("conversationType", 0);
-        mConversationType = Conversation.ConversationType.setValue(type);
         initData(userInfo);
-
-
+        SealAppContext.getInstance().pushActivity(this);
     }
 
     private void initData(UserInfo userInfo) {
         mPersonalName.setText(userInfo.getName());
         ImageLoader.getInstance().displayImage(userInfo.getPortraitUri().toString(), mPersonalPortrait, App.getOptions());
-        if (userInfo != null && !TextUtils.isEmpty(userInfo.getUserId())) {
-            mySelf = getSharedPreferences("config", MODE_PRIVATE).getString("loginid", "");
+        if (!TextUtils.isEmpty(userInfo.getUserId())) {
+            String mySelf = getSharedPreferences("config", MODE_PRIVATE).getString("loginid", "");
             if (mySelf.equals(userInfo.getUserId())) {
                 mChatGroupBtn.setVisibility(View.VISIBLE);
                 return;
@@ -97,7 +84,6 @@ public class PersonalProfileActivity extends BaseActivity implements View.OnClic
 
     public void startChat(View view) {
         RongIM.getInstance().startPrivateChat(mContext, userInfo.getUserId(), userInfo.getName());
-        finish();
     }
 
     //VoIP start 2
@@ -155,15 +141,11 @@ public class PersonalProfileActivity extends BaseActivity implements View.OnClic
     /**
      * 从本地缓存的数据库中查询是否存在好友关系
      *
-     * @param userid
-     * @return
+     * @param userId 用户 Id
+     * @return true or false
      */
-    private boolean getFriendShip(String userid) {
-        if (DBManager.getInstance(mContext).getDaoSession().getFriendDao().queryBuilder().where(FriendDao.Properties.UserId.eq(userid)).unique() != null) {
-            return true;
-        } else {
-            return false;
-        }
+    private boolean getFriendShip(String userId) {
+        return DBManager.getInstance(mContext).getDaoSession().getFriendDao().queryBuilder().where(FriendDao.Properties.UserId.eq(userId)).unique() != null;
     }
 
     @Override
@@ -179,12 +161,12 @@ public class PersonalProfileActivity extends BaseActivity implements View.OnClic
             case R.id.per_add_friend:
                 DialogWithYesOrNoUtils.getInstance().showEditDialog(mContext, getString(R.string.add_text), getString(R.string.confirm), new DialogWithYesOrNoUtils.DialogCallBack() {
                     @Override
-                    public void exectEvent() {
+                    public void executeEvent() {
 
                     }
 
                     @Override
-                    public void exectEditEvent(String editText) {
+                    public void executeEditEvent(String editText) {
                         if (TextUtils.isEmpty(editText)) {
                             if (mGroup != null && !TextUtils.isEmpty(mGroup.getName())) {
                                 addMessage = "我是" + mGroup.getName() + "群的" + getSharedPreferences("config", MODE_PRIVATE).getString("loginnickname", "");
@@ -195,7 +177,7 @@ public class PersonalProfileActivity extends BaseActivity implements View.OnClic
                             addMessage = editText;
                         }
                         LoadDialog.show(mContext);
-                        request(ADDFRIEND);
+                        request(ADD_FRIEND);
                     }
 
                     @Override
@@ -208,7 +190,7 @@ public class PersonalProfileActivity extends BaseActivity implements View.OnClic
     }
 
     @Override
-    public Object doInBackground(int requsetCode, String id) throws HttpException {
+    public Object doInBackground(int requestCode, String id) throws HttpException {
         return action.sendFriendInvitation(userInfo.getUserId(), addMessage);
     }
 
@@ -225,8 +207,14 @@ public class PersonalProfileActivity extends BaseActivity implements View.OnClic
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        finish();
-        return super.onOptionsItemSelected(item);
+    public void onBackPressed() {
+        SealAppContext.getInstance().popActivity(this);
+        super.onBackPressed();
+    }
+
+    @Override
+    public void onLeftClick(View v) {
+        SealAppContext.getInstance().popActivity(this);
+        super.onLeftClick(v);
     }
 }

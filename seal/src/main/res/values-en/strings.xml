@@ -56,7 +56,7 @@
     <string name="add_success">add success</string>
     <string name="not_group_members">Not a member of group cannot view group details</string>
     <string name="check_network">Please check the network</string>
-    <string name="agreed_friend">Has agreed to a friend request</string>
+    <string name="agreed_friend">Has agreed to a friendInfo request</string>
     <string name="agree">agree</string>
     <string name="request">request</string>
     <string name="ignore">ignore</string>
@@ -94,7 +94,7 @@
     <string name="create_group"> Create a Group</string>
     <string name="created_group">&#160;created group</string>
     <string name="you">You</string>
-    <string name="request_friends">request to add you as a friend</string>
+    <string name="request_friends">request to add you as a friendInfo</string>
     <string name="edit_phone">Enter the 11 phone number</string>
     <string name="original_password">The original password cannot be empty</string>
     <string name="new_password_not_null">The new password cannot be empty</string>
@@ -127,14 +127,14 @@
     <string name="invitation">&#160;invited&#160;</string>
     <string name="remove_group_before_str">&#160;removed&#160;</string>
     <string name="remove_group_after_str">&#160;from the group chat</string>
-    <string name="my_groups">My Groups</string>
+    <string name="my_groups">Groups</string>
     <string name="code_is_null">Verification code is empty</string>
     <string name="name_is_null">Nickname cannot be empty</string>
     <string name="name_contain_spaces">Pet name cannot contain Spaces</string>
     <string name="remove_group_members">Confirm to remove the following group members?</string>
     <string name="add_successful">add successful</string>
     <string name="remove_successful">remove successful</string>
-    <string name="least_one_friend">Select at least one friend</string>
+    <string name="least_one_friend">Select at least one friendInfo</string>
     <string name="not_send_code">Not to the server for verification code</string>
     <string name="get_code">get code</string>
     <string name="de_actionbar_set_public">Official Accounts</string>

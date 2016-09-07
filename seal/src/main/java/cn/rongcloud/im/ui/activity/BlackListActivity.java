@@ -21,40 +21,29 @@ import cn.rongcloud.im.server.response.GetBlackListResponse;
 import cn.rongcloud.im.server.utils.RongGenerate;
 import cn.rongcloud.im.server.widget.LoadDialog;
 
-/**
- * Created by Bob on 2015/4/9.
- */
-public class BlackListActivity extends BaseActionBarActivity {
+public class BlackListActivity extends BaseActivity {
 
-    private static final int GETBLACKLIST = 66;
-    private String TAG = BlackListActivity.class.getSimpleName();
-
+    private static final int GET_BLACK_LIST = 66;
     private TextView isShowData;
-
-    private ListView blackList;
-
-    private List<GetBlackListResponse.ResultEntity> dataList;
-
-    private MyBlackListAdapter adapter;
-
+    private ListView mBlackList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_black);
-        getSupportActionBar().setTitle(R.string.the_blacklist);
+        setTitle(R.string.the_blacklist);
         initView();
         requestData();
     }
 
     private void requestData() {
         LoadDialog.show(mContext);
-        request(GETBLACKLIST);
+        request(GET_BLACK_LIST);
     }
 
     private void initView() {
         isShowData = (TextView) findViewById(R.id.blacklsit_show_data);
-        blackList = (ListView) findViewById(R.id.blacklsit_list);
+        mBlackList = (ListView) findViewById(R.id.blacklsit_list);
     }
 
     @Override
@@ -68,11 +57,11 @@ public class BlackListActivity extends BaseActionBarActivity {
             GetBlackListResponse response = (GetBlackListResponse) result;
             if (response.getCode() == 200) {
                 LoadDialog.dismiss(mContext);
-                dataList = response.getResult();
+                List<GetBlackListResponse.ResultEntity> dataList = response.getResult();
                 if (dataList != null) {
                     if (dataList.size() > 0) {
-                        adapter = new MyBlackListAdapter(dataList);
-                        blackList.setAdapter(adapter);
+                        MyBlackListAdapter adapter = new MyBlackListAdapter(dataList);
+                        mBlackList.setAdapter(adapter);
                     } else {
                         isShowData.setVisibility(View.VISIBLE);
                     }
@@ -107,16 +96,16 @@ public class BlackListActivity extends BaseActionBarActivity {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            ViewHoler viewHolder = null;
+            ViewHolder viewHolder;
             GetBlackListResponse.ResultEntity bean = dataList.get(position);
             if (convertView == null) {
-                viewHolder = new ViewHoler();
+                viewHolder = new ViewHolder();
                 convertView = LayoutInflater.from(mContext).inflate(R.layout.black_item_new, null);
                 viewHolder.mName = (TextView) convertView.findViewById(R.id.blackname);
                 viewHolder.mHead = (ImageView) convertView.findViewById(R.id.blackuri);
                 convertView.setTag(viewHolder);
             } else {
-                viewHolder = (ViewHoler) convertView.getTag();
+                viewHolder = (ViewHolder) convertView.getTag();
             }
             viewHolder.mName.setText(bean.getUser().getNickname());
             ImageLoader.getInstance().displayImage(TextUtils.isEmpty(bean.getUser().getPortraitUri()) ? RongGenerate.generateDefaultAvatar(bean.getUser().getNickname(), bean.getUser().getId()) : bean.getUser().getPortraitUri(), viewHolder.mHead, App.getOptions());
@@ -124,7 +113,7 @@ public class BlackListActivity extends BaseActionBarActivity {
         }
 
 
-        class ViewHoler {
+        class ViewHolder {
             ImageView mHead;
             TextView mName;
         }
