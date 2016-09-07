@@ -17,9 +17,9 @@ Android App of SealTalk powered by RongCloud.
 - To be continued...
 
 ## ScreenShots
-![image](https://github.com/sealtalk/sealtalk-android/blob/master/screenshots/image1.png)<br/>
-![image](https://github.com/sealtalk/sealtalk-android/blob/master/screenshots/image2.png)<br/>
-![image](https://github.com/sealtalk/sealtalk-android/blob/master/screenshots/image3.png)<br/>
+![image](https://github.com/sealtalk/sealtalk-android/blob/master/screenshots/image1.jpg)<br/>
+![image](https://github.com/sealtalk/sealtalk-android/blob/master/screenshots/image2.jpg)<br/>
+![image](https://github.com/sealtalk/sealtalk-android/blob/master/screenshots/image3.jpg)<br/>
 
 ## UML
   LoginClassDiagram
