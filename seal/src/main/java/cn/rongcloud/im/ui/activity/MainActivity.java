@@ -432,8 +432,6 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
 
     @Override
     protected void onDestroy() {
-        BroadcastManager.getInstance(mContext).destroy(SealConst.EXIT);
-        BroadcastManager.getInstance(mContext).destroy(MineFragment.SHOW_RED);
         super.onDestroy();
     }
 
