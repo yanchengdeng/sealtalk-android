@@ -54,8 +54,11 @@
         android:layout_marginTop="-3dp"
         android:layout_toLeftOf="@id/rc_right"
         android:layout_toRightOf="@id/rc_left"
+        android:ellipsize="end"
         android:gravity="center_vertical"
-        android:visibility="gone" />
+        android:maxEms="14"
+        android:singleLine="true"
+        android:visibility="gone"/>
 
     <FrameLayout
         android:layout_width="match_parent"

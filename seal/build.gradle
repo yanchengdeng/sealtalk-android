@@ -9,7 +9,7 @@ android {
         minSdkVersion 11
         targetSdkVersion 23
         versionCode 2016081820
-        versionName "2.7.1 Dev"
+        versionName "2.7.2 Dev"
 
         multiDexEnabled true
     }
@@ -66,6 +66,6 @@ dependencies {
     //    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta2'
     //    testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta2'
     //    compile 'com.android.support:multidex:1.0.1'
-    compile project(':Rong_Cloud_Android_IMKit_SDK_v2_7_1_dev_with_CallKit')
+    compile project(':Rong_Cloud_Android_IMKit_SDK_v2_7_2_stable_with_CallKit')
 }
 apply plugin: 'com.google.gms.google-services'

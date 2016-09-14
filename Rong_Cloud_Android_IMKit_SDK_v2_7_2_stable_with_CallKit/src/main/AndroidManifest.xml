@@ -36,7 +36,27 @@
 
         <activity
             android:name="io.rong.imkit.tools.RongWebviewActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait">
+            <!-- WebView IntentFilter Start -->
+            <intent-filter>
+                <action android:name="io.rong.imkit.intent.action.webview" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter>
+                <data
+                    android:host="*"
+                    android:scheme="http" />
+                <data
+                    android:host="*"
+                    android:scheme="https" />
+
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+            <!-- WebView IntentFilter End -->
+        </activity>
 
         <activity
             android:name="io.rong.imkit.widget.provider.TakingPicturesActivity"
