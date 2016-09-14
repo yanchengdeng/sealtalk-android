@@ -24,6 +24,9 @@ Android 应用 SealTalk 由 融云 RongCloud 出品
 ![image](https://github.com/sealtalk/sealtalk-android/blob/master/screenshots/image2.jpg)<br/>
 ![image](https://github.com/sealtalk/sealtalk-android/blob/master/screenshots/image3.jpg)<br/>
 
+## APK
+[下载 Apk](http://rongcloud.cn/sealtalk)<br/>
+
 ## UML
  登录类图
  ![image](https://github.com/sealtalk/sealtalk-android/blob/master/screenshots/LoginClassDiagram.png)<br/>
