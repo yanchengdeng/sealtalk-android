@@ -180,9 +180,11 @@
             android:exported="true"
             android:process=":ipc" />
 
-        <service android:name="io.rong.imlib.ReConnectService" />
+        <service android:name="io.rong.imlib.ReConnectService"
+            android:exported="true"/>
 
-        <receiver android:name="io.rong.imlib.ConnectChangeReceiver" />
+        <receiver android:name="io.rong.imlib.ConnectChangeReceiver"
+            android:exported="true"/>
 
         <receiver
             android:name="io.rong.imlib.HeartbeatReceiver"
