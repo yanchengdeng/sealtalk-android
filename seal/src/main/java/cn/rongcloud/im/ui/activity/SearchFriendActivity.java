@@ -16,6 +16,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 
 import cn.rongcloud.im.App;
 import cn.rongcloud.im.R;
+import cn.rongcloud.im.server.network.async.AsyncTaskManager;
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.response.FriendInvitationResponse;
 import cn.rongcloud.im.server.response.GetUserInfoByPhoneResponse;
@@ -167,7 +168,11 @@ public class SearchFriendActivity extends BaseActivity {
                 LoadDialog.dismiss(mContext);
                 break;
             case SEARCH_PHONE:
-                NToast.shortToast(mContext, "用户不存在");
+                if (state == AsyncTaskManager.HTTP_ERROR_CODE || state == AsyncTaskManager.HTTP_NULL_CODE) {
+                    super.onFailure(requestCode, state, result);
+                } else {
+                    NToast.shortToast(mContext, "用户不存在");
+                }
                 LoadDialog.dismiss(mContext);
                 break;
         }

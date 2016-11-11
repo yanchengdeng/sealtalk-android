@@ -157,7 +157,7 @@ public class DisturbActivity extends BaseActivity implements View.OnClickListene
     }
 
     protected void initData() {
-        setTitle(R.string.new_message_notice);
+        setTitle(R.string.new_message_notice_title);
 
         mStartNotification.setOnClickListener(this);
         mEndNotification.setOnClickListener(this);

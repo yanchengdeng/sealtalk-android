@@ -7,7 +7,7 @@
 
     <RelativeLayout
         android:layout_width="56dp"
-        android:layout_height="100dp"
+        android:layout_height="wrap_content"
         android:layout_centerInParent="true" >
 
         <cn.rongcloud.im.server.widget.SelectableRoundedImageView
@@ -19,8 +19,8 @@
             app:sriv_right_bottom_corner_radius="3dip"
             app:sriv_right_top_corner_radius="3dip"
             android:scaleType="centerCrop"
+            android:layout_marginTop="14dp"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="12dp"
             android:src="@drawable/default_useravatar" />
 
         <ImageView
@@ -39,10 +39,12 @@
             android:layout_alignParentBottom="true"
             android:layout_below="@+id/iv_avatar"
             android:layout_centerHorizontal="true"
+            android:includeFontPadding="false"
+            android:layout_marginTop="6dp"
             android:gravity="center"
             android:singleLine="true"
             android:textColor="#AAAAAA"
-            android:textSize="12sp" />
+            android:textSize="14sp"/>
     </RelativeLayout>
 
 </RelativeLayout>

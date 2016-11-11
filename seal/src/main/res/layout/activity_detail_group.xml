@@ -20,8 +20,9 @@
                 android:id="@+id/gridview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:paddingLeft="1dp"
+                android:paddingRight="1dp"
                 android:background="#ffffff"
-                android:columnWidth="56dp"
                 android:gravity="start"
                 android:listSelector="@android:color/transparent"
                 android:numColumns="4"></cn.rongcloud.im.ui.widget.DemoGridView>
@@ -36,6 +37,7 @@
                     android:layout_height="0.25dp"
                     android:layout_marginLeft="14dp"
                     android:layout_marginRight="14dp"
+                    android:layout_marginTop="14dp"
                     android:background="#dfdfdd" />
             </LinearLayout>
 
@@ -67,7 +69,43 @@
                 android:layout_marginRight="14dp"
                 android:layout_marginTop="20dp"
                 android:background="#dfdfdd" />
-
+            <LinearLayout
+                android:id="@+id/ac_ll_search_chatting_records"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/btn_list_item_bg"
+                android:clickable="true"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_weight="1"
+                    android:text="@string/search_message"
+                    android:textColor="@color/text_color"
+                    android:textSize="16dp" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#fff">
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.25dp"
+                    android:layout_marginLeft="14dp"
+                    android:layout_marginRight="14dp"
+                    android:background="#dfdfdd" />
+            </LinearLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.25dp"
+                android:layout_marginLeft="14dp"
+                android:layout_marginRight="14dp"
+                android:layout_marginTop="20dp"
+                android:background="#dfdfdd" />
             <LinearLayout
                 android:id="@+id/ll_group_port"
                 android:layout_width="match_parent"
@@ -157,6 +195,7 @@
 
 
             <LinearLayout
+                android:id="@+id/ac_ll_group_announcement_divider"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="#fff"
@@ -232,6 +271,14 @@
 
             </LinearLayout>
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.25dp"
+                android:layout_marginLeft="14dp"
+                android:layout_marginRight="14dp"
+                android:layout_marginTop="20dp"
+                android:background="#dfdfdd" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
@@ -247,7 +294,7 @@
                     android:layout_marginLeft="16dp"
                     android:layout_marginTop="10dp"
                     android:layout_weight="1"
-                    android:text="@string/messsage_notice"
+                    android:text="@string/message_notice"
                     android:textColor="@color/text_color"
                     android:textSize="16dp" />
 

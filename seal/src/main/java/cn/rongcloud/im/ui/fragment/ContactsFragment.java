@@ -28,10 +28,10 @@ import cn.rongcloud.im.App;
 import cn.rongcloud.im.R;
 import cn.rongcloud.im.SealAppContext;
 import cn.rongcloud.im.SealConst;
-import cn.rongcloud.im.db.DBManager;
+import cn.rongcloud.im.SealUserInfoManager;
+import cn.rongcloud.im.db.Friend;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.pinyin.CharacterParser;
-import cn.rongcloud.im.server.pinyin.FriendInfo;
 import cn.rongcloud.im.server.pinyin.PinyinComparator;
 import cn.rongcloud.im.server.pinyin.SideBar;
 import cn.rongcloud.im.server.utils.RongGenerate;
@@ -39,12 +39,12 @@ import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
 import cn.rongcloud.im.ui.activity.GroupListActivity;
 import cn.rongcloud.im.ui.activity.NewFriendListActivity;
 import cn.rongcloud.im.ui.activity.PublicServiceActivity;
-import cn.rongcloud.im.ui.activity.SingleContactActivity;
+import cn.rongcloud.im.ui.activity.UserDetailActivity;
 import cn.rongcloud.im.ui.adapter.FriendListAdapter;
 import io.rong.imkit.RongIM;
 
 /**
- * tab 3 通讯录的 Fragment
+ * tab 2 通讯录的 Fragment
  * Created by Bob on 2015/1/25.
  */
 public class ContactsFragment extends Fragment implements View.OnClickListener {
@@ -57,14 +57,15 @@ public class ContactsFragment extends Fragment implements View.OnClickListener {
     private EditText mSearchEditText;
     private ListView mListView;
     private PinyinComparator mPinyinComparator;
+    private SideBar mSidBar;
     /**
      * 中部展示的字母提示
      */
     public TextView mDialogTextView;
 
-    private List<FriendInfo> mSourceFriendList;
-    private List<FriendInfo> mFriendInfoList;
-    private List<FriendInfo> mFilteredFriendList;
+    private List<Friend> mSourceFriendList;
+    private List<Friend> mFriendList;
+    private List<Friend> mFilteredFriendList;
     /**
      * 好友列表的 mFriendListAdapter
      */
@@ -80,28 +81,32 @@ public class ContactsFragment extends Fragment implements View.OnClickListener {
     private String mId;
     private String mCacheName;
 
+    private static final int CLICK_CONTACT_FRAGMENT_FRIEND = 2;
+
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_address, container, false);
         initView(view);
         initData();
-        if (mSourceFriendList != null && mSourceFriendList.size() > 0) {
-            mFriendInfoList = labelSourceFriendList(mSourceFriendList); //过滤数据为有字母的字段  现在有字母 别的数据没有
-        } else {
-            mNoFriends.setVisibility(View.VISIBLE);
-        }
+        updateUI();
+        refreshUIListener();
+        return view;
+    }
 
-        //还原除了带字母字段的其他数据
-        for (int i = 0; i < mSourceFriendList.size(); i++) {
-            mFriendInfoList.get(i).setName(mSourceFriendList.get(i).getName());
-            mFriendInfoList.get(i).setUserId(mSourceFriendList.get(i).getUserId());
-            mFriendInfoList.get(i).setPortraitUri(mSourceFriendList.get(i).getPortraitUri());
-            mFriendInfoList.get(i).setDisplayName(mSourceFriendList.get(i).getDisplayName());
-        }
+    private void startFriendDetailsPage(Friend friend) {
+        Intent intent = new Intent(getActivity(), UserDetailActivity.class);
+        intent.putExtra("type", CLICK_CONTACT_FRAGMENT_FRIEND);
+        intent.putExtra("friend", friend);
+        startActivity(intent);
+    }
 
-        // 根据a-z进行排序源数据
-        Collections.sort(mFriendInfoList, mPinyinComparator);
-
+    private void initView(View view) {
+        mSearchEditText = (EditText) view.findViewById(R.id.search);
+        mListView = (ListView) view.findViewById(R.id.listview);
+        mNoFriends = (TextView) view.findViewById(R.id.show_no_friend);
+        mSidBar = (SideBar) view.findViewById(R.id.sidrbar);
+        mDialogTextView = (TextView) view.findViewById(R.id.group_dialog);
+        mSidBar.setTextView(mDialogTextView);
         LayoutInflater mLayoutInflater = LayoutInflater.from(getActivity());
         mHeadView = mLayoutInflater.inflate(R.layout.item_contact_list_header,
                                             null);
@@ -118,77 +123,13 @@ public class ContactsFragment extends Fragment implements View.OnClickListener {
         final String header = sp.getString("loginPortrait", "");
         mNameTextView.setText(mCacheName);
         ImageLoader.getInstance().displayImage(TextUtils.isEmpty(header) ? RongGenerate.generateDefaultAvatar(mCacheName, mId) : header, mSelectableRoundedImageView, App.getOptions());
+        mListView.addHeaderView(mHeadView);
+        mNoFriends.setVisibility(View.VISIBLE);
 
         selfLayout.setOnClickListener(this);
         groupLayout.setOnClickListener(this);
         newFriendsLayout.setOnClickListener(this);
         publicServiceLayout.setOnClickListener(this);
-        mFriendListAdapter = new FriendListAdapter(getActivity(), mFriendInfoList);
-        mListView.addHeaderView(mHeadView);
-        mListView.setAdapter(mFriendListAdapter);
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (mListView.getHeaderViewsCount() > 0) {
-                    startFriendDetailsPage(mFriendInfoList.get(position - 1));
-                } else {
-                    startFriendDetailsPage(mFilteredFriendList.get(position));
-                }
-            }
-        });
-
-
-        mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
-                FriendInfo bean = mFriendInfoList.get(position - 1);
-                startFriendDetailsPage(bean);
-                return true;
-            }
-        });
-        mSearchEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                //当输入框里面的值为空，更新为原来的列表，否则为过滤数据列表
-                filterData(s.toString());
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (s.length() != 0) {
-                    if (mListView.getHeaderViewsCount() > 0) {
-                        mListView.removeHeaderView(mHeadView);
-                    }
-                } else {
-                    if (mListView.getHeaderViewsCount() == 0) {
-                        mListView.addHeaderView(mHeadView);
-                    }
-                }
-            }
-        });
-        refreshUIListener();
-        return view;
-    }
-
-    private void startFriendDetailsPage(FriendInfo friendInfo) {
-        Intent intent = new Intent(getActivity(), SingleContactActivity.class);
-        intent.putExtra("FriendDetails", friendInfo);
-        startActivity(intent);
-    }
-
-    private void initView(View view) {
-
-        mSearchEditText = (EditText) view.findViewById(R.id.search);
-        mListView = (ListView) view.findViewById(R.id.listview);
-        mNoFriends = (TextView) view.findViewById(R.id.show_no_friend);
-        SideBar mSidBar = (SideBar) view.findViewById(R.id.sidrbar);
-        mDialogTextView = (TextView) view.findViewById(R.id.group_dialog);
-        mSidBar.setTextView(mDialogTextView);
         //设置右侧触摸监听
         mSidBar.setOnTouchingLetterChangedListener(new SideBar.OnTouchingLetterChangedListener() {
 
@@ -206,14 +147,10 @@ public class ContactsFragment extends Fragment implements View.OnClickListener {
 
     private void initData() {
         mSourceFriendList = new ArrayList<>();
-        mFriendInfoList = new ArrayList<>();
+        mFriendList = new ArrayList<>();
+        FriendListAdapter adapter = new FriendListAdapter(getActivity(), mFriendList);
+        mListView.setAdapter(adapter);
         mFilteredFriendList = new ArrayList<>();
-        List<cn.rongcloud.im.db.Friend> list = DBManager.getInstance(getActivity()).getDaoSession().getFriendDao().loadAll();
-        if (list != null && list.size() > 0) {
-            for (cn.rongcloud.im.db.Friend friend : list) {
-                mSourceFriendList.add(new FriendInfo(friend.getUserId(), friend.getName(), friend.getPortraitUri(), friend.getDisplayName(), null, null));
-            }
-        }
         //实例化汉字转拼音类
         mCharacterParser = CharacterParser.getInstance();
         mPinyinComparator = PinyinComparator.getInstance();
@@ -234,26 +171,29 @@ public class ContactsFragment extends Fragment implements View.OnClickListener {
      * @param filterStr 需要过滤的 String
      */
     private void filterData(String filterStr) {
-        List<FriendInfo> filterDateList = new ArrayList<>();
+        List<Friend> filterDateList = new ArrayList<>();
 
-
-        if (TextUtils.isEmpty(filterStr)) {
-            filterDateList = mFriendInfoList;
-        } else {
-            filterDateList.clear();
-            for (FriendInfo friendInfoModel : mFriendInfoList) {
-                String name = friendInfoModel.getName();
-                String displayName = friendInfoModel.getDisplayName();
-                if (!TextUtils.isEmpty(displayName)) {
-                    if (name.contains(filterStr) || mCharacterParser.getSpelling(name).startsWith(filterStr) || displayName.contains(filterStr) || mCharacterParser.getSpelling(displayName).startsWith(filterStr)) {
-                        filterDateList.add(friendInfoModel);
-                    }
-                } else {
-                    if (name.contains(filterStr) || mCharacterParser.getSpelling(name).startsWith(filterStr)) {
-                        filterDateList.add(friendInfoModel);
+        try {
+            if (TextUtils.isEmpty(filterStr)) {
+                filterDateList = mFriendList;
+            } else {
+                filterDateList.clear();
+                for (Friend friendModel : mFriendList) {
+                    String name = friendModel.getName();
+                    String displayName = friendModel.getDisplayName();
+                    if (!TextUtils.isEmpty(displayName)) {
+                        if (name.contains(filterStr) || mCharacterParser.getSpelling(name).startsWith(filterStr) || displayName.contains(filterStr) || mCharacterParser.getSpelling(displayName).startsWith(filterStr)) {
+                            filterDateList.add(friendModel);
+                        }
+                    } else {
+                        if (name.contains(filterStr) || mCharacterParser.getSpelling(name).startsWith(filterStr)) {
+                            filterDateList.add(friendModel);
+                        }
                     }
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         // 根据a-z进行排序
@@ -266,27 +206,34 @@ public class ContactsFragment extends Fragment implements View.OnClickListener {
     /**
      * 为ListView填充数据
      */
-    private List<FriendInfo> labelSourceFriendList(List<FriendInfo> list) {
-        List<FriendInfo> mFriendInfoList = new ArrayList<>();
+    private List<Friend> labelSourceFriendList(List<Friend> list) {
+        List<Friend> mFriendList = new ArrayList<>();
 
         for (int i = 0; i < list.size(); i++) {
-            FriendInfo friendInfoModel = new FriendInfo();
-            friendInfoModel.setName(list.get(i).getName());
+            Friend friendModel = new Friend();
+            friendModel.setName(list.get(i).getName());
             //汉字转换成拼音
-            String pinyin = mCharacterParser.getSpelling(list.get(i).getName());
-            String sortString = pinyin.substring(0, 1).toUpperCase();
-
-            // 正则表达式，判断首字母是否是英文字母
-            if (sortString.matches("[A-Z]")) {
-                friendInfoModel.setLetters(sortString.toUpperCase());
+            String pinyin;
+            if (!TextUtils.isEmpty(list.get(i).getDisplayName())) {
+                pinyin = mCharacterParser.getSpelling(list.get(i).getDisplayName());
             } else {
-                friendInfoModel.setLetters("#");
+                pinyin = mCharacterParser.getSpelling(list.get(i).getName());
+            }
+            if (pinyin != null && pinyin.length() > 0) {
+                String sortString = pinyin.substring(0, 1).toUpperCase();
+                // 正则表达式，判断首字母是否是英文字母
+                if (sortString.matches("[A-Z]")) {
+                    friendModel.setLetters(sortString.toUpperCase());
+                } else {
+                    friendModel.setLetters("#");
+                }
+            } else {
+                friendModel.setLetters("#");
             }
 
-            mFriendInfoList.add(friendInfoModel);
+            mFriendList.add(friendModel);
         }
-        return mFriendInfoList;
-
+        return mFriendList;
     }
 
     @Override
@@ -334,7 +281,7 @@ public class ContactsFragment extends Fragment implements View.OnClickListener {
         BroadcastManager.getInstance(getActivity()).addAction(SealConst.CHANGEINFO, new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                SharedPreferences sp = getActivity().getSharedPreferences("config", Context.MODE_PRIVATE);
+                SharedPreferences sp = context.getSharedPreferences("config", Context.MODE_PRIVATE);
                 mId = sp.getString("loginid", "");
                 mCacheName = sp.getString("loginnickname", "");
                 String header = sp.getString("loginPortrait", "");
@@ -349,42 +296,118 @@ public class ContactsFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        BroadcastManager.getInstance(getActivity()).destroy(SealAppContext.UPDATE_FRIEND);
-        BroadcastManager.getInstance(getActivity()).destroy(SealAppContext.UPDATE_RED_DOT);
-        BroadcastManager.getInstance(getActivity()).destroy(SealConst.CHANGEINFO);
+        try {
+            BroadcastManager.getInstance(getActivity()).destroy(SealAppContext.UPDATE_FRIEND);
+            BroadcastManager.getInstance(getActivity()).destroy(SealAppContext.UPDATE_RED_DOT);
+            BroadcastManager.getInstance(getActivity()).destroy(SealConst.CHANGEINFO);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
     }
 
     private void updateUI() {
-        List<cn.rongcloud.im.db.Friend> list = DBManager.getInstance(getActivity()).getDaoSession().getFriendDao().loadAll();
-        if (list != null) {
-            if (mSourceFriendList != null) {
-                mSourceFriendList.clear();
-            }
-            if (mFriendInfoList != null) {
-                mFriendInfoList.clear();
-            }
-            for (cn.rongcloud.im.db.Friend friend : list) {
-                mSourceFriendList.add(new FriendInfo(friend.getUserId(), friend.getName(), friend.getPortraitUri(), friend.getDisplayName()));
+        SealUserInfoManager.getInstance().getFriends(new SealUserInfoManager.ResultCallback<List<Friend>>() {
+            @Override
+            public void onSuccess(List<Friend> friendsList) {
+                updateFriendsList(friendsList);
             }
 
+            @Override
+            public void onError(String errString) {
+                updateFriendsList(null);
+            }
+        });
+    }
+
+    private void updateFriendsList(List<Friend> friendsList) {
+        //updateUI fragment初始化和好友信息更新时都会调用,isReloadList表示是否是好友更新时调用
+        // 这种实现方式可能不是最佳,以后可以重构 //// TODO: 16/9/19
+        boolean isReloadList = false;
+        if (mSourceFriendList != null && mSourceFriendList.size() > 0) {
+            mSourceFriendList.clear();
+            isReloadList = true;
         }
-        if (mSourceFriendList != null) {
-            mFriendInfoList = labelSourceFriendList(mSourceFriendList); //过滤数据为有字母的字段  现在有字母 别的数据没有
+        if (mFriendList != null && mFriendList.size() > 0) {
+            mFriendList.clear();
+        }
+        if (friendsList != null && friendsList.size() > 0) {
+            for (Friend friend : friendsList) {
+                mSourceFriendList.add(new Friend(friend.getUserId(), friend.getName(), friend.getPortraitUri(), friend.getPhoneNumber(), friend.getDisplayName()));
+            }
+        }
+        if (mSourceFriendList != null && mSourceFriendList.size() > 0) {
+            mFriendList = labelSourceFriendList(mSourceFriendList); //过滤数据为有字母的字段  现在有字母 别的数据没有
+            mNoFriends.setVisibility(View.GONE);
         } else {
             mNoFriends.setVisibility(View.VISIBLE);
         }
 
         //还原除了带字母字段的其他数据
-        for (int i = 0; i < mSourceFriendList.size(); i++) {
-            mFriendInfoList.get(i).setName(mSourceFriendList.get(i).getName());
-            mFriendInfoList.get(i).setUserId(mSourceFriendList.get(i).getUserId());
-            mFriendInfoList.get(i).setPortraitUri(mSourceFriendList.get(i).getPortraitUri());
-            mFriendInfoList.get(i).setDisplayName(mSourceFriendList.get(i).getDisplayName());
+        if (mSourceFriendList != null) {
+            for (int i = 0; i < mSourceFriendList.size(); i++) {
+                mFriendList.get(i).setName(mSourceFriendList.get(i).getName());
+                mFriendList.get(i).setUserId(mSourceFriendList.get(i).getUserId());
+                mFriendList.get(i).setPortraitUri(mSourceFriendList.get(i).getPortraitUri());
+                mFriendList.get(i).setPhoneNumber(mSourceFriendList.get(i).getPhoneNumber());
+                mFriendList.get(i).setDisplayName(mSourceFriendList.get(i).getDisplayName());
+            }
         }
 
         // 根据a-z进行排序源数据
-        Collections.sort(mFriendInfoList, mPinyinComparator);
-        mFriendListAdapter.updateListView(mFriendInfoList);
-    }
+        Collections.sort(mFriendList, mPinyinComparator);
+        if (isReloadList) {
+            mSidBar.setVisibility(View.VISIBLE);
+            mFriendListAdapter.updateListView(mFriendList);
+        } else {
+            mSidBar.setVisibility(View.VISIBLE);
+            mFriendListAdapter = new FriendListAdapter(getActivity(), mFriendList);
 
+            mListView.setAdapter(mFriendListAdapter);
+            mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    if (mListView.getHeaderViewsCount() > 0) {
+                        startFriendDetailsPage(mFriendList.get(position - 1));
+                    } else {
+                        startFriendDetailsPage(mFilteredFriendList.get(position));
+                    }
+                }
+            });
+
+
+            mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                @Override
+                public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+                    Friend bean = mFriendList.get(position - 1);
+                    startFriendDetailsPage(bean);
+                    return true;
+                }
+            });
+            mSearchEditText.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    //当输入框里面的值为空，更新为原来的列表，否则为过滤数据列表
+                    filterData(s.toString());
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    if (s.length() != 0) {
+                        if (mListView.getHeaderViewsCount() > 0) {
+                            mListView.removeHeaderView(mHeadView);
+                        }
+                    } else {
+                        if (mListView.getHeaderViewsCount() == 0) {
+                            mListView.addHeaderView(mHeadView);
+                        }
+                    }
+                }
+            });
+        }
+    }
 }

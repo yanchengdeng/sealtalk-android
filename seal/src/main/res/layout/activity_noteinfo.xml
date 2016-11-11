@@ -58,7 +58,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:lines="1"
-            android:maxLength="11"
+            android:maxLength="16"
             android:singleLine="true" />
 
 

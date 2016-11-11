@@ -15,15 +15,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.jrmf360.rylib.JrmfClient;
 import com.nostra13.universalimageloader.core.ImageLoader;
-
-import java.util.List;
 
 import cn.rongcloud.im.App;
 import cn.rongcloud.im.R;
 import cn.rongcloud.im.SealConst;
-import cn.rongcloud.im.db.DBManager;
-import cn.rongcloud.im.db.GroupMember;
 import cn.rongcloud.im.server.SealAction;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.network.async.AsyncTaskManager;
@@ -35,7 +32,6 @@ import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
 import cn.rongcloud.im.ui.activity.AboutRongCloudActivity;
 import cn.rongcloud.im.ui.activity.AccountSettingActivity;
 import cn.rongcloud.im.ui.activity.MyAccountActivity;
-import io.rong.imageloader.cache.memory.MemoryCache;
 import io.rong.imkit.RongIM;
 
 /**
@@ -131,7 +127,7 @@ public class MineFragment extends Fragment implements View.OnClickListener {
         mMineSetting.setOnClickListener(this);
         mMineService.setOnClickListener(this);
         mMineAbout.setOnClickListener(this);
-
+        mView.findViewById(R.id.my_wallet).setOnClickListener(this);
     }
 
     @Override
@@ -155,6 +151,9 @@ public class MineFragment extends Fragment implements View.OnClickListener {
                     intent.putExtra("url", url);
                 }
                 startActivity(intent);
+                break;
+            case R.id.my_wallet:
+                JrmfClient.intentWallet(getActivity());
                 break;
         }
     }

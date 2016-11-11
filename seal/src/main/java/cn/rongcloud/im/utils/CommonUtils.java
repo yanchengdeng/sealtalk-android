@@ -15,6 +15,9 @@ import android.view.WindowManager;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import cn.rongcloud.im.db.Friend;
+import io.rong.imlib.model.UserInfo;
+
 /**
  * Created by bob on 2015/2/2.
  */

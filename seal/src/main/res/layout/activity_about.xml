@@ -166,7 +166,7 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="18dp"
-            android:text="2.6.6 Stable"
+            android:text="2.8.0 Dev"
             android:textColor="#999"
             android:textSize="14sp" />
 

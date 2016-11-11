@@ -15,7 +15,7 @@ import java.util.List;
 
 import cn.rongcloud.im.App;
 import cn.rongcloud.im.R;
-import cn.rongcloud.im.server.pinyin.FriendInfo;
+import cn.rongcloud.im.db.Friend;
 import cn.rongcloud.im.server.utils.RongGenerate;
 import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
 
@@ -27,9 +27,9 @@ public class FriendListAdapter extends BaseAdapter implements SectionIndexer {
 
     private Context context;
 
-    private List<FriendInfo> list;
+    private List<Friend> list;
 
-    public FriendListAdapter(Context context, List<FriendInfo> list) {
+    public FriendListAdapter(Context context, List<Friend> list) {
         this.context = context;
         this.list = list;
     }
@@ -38,18 +38,25 @@ public class FriendListAdapter extends BaseAdapter implements SectionIndexer {
     /**
      * 传入新的数据 刷新UI的方法
      */
-    public void updateListView(List<FriendInfo> list) {
+    public void updateListView(List<Friend> list) {
         this.list = list;
         notifyDataSetChanged();
     }
 
     @Override
     public int getCount() {
-        return list.size();
+        if (list != null) return list.size();
+        return 0;
     }
 
     @Override
     public Object getItem(int position) {
+        if (list == null)
+            return null;
+
+        if (position >= list.size())
+            return null;
+
         return list.get(position);
     }
 
@@ -61,7 +68,7 @@ public class FriendListAdapter extends BaseAdapter implements SectionIndexer {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder = null;
-        final FriendInfo mContent = list.get(position);
+        final Friend mContent = list.get(position);
         if (convertView == null) {
             viewHolder = new ViewHolder();
             convertView = LayoutInflater.from(context).inflate(R.layout.friend_item, null);

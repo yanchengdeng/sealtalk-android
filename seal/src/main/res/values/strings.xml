@@ -29,7 +29,7 @@
     <string name="login_success">"登录成功"</string>
 
     <!--设置-->
-    <string name="new_message_notice">新消息提醒</string>
+    <string name="new_message_notice">开启消息免打扰</string>
     <string name="new_message_show">新消息通知</string>
     <string name="new_message_voice">声音</string>
     <string name="new_message_vibration">震动</string>
@@ -51,8 +51,7 @@
     <string name="de_notification_end">结束时间</string>
 
 
-
-    <!-- friendInfo list -->
+    <!-- friend list -->
     <string name="de_item_delete_friend">"删除"</string>
 
 
@@ -74,7 +73,7 @@
     <string name="de_message_at_me">[有人@我]</string>
 
     <!-- Aming 10月重构版 -->
-    <string name="start_chat">发起聊天</string>
+    <string name="start_chat">发起会话</string>
     <string name="network_not_available">网络不可用</string>
     <string name="login_api_fail">登录请求接口失败</string>
     <string name="sync_userinfo_api_fail">同步用户信息接口请求失败</string>
@@ -153,7 +152,8 @@
     <string name="confirm_dismiss_group">确认解散群组?</string>
     <string name="clean_history">是否清除会话聊天记录?</string>
     <string name="set_top">会话置顶</string>
-    <string name="messsage_notice">消息免打扰</string>
+    <string name="message_notice">消息免打扰</string>
+    <string name="search_message">查找聊天记录</string>
     <string name="clean_message">清空聊天信息</string>
     <string name="send_message">发起聊天</string>
     <string name="quit_group">删除并退出</string>
@@ -203,6 +203,7 @@
     <string name="discover">发现</string>
     <string name="me">我</string>
     <string name="mine_about">关于 SealTalk</string>
+    <string name="my_wallet">我的钱包</string>
     <string name="mine_service">意见反馈</string>
     <string name="mine_setting">帐号设置</string>
     <string name="account_setting">帐号设置</string>
@@ -251,4 +252,43 @@
     <string name="setdisplayname">设置备注</string>
     <string name="new_and_old_password">新旧密码一致</string>
     <string name="nickname_show">昵称:</string>
+    <string name="ac_item_friend_nick_name">昵称:%1$s</string>
+    <string name="ac_search_no_result">没有搜索到%1$s相关的会话</string>
+    <string name="other_devices_login">账号在其它设备登录</string>
+    <string name="new_message_notice_title">消息免打扰</string>
+    <string name="other_devices_text">您的账号在别的设备上登录，您被迫下线!</string>
+    <string name="i_know">知道了</string>
+    <string name="update_name">昵称更改</string>
+    <string name="ac_search_no_result_pre">没有搜到</string>
+    <string name="ac_search_no_result_suffix">相关的信息</string>
+    <string name="ac_search_chat_title">聊天记录</string>
+    <string name="ac_search_chat_detail">共%1$d条与</string>
+    <string name="ac_search_chat_detail_one">共</string>
+    <string name="ac_search_chat_detail_two">条与</string>
+    <string name="ac_search_chat_detail_three">相关的聊天记录</string>
+    <string name="ac_contact_nick_name">昵称:</string>
+
+    <string name="ac_search_friend">联系人</string>
+    <string name="ac_search_group">群组</string>
+    <string name="ac_search_chatting_records">聊天记录</string>
+    <string name="ac_search_more_friend">查看更多联系人</string>
+    <string name="ac_search_more_group">查看更多群组</string>
+    <string name="ac_search_more_chatting_records">查看更多聊天记录</string>
+
+    <string name="search_item_chat_records">%d条相关记录</string>
+    <string name="offline">离线</string>
+    <string name="web_online">网页在线</string>
+    <string name="pc_online">电脑在线</string>
+    <string name="phone_online">手机在线</string>
+    <string name="read_receipt_detail">回执详情</string>
+    <string name="read_receipt_unread_persons">%1$s人未读</string>
+    <string name="read_receipt_read_persons">%1$s人已读</string>
+    <string name="read_receipt_no_person_read">全部未读</string>
+    <string name="read_receipt_no_person_unread">全部已读</string>
+    <string name="des_add_friend_to_black_list">你将不再收到对方的消息</string>
+
+    <string name="clean_private_chat_history">确定删除聊天记录吗</string>
+    <string name="clean_group_chat_history">确定删除群聊天记录吗</string>
+    <string name="clean_discussion_chat_history">确定删除讨论组聊天记录吗</string>
+    <string name="join_chat_room_error_toast">聊天室ID为空,请稍后重试</string>
 </resources>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    android:background="@drawable/_bg_bribery_open"
+    android:gravity="center"
+    android:orientation="horizontal"
+    android:paddingTop="3dip"
+    android:paddingBottom="3dip"
+    android:paddingLeft="5dip"
+    android:paddingRight="5dip">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/_xiaobao_icon" />
+
+    <TextView
+        android:id="@+id/packet_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="4dip"
+        android:gravity="center"
+        android:text="您领取了刘洪林的红包"
+        android:textColor="@color/white"
+        android:textSize="14sp" />
+
+</LinearLayout>

@@ -15,6 +15,7 @@ import cn.rongcloud.im.server.network.async.AsyncTaskManager;
 import cn.rongcloud.im.server.network.async.OnDataListener;
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.response.DefaultConversationResponse;
+import cn.rongcloud.im.server.utils.NToast;
 import io.rong.imkit.RongIM;
 import io.rong.imlib.model.Conversation;
 
@@ -47,6 +48,10 @@ public class DiscoverFragment extends Fragment implements View.OnClickListener, 
 
     @Override
     public void onClick(View v) {
+        if (chatroomList == null || chatroomList.get(0) == null) {
+            NToast.shortToast(getActivity(), getString(R.string.join_chat_room_error_toast));
+            return;
+        }
         switch (v.getId()) {
             case R.id.def_chatroom1:
                 RongIM.getInstance().startConversation(getActivity(), Conversation.ConversationType.CHATROOM, chatroomList.get(0).getId(), "聊天室 I");

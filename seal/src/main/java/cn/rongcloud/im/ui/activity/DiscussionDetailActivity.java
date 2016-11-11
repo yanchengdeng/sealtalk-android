@@ -6,7 +6,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -25,19 +24,20 @@ import java.util.List;
 import cn.rongcloud.im.App;
 import cn.rongcloud.im.R;
 import cn.rongcloud.im.SealConst;
-import cn.rongcloud.im.db.DBManager;
+import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.db.Friend;
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.response.GetUserInfosResponse;
-import cn.rongcloud.im.server.utils.RongGenerate;
 import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.server.utils.OperationRong;
+import cn.rongcloud.im.server.utils.RongGenerate;
 import cn.rongcloud.im.server.widget.DialogWithYesOrNoUtils;
 import cn.rongcloud.im.server.widget.LoadDialog;
 import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
 import cn.rongcloud.im.ui.widget.DemoGridView;
 import cn.rongcloud.im.ui.widget.switchbutton.SwitchButton;
 import io.rong.imkit.RongIM;
+import io.rong.imkit.widget.PromptPopupDialog;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.Discussion;
@@ -176,9 +176,11 @@ public class DiscussionDetailActivity extends BaseActivity implements CompoundBu
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.discu_clean:
-                DialogWithYesOrNoUtils.getInstance().showDialog(mContext, "是否清除会话聊天记录？", new DialogWithYesOrNoUtils.DialogCallBack() {
+                PromptPopupDialog.newInstance(mContext,
+                                              getString(R.string.clean_discussion_chat_history)).setLayoutRes(io.rong.imkit.R.layout.rc_dialog_popup_prompt_warning)
+                .setPromptButtonClickedListener(new PromptPopupDialog.OnPromptButtonClickedListener() {
                     @Override
-                    public void executeEvent() {
+                    public void onPositiveButtonClicked() {
                         if (RongIM.getInstance() != null) {
                             RongIM.getInstance().clearMessages(Conversation.ConversationType.DISCUSSION, targetId, new RongIMClient.ResultCallback<Boolean>() {
                                 @Override
@@ -193,17 +195,7 @@ public class DiscussionDetailActivity extends BaseActivity implements CompoundBu
                             });
                         }
                     }
-
-                    @Override
-                    public void executeEditEvent(String editText) {
-
-                    }
-
-                    @Override
-                    public void updatePassword(String oldPassword, String newPassword) {
-
-                    }
-                });
+                }).show();
                 break;
             case R.id.discu_quit:
                 DialogWithYesOrNoUtils.getInstance().showDialog(mContext, "是否退出并删除当前讨论组?", new DialogWithYesOrNoUtils.DialogCallBack() {
@@ -361,14 +353,25 @@ public class DiscussionDetailActivity extends BaseActivity implements CompoundBu
                     RongIMClient.getInstance().addMemberToDiscussion(targetId, addMember, new RongIMClient.OperationCallback() {
                         @Override
                         public void onSuccess() {
-                            List<Friend> list = DBManager.getInstance(mContext).getDaoSession().getFriendDao().loadAll();
-                            for (Friend friend : list) {
-                                for (String userId : addMember) {
-                                    if (userId.equals(friend.getUserId()))
-                                        memberList.add(new UserInfo(userId, friend.getName(), Uri.parse(friend.getPortraitUri())));
+                            SealUserInfoManager.getInstance().getFriends(new SealUserInfoManager.ResultCallback<List<Friend>>() {
+                                @Override
+                                public void onSuccess(List<Friend> friendList) {
+                                    if (friendList != null && friendList.size() > 0) {
+                                        for (Friend friend : friendList) {
+                                            for (String userId : addMember) {
+                                                if (userId.equals(friend.getUserId()))
+                                                    memberList.add(new UserInfo(userId, friend.getName(), Uri.parse(friend.getPortraitUri())));
+                                            }
+                                        }
+                                        adapter.updateListView(memberList);
+                                    }
                                 }
-                            }
-                            adapter.updateListView(memberList);
+
+                                @Override
+                                public void onError(String errString) {
+
+                                }
+                            });
                         }
 
                         @Override

@@ -14,6 +14,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.Random;
+
+import io.rong.imlib.model.UserInfo;
 
 /**
  * Created by AMing on 16/4/6.
@@ -28,9 +31,13 @@ public class RongGenerate {
 
 
     public static String generateDefaultAvatar(String username, String userid) {
+
         String s = null;
         if (!TextUtils.isEmpty(username)) {
             s = String.valueOf(username.charAt(0));
+        }
+        if (s == null) {
+            s = generateRandomCharacter();
         }
         String color = getColorRGB(userid);
         String string = getAllFirstLetter(username);
@@ -55,6 +62,13 @@ public class RongGenerate {
         int textTop = (int) (height - width / 2 + Math.abs(fm.ascent) / 2 - 25);
         canvas.drawText(s, textLeft, textTop, paint);
         return saveBitmap(bitmap, string + "_" + userid);
+    }
+
+    public static String generateDefaultAvatar(UserInfo userInfo) {
+        if (userInfo == null)
+            return null;
+        else
+            return generateDefaultAvatar(userInfo.getName(), userInfo.getUserId());
     }
 
     private static void createDir(String saveaddress) {
@@ -89,12 +103,10 @@ public class RongGenerate {
     }
 
     private static String getColorRGB(String userId) {
-        if (TextUtils.isEmpty(userId)) {
-            throw new RuntimeException("Generate Color userId not is null!");
-        }
-        int i = getAscii(userId.charAt(0)) % 5;
         String[] portraitColors = {"#e97ffb", "#00b8d4", "#82b2ff", "#f3db73", "#f0857c"};
-        return portraitColors[i];
+        int length = portraitColors.length;
+        Random random = new Random();
+        return portraitColors[random.nextInt(length)];
     }
 
 
@@ -205,5 +217,13 @@ public class RongGenerate {
             System.out.println("字符串编码转换异常：" + ex.getMessage());
         }
         return str;
+    }
+
+    private static String generateRandomCharacter() {
+        final String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        final int length = alphabet.length();
+        Random random = new Random();
+        String randomChar = String.valueOf(alphabet.charAt(random.nextInt(length)));
+        return randomChar;
     }
 }

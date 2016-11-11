@@ -82,7 +82,7 @@
             android:name=".ui.activity.GroupListActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.activity.FriendDetailActivity"
+            android:name=".ui.activity.PrivateChatDetailActivity"
             android:screenOrientation="portrait" />
         <!--注册页面-->
         <activity
@@ -105,6 +105,7 @@
         <activity
             android:name=".ui.activity.DisturbActivity"
             android:screenOrientation="portrait" />
+        <activity android:name=".ui.activity.MessageDisturbActivity" />
         <!--隐私-->
         <activity
             android:name=".ui.activity.PrivacyActivity"
@@ -154,10 +155,6 @@
             android:name=".ui.activity.PublicServiceSearchActivity"
             android:screenOrientation="portrait" />
 
-        <activity
-            android:name=".ui.activity.RealTimeLocationActivity"
-            android:screenOrientation="portrait" />
-
         <!--选择联系人 多人聊天-->
         <activity
             android:name=".ui.activity.SelectFriendsActivity"
@@ -168,6 +165,9 @@
         <activity
             android:name=".ui.activity.GroupDetailActivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.activity.ReadReceiptDetailActivity"
+            android:screenOrientation="portrait" />
 
         <activity
             android:name=".ui.activity.DiscussionDetailActivity"
@@ -175,9 +175,6 @@
 
         <activity
             android:name=".ui.activity.ForgetPasswordActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".ui.activity.AMAPLocationActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activity.GroupNoticeActivity"
@@ -189,20 +186,6 @@
             <intent-filter>
                 <action android:name="io.rong.imkit.intent.action.webview" />
                 <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-
-            <intent-filter>
-                <data
-                    android:host="*"
-                    android:scheme="http" />
-                <data
-                    android:host="*"
-                    android:scheme="https" />
-
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
             </intent-filter>
         </activity>
 
@@ -281,8 +264,26 @@
                     android:scheme="rong" />
             </intent-filter>
         </activity>
-
-
+        <activity android:name=".ui.activity.SealSearchActivity"
+            android:configChanges="orientation|keyboardHidden|locale"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateVisible|adjustPan"/>
+        <activity android:name=".ui.activity.SealSearchMoreFriendsActivity"
+            android:configChanges="orientation|keyboardHidden|locale"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+        <activity android:name=".ui.activity.SealSearchMoreGroupActivity"
+            android:configChanges="orientation|keyboardHidden|locale"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+        <activity android:name=".ui.activity.SealSearchMoreChattingRecordsActivity"
+            android:configChanges="orientation|keyboardHidden|locale"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+        <activity android:name=".ui.activity.SealSearchChattingDetailActivity"
+            android:configChanges="orientation|keyboardHidden|locale"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
         <activity
             android:name=".ui.activity.UpdateNameActivity"
             android:screenOrientation="portrait" />
@@ -309,19 +310,13 @@
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".ui.activity.SingleContactActivity"
-            android:screenOrientation="portrait" />
-        <activity
             android:name="io.rong.imkit.widget.provider.TakingPicturesActivity"
             android:configChanges="orientation|keyboardHidden"
             android:screenOrientation="portrait" />
 
         <service android:name=".server.UpdateService" />
-
-        <activity
-            android:name=".ui.activity.PersonalProfileActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait" />
+        <activity android:name=".ui.activity.UserDetailActivity"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".ui.activity.SharedReceiverActivity"
             android:screenOrientation="portrait">
@@ -357,9 +352,9 @@
         </receiver>
 
 
-        <!--<meta-data-->
-        <!--android:name="RONG_CLOUD_APP_KEY"-->
-        <!--android:value="e0x9wycfx7flq" />-->
+        <meta-data
+        android:name="RONG_CLOUD_APP_KEY"
+        android:value="n19jmcy59f1q9" />
 
         <!-- 正式 n19jmcy59f1q9  测试 p5tvi9dst25b4  小乔 e0x9wycfx7flq-->
 

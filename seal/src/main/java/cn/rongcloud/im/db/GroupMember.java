@@ -13,8 +13,38 @@ public class GroupMember {
     private String name;
     private String portraitUri;
     private String displayName;
+    private String nameSpelling;
+    private String displayNameSpelling;
+    private String groupName;
+    private String groupNameSpelling;
+    private String groupPortraitUri;
 
     public GroupMember() {
+    }
+
+    public GroupMember(String groupId, String userId, String name, String portraitUri, String displayName, String nameSpelling, String displayNameSpelling, String groupName, String groupNameSpelling, String groupPortraitUri) {
+        this.groupId = groupId;
+        this.userId = userId;
+        this.name = name;
+        this.portraitUri = portraitUri;
+        this.displayName = displayName;
+        this.nameSpelling = nameSpelling;
+        this.displayNameSpelling = displayNameSpelling;
+        this.groupName = groupName;
+        this.groupNameSpelling = groupNameSpelling;
+        this.groupPortraitUri = groupPortraitUri;
+    }
+
+    public GroupMember(String groupId, String userId, String name, String portraitUri, String displayName, String nameSpelling, String displayNameSpelling, String groupName, String groupNameSpelling) {
+        this.groupId = groupId;
+        this.userId = userId;
+        this.name = name;
+        this.portraitUri = portraitUri;
+        this.displayName = displayName;
+        this.nameSpelling = nameSpelling;
+        this.displayNameSpelling = displayNameSpelling;
+        this.groupName = groupName;
+        this.groupNameSpelling = groupNameSpelling;
     }
 
     public GroupMember(String groupId, String userId, String name, String portraitUri, String displayName) {
@@ -69,4 +99,43 @@ public class GroupMember {
         this.displayName = displayName;
     }
 
+    public String getNameSpelling() {
+        return nameSpelling;
+    }
+
+    public void setNameSpelling(String nameSpelling) {
+        this.nameSpelling = nameSpelling;
+    }
+
+    public String getDisplayNameSpelling() {
+        return displayNameSpelling;
+    }
+
+    public void setDisplayNameSpelling(String displayNameSpelling) {
+        this.displayNameSpelling = displayNameSpelling;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
+
+    public String getGroupNameSpelling() {
+        return groupNameSpelling;
+    }
+
+    public void setGroupNameSpelling(String groupNameSpelling) {
+        this.groupNameSpelling = groupNameSpelling;
+    }
+
+    public String getGroupPortraitUri() {
+        return groupPortraitUri;
+    }
+
+    public void setGroupPortraitUri(String groupPortraitUri) {
+        this.groupPortraitUri = groupPortraitUri;
+    }
 }
