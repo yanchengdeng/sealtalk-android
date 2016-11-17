@@ -16,17 +16,24 @@ Android App of SealTalk powered by RongCloud.
 - Different social situations such as single chat，group chat，chatroom satisfy your needs, what’s more, [live video](http://rongcloud.cn/live) can be simply implemented. [Customer service](http://rongcloud.cn/customservice)? Yes, it’s simpler than your imagination.
 - To be continued...
 
-## ScreenShots
-![image](https://github.com/sealtalk/sealtalk-android/blob/master/screenshots/image1.jpg)<br/>
-![image](https://github.com/sealtalk/sealtalk-android/blob/master/screenshots/image2.jpg)<br/>
-![image](https://github.com/sealtalk/sealtalk-android/blob/master/screenshots/image3.jpg)<br/>
+## Gif
+ ### Add RedPacket
+ ![image](https://github.com/sealtalk/sealtalk-android/blob/master/gif/redpacket.gif)<br/>
+ ### Powerful global searching
+ ![image](https://github.com/sealtalk/sealtalk-android/blob/master/gif/search.gif)<br/>
+ ### Single and muliple audio and video
+ ![image](https://github.com/sealtalk/sealtalk-android/blob/master/gif/audio_video.gif)<br/>
+ ### Customer service, service robot
+ ![image](https://github.com/sealtalk/sealtalk-android/blob/master/gif/customer_service.gif)<br/>
+ ### Group
+ ![image](https://github.com/sealtalk/sealtalk-android/blob/master/gif/group.gif)<br/>
 
 ## APK
 [Download Apk](http://rongcloud.cn/sealtalk)<br/>
 
 ## UML
-  LoginClassDiagram
- ![image](https://github.com/sealtalk/sealtalk-android/blob/master/screenshots/LoginClassDiagram.png)<br/>
+  SealTalk UML
+ ![image](https://github.com/sealtalk/sealtalk-android/blob/master/screenshots/SealTalk_UML.png)<br/>
 
 ## Uses
 #### Step 1:
