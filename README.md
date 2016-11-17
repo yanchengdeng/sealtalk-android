@@ -17,16 +17,21 @@ Android App of SealTalk powered by RongCloud.
 - To be continued...
 
 ## Gif
- ### Add RedPacket
- ![image](https://github.com/sealtalk/sealtalk-android/blob/master/gif/redpacket.gif)<br/>
- ### Powerful global searching
- ![image](https://github.com/sealtalk/sealtalk-android/blob/master/gif/search.gif)<br/>
- ### Single and muliple audio and video
- ![image](https://github.com/sealtalk/sealtalk-android/blob/master/gif/audio_video.gif)<br/>
- ### Customer service, service robot
- ![image](https://github.com/sealtalk/sealtalk-android/blob/master/gif/customer_service.gif)<br/>
- ### Group
- ![image](https://github.com/sealtalk/sealtalk-android/blob/master/gif/group.gif)<br/>
+
+### Add RedPacket
+ 
+![image](https://github.com/sealtalk/sealtalk-android/blob/master/gif/redpacket.gif)<br/>
+ 
+### Powerful global searching
+ 
+![image](https://github.com/sealtalk/sealtalk-android/blob/master/gif/search.gif)<br/>
+ 
+### Single and muliple audio and video
+![image](https://github.com/sealtalk/sealtalk-android/blob/master/gif/audio_video.gif)<br/>
+### Customer service, service robot
+![image](https://github.com/sealtalk/sealtalk-android/blob/master/gif/customer_service.gif)<br/>
+### Group
+![image](https://github.com/sealtalk/sealtalk-android/blob/master/gif/group.gif)<br/>
 
 ## APK
 [Download Apk](http://rongcloud.cn/sealtalk)<br/>
