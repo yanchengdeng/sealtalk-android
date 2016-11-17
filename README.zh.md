@@ -35,7 +35,7 @@ Android 应用 SealTalk 由 融云 RongCloud 出品
 
 ## UML
  登录类图
- ![image](https://github.com/sealtalk/sealtalk-android/blob/master/screenshots/sealtalk_uml.pdf)<br/>
+ ![image](https://github.com/sealtalk/sealtalk-android/blob/master/screenshots/SealTalk_UML.png)<br/>
 
 ## 使用
 #### Step 1:
