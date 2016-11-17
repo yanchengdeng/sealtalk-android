@@ -19,17 +19,10 @@ Android 应用 SealTalk 由 融云 RongCloud 出品
 
 
 
-## Gif
-### 新增红包
-![image](https://github.com/sealtalk/sealtalk-android/blob/master/gif/redpacket.gif)<br/>
-### 强大的全局搜索
-![image](https://github.com/sealtalk/sealtalk-android/blob/master/gif/search.gif)<br/>
-### 单人、多人音视频
-![image](https://github.com/sealtalk/sealtalk-android/blob/master/gif/audio_video.gif)<br/>
-### 客服/机器人服务
-![image](https://github.com/sealtalk/sealtalk-android/blob/master/gif/customer_service.gif)<br/>
-### 群组
-![image](https://github.com/sealtalk/sealtalk-android/blob/master/gif/group.gif)<br/>
+## 截屏
+![image](https://github.com/sealtalk/sealtalk-android/blob/master/screenshots/image1.jpg)<br/>
+![image](https://github.com/sealtalk/sealtalk-android/blob/master/screenshots/image2.jpg)<br/>
+![image](https://github.com/sealtalk/sealtalk-android/blob/master/screenshots/image3.jpg)<br/>
 
 ## APK
 [下载 Apk](http://rongcloud.cn/sealtalk)<br/>
