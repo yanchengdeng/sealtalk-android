@@ -15,7 +15,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
 
-
 import cn.rongcloud.im.R;
 import cn.rongcloud.im.server.SealAction;
 import cn.rongcloud.im.server.network.async.AsyncTaskManager;
@@ -179,12 +178,10 @@ public abstract class BaseActivity extends FragmentActivity implements OnDataLis
 
     protected void onResume() {
         super.onResume();
-//        MobclickAgent.onResume(this);
     }
 
     protected void onPause() {
         super.onPause();
-//        MobclickAgent.onPause(this);
     }
 
 

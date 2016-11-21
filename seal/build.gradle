@@ -63,6 +63,6 @@ dependencies {
     compile 'com.android.support:multidex:1.0.1'
     compile project(':CallKit')
     compile project(':RedPacket')
-    compile project(':recognizer')
+    compile project(':Recognizer')
 }
 apply plugin: 'com.google.gms.google-services'
