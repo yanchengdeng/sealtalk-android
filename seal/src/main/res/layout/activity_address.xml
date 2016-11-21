@@ -17,7 +17,7 @@
         android:drawableLeft="@drawable/sealtalk_search"
         android:drawablePadding="10dp"
         android:hint="@string/Search"
-        android:singleLine="true"
+        android:maxLines="1"
         android:textSize="16sp"
         android:imeOptions="actionSearch"
         android:visibility="gone"/>
@@ -37,7 +37,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:divider="@null"></ListView>
+            android:divider="@null"/>
 
         <TextView
             android:id="@+id/group_dialog"

@@ -47,7 +47,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="昵称: "
+                    android:text="@string/ac_search_nick_name"
                     android:textColor="#999999"
                     android:textSize="14sp" />
                 <TextView

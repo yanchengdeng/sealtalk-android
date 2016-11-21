@@ -17,6 +17,7 @@ import cn.rongcloud.im.R;
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.response.ContactNotificationMessageData;
 import cn.rongcloud.im.server.utils.json.JsonMananger;
+import io.rong.imkit.RongContext;
 import io.rong.imkit.RongIM;
 import io.rong.imkit.model.ProviderTag;
 import io.rong.imkit.model.UIMessage;
@@ -48,11 +49,11 @@ public class ContactNotificationMessageProvider extends IContainerItemProvider.M
                 } finally {
                     if (bean != null && !TextUtils.isEmpty(bean.getSourceUserNickname())) {
                         if (content.getOperation().equals("AcceptResponse")) {
-                            viewHolder.contentTextView.setText(bean.getSourceUserNickname() + "已同意你的好友请求");
+                            viewHolder.contentTextView.setText(RongContext.getInstance().getResources().getString(R.string.contact_notification_someone_agree_your_request, bean.getSourceUserNickname()));
                         }
                     } else {
                         if (content.getOperation().equals("AcceptResponse")) {
-                            viewHolder.contentTextView.setText("对方已同意你的好友请求");
+                            viewHolder.contentTextView.setText(RongContext.getInstance().getResources().getString(R.string.contact_notification_agree_your_request));
                         }
                     }
                     if (content.getOperation().equals("Request")) {

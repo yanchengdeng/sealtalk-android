@@ -51,15 +51,15 @@ public class MineFragment extends Fragment implements View.OnClickListener {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View mView = inflater.inflate(R.layout.seal_mine_fragment, null);
+        View mView = inflater.inflate(R.layout.seal_mine_fragment, container, false);
         initViews(mView);
         initData();
         BroadcastManager.getInstance(getActivity()).addAction(SealConst.CHANGEINFO, new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                String userId = sp.getString("loginid", "");
-                String username = sp.getString("loginnickname", "");
-                String userPortrait = sp.getString("loginPortrait", "");
+                String userId = sp.getString(SealConst.SEALTALK_LOGIN_ID, "");
+                String username = sp.getString(SealConst.SEALTALK_LOGIN_NAME, "");
+                String userPortrait = sp.getString(SealConst.SEALTALK_LOGING_PORTRAIT, "");
                 mName.setText(username);
                 ImageLoader.getInstance().displayImage(TextUtils.isEmpty(userPortrait) ? RongGenerate.generateDefaultAvatar(username, userId) : userPortrait, imageView, App.getOptions());
             }
@@ -108,9 +108,9 @@ public class MineFragment extends Fragment implements View.OnClickListener {
 
     private void initData() {
         sp = getActivity().getSharedPreferences("config", Context.MODE_PRIVATE);
-        String userId = sp.getString("loginid", "");
-        String username = sp.getString("loginnickname", "");
-        String userPortrait = sp.getString("loginPortrait", "");
+        String userId = sp.getString(SealConst.SEALTALK_LOGIN_ID, "");
+        String username = sp.getString(SealConst.SEALTALK_LOGIN_NAME, "");
+        String userPortrait = sp.getString(SealConst.SEALTALK_LOGING_PORTRAIT, "");
         mName.setText(username);
         ImageLoader.getInstance().displayImage(TextUtils.isEmpty(userPortrait) ? RongGenerate.generateDefaultAvatar(username, userId) : userPortrait, imageView, App.getOptions());
     }

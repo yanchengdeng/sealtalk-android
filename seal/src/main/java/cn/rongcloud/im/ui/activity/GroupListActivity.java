@@ -72,7 +72,7 @@ public class GroupListActivity extends BaseActivity {
                     mGroupListView.setAdapter(adapter);
                     mNoGroups.setVisibility(View.GONE);
                     mTextView.setVisibility(View.VISIBLE);
-                    mTextView.setText(mList.size() + " 个群组");
+                    mTextView.setText(getString(R.string.ac_group_list_group_number, mList.size()));
                     mGroupListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -119,7 +119,7 @@ public class GroupListActivity extends BaseActivity {
             }
         }
         adapter.updateListView(filterDataList);
-        mTextView.setText(filterDataList.size() + " 个群组");
+        mTextView.setText(getString(R.string.ac_group_list_group_number, filterDataList.size()));
     }
 
 
@@ -170,7 +170,7 @@ public class GroupListActivity extends BaseActivity {
             final Groups mContent = list.get(position);
             if (convertView == null) {
                 viewHolder = new ViewHolder();
-                convertView = LayoutInflater.from(context).inflate(R.layout.group_item_new, null);
+                convertView = LayoutInflater.from(context).inflate(R.layout.group_item_new, parent, false);
                 viewHolder.tvTitle = (TextView) convertView.findViewById(R.id.groupname);
                 viewHolder.mImageView = (SelectableRoundedImageView) convertView.findViewById(R.id.groupuri);
                 viewHolder.groupId = (TextView) convertView.findViewById(R.id.group_id);

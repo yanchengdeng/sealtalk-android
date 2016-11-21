@@ -18,7 +18,7 @@
             android:layout_width="48dp"
             android:layout_height="match_parent"
             android:background="@drawable/selector_btn_back"
-            android:drawableLeft="@drawable/actionbar_back"
+            android:drawableLeft="@drawable/ac_back_icon"
             android:gravity="center_vertical"
             android:onClick="onHeadLeftButtonClick"
             android:textColor="@drawable/selector_btn_top" />
@@ -39,7 +39,7 @@
             android:layout_height="match_parent"
             android:maxLength="20"
             android:layout_marginLeft="12dp"
-            android:singleLine="true"
+            android:maxLines="1"
             android:textColor="@color/white"
             android:textSize="18sp" />
 
@@ -52,7 +52,7 @@
             android:layout_marginRight="15dp"
             android:background="@null"
             android:onClick="onHeadRightButtonClick"
-            android:singleLine="true"
+            android:maxLines="1"
             android:textColor="@drawable/selector_btn_top" />
 
         <TextView
@@ -63,7 +63,7 @@
             android:layout_centerVertical="true"
             android:layout_marginRight="15dp"
             android:clickable="true"
-            android:singleLine="true"
+            android:maxLines="1"
             android:textColor="#fff"
             android:textSize="18sp"
             android:visibility="gone" />

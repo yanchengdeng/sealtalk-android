@@ -80,16 +80,16 @@ public class MyAccountActivity extends BaseActivity implements View.OnClickListe
         mName = (TextView) findViewById(R.id.tv_my_username);
         portraitItem.setOnClickListener(this);
         nameItem.setOnClickListener(this);
-        String cacheName = sp.getString("loginnickname", "");
-        String cachePortrait = sp.getString("loginPortrait", "");
-        String cachePhone = sp.getString("loginphone", "");
+        String cacheName = sp.getString(SealConst.SEALTALK_LOGIN_NAME, "");
+        String cachePortrait = sp.getString(SealConst.SEALTALK_LOGING_PORTRAIT, "");
+        String cachePhone = sp.getString(SealConst.SEALTALK_LOGING_PHONE, "");
         if (!TextUtils.isEmpty(cachePhone)) {
             mPhone.setText("+86 " + cachePhone);
         }
         if (!TextUtils.isEmpty(cacheName)) {
             mName.setText(cacheName);
             if (TextUtils.isEmpty(cachePortrait)) {
-                ImageLoader.getInstance().displayImage(RongGenerate.generateDefaultAvatar(cacheName, sp.getString("loginid", "a")), mImageView, App.getOptions());
+                ImageLoader.getInstance().displayImage(RongGenerate.generateDefaultAvatar(cacheName, sp.getString(SealConst.SEALTALK_LOGIN_ID, "a")), mImageView, App.getOptions());
             } else {
                 ImageLoader.getInstance().displayImage(cachePortrait, mImageView, App.getOptions());
             }
@@ -98,7 +98,7 @@ public class MyAccountActivity extends BaseActivity implements View.OnClickListe
         BroadcastManager.getInstance(mContext).addAction(SealConst.CHANGEINFO, new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                mName.setText(sp.getString("loginnickname", ""));
+                mName.setText(sp.getString(SealConst.SEALTALK_LOGIN_NAME, ""));
             }
         });
     }
@@ -158,12 +158,12 @@ public class MyAccountActivity extends BaseActivity implements View.OnClickListe
                 case UP_LOAD_PORTRAIT:
                     SetPortraitResponse spRes = (SetPortraitResponse) result;
                     if (spRes.getCode() == 200) {
-                        editor.putString("loginPortrait", imageUrl);
+                        editor.putString(SealConst.SEALTALK_LOGING_PORTRAIT, imageUrl);
                         editor.commit();
                         ImageLoader.getInstance().displayImage(imageUrl, mImageView, App.getOptions());
                         if (RongIM.getInstance() != null) {
-                            RongIM.getInstance().refreshUserInfoCache(new UserInfo(sp.getString("loginid", ""), sp.getString("loginnickname", ""), Uri.parse(imageUrl)));
-                            RongIM.getInstance().setCurrentUserInfo(new UserInfo(sp.getString("loginid", ""), sp.getString("loginnickname", ""), Uri.parse(imageUrl)));
+                            RongIM.getInstance().refreshUserInfoCache(new UserInfo(sp.getString(SealConst.SEALTALK_LOGIN_ID, ""), sp.getString(SealConst.SEALTALK_LOGIN_NAME, ""), Uri.parse(imageUrl)));
+                            RongIM.getInstance().setCurrentUserInfo(new UserInfo(sp.getString(SealConst.SEALTALK_LOGIN_ID, ""), sp.getString(SealConst.SEALTALK_LOGIN_NAME, ""), Uri.parse(imageUrl)));
                         }
                         BroadcastManager.getInstance(mContext).sendBroadcast(SealConst.CHANGEINFO);
                         NToast.shortToast(mContext, getString(R.string.portrait_update_success));

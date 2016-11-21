@@ -18,7 +18,7 @@
         android:drawableLeft="@drawable/sealtalk_search"
         android:drawablePadding="10dp"
         android:hint="@string/Search"
-        android:singleLine="true"
+        android:maxLines="1"
         android:textSize="16sp" />
 
     <View
@@ -38,7 +38,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="暂未加入群组"
+                android:text="@string/fr_group_list_not_join_the_group"
                 android:textColor="@color/group_list_gray"
                 android:visibility="gone" />
             <cn.rongcloud.im.ui.widget.NestedListView

@@ -360,7 +360,7 @@ public class MainActivity extends FragmentActivity implements
                 if (TextUtils.isEmpty(cacheToken)) {
                     startActivity(new Intent(MainActivity.this, LoginActivity.class));
                 } else {
-                    if (!RongIM.getInstance().getCurrentConnectionStatus().equals(RongIMClient.ConnectionStatusListener.ConnectionStatus.CONNECTED)) {
+                    if (!RongIM.getInstance().getCurrentConnectionStatus().equals(ConnectionStatus.CONNECTED)) {
                         LoadDialog.show(mContext);
                         RongIM.connect(cacheToken, new RongIMClient.ConnectCallback() {
                             @Override
@@ -390,7 +390,7 @@ public class MainActivity extends FragmentActivity implements
             mUnreadNumView.setVisibility(View.GONE);
         } else if (count > 0 && count < 100) {
             mUnreadNumView.setVisibility(View.VISIBLE);
-            mUnreadNumView.setText(count + "");
+            mUnreadNumView.setText(String.valueOf(count));
         } else {
             mUnreadNumView.setVisibility(View.VISIBLE);
             mUnreadNumView.setText(R.string.no_read_message);
@@ -477,7 +477,7 @@ public class MainActivity extends FragmentActivity implements
             editor.putBoolean("exit", true);
         }
         editor.putString("loginToken", "");
-        editor.putString("loginid", "");
+        editor.putString(SealConst.SEALTALK_LOGIN_ID, "");
         editor.putInt("getAllUserInfoState", 0);
         editor.apply();
         /*//这些数据清除操作之前一直是在login界面,因为app的数据库改为按照userID存储,退出登录时先直接删除

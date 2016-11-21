@@ -24,8 +24,6 @@ import io.rong.imlib.model.UserInfo;
  */
 public class RongGenerate {
 
-    //    private static String SAVEADDRESS = "/sdcard/DCIM/Camera/";
-//    private static String SAVEADDRESS = "/sdcard/DCIM/RongDef/";
     private static String SAVEADDRESS = "/data/data/cn.rongcloud.im/temp";
     private static final String SCHEMA = "file://";
 
@@ -37,7 +35,7 @@ public class RongGenerate {
             s = String.valueOf(username.charAt(0));
         }
         if (s == null) {
-            s = generateRandomCharacter();
+            s = "A";
         }
         String color = getColorRGB(userid);
         String string = getAllFirstLetter(username);
@@ -74,11 +72,7 @@ public class RongGenerate {
     private static void createDir(String saveaddress) {
         boolean b;
         String status = Environment.getExternalStorageState();
-        if (status.equals(Environment.MEDIA_MOUNTED)) {
-            b = true;
-        } else {
-            b = false;
-        }
+        b = status.equals(Environment.MEDIA_MOUNTED);
         if (b) {
             File destDir = new File(saveaddress);
             if (!destDir.exists()) {
@@ -104,9 +98,12 @@ public class RongGenerate {
 
     private static String getColorRGB(String userId) {
         String[] portraitColors = {"#e97ffb", "#00b8d4", "#82b2ff", "#f3db73", "#f0857c"};
-        int length = portraitColors.length;
-        Random random = new Random();
-        return portraitColors[random.nextInt(length)];
+        if (TextUtils.isEmpty(userId)) {
+            return portraitColors[0];
+        }
+        int i = getAscii(userId.charAt(0)) % 5;
+
+        return portraitColors[i];
     }
 
 

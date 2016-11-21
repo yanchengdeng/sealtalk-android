@@ -185,7 +185,7 @@ public class SharedReceiverActivity extends BaseActivity {
                             ImageLoader.getInstance().displayImage(imageString, image);
                         }
                         if (!TextUtils.isEmpty(fromString)) {
-                            from.setText("来自:" + fromString);
+                            from.setText(getString(R.string.ac_share_receiver_from, fromString));
                         } else {
                             from.setVisibility(View.GONE);
                         }
@@ -293,7 +293,7 @@ public class SharedReceiverActivity extends BaseActivity {
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
                 holder = new ViewHolder();
-                convertView = LayoutInflater.from(context).inflate(R.layout.share_item, null);
+                convertView = LayoutInflater.from(context).inflate(R.layout.share_item, parent, false);
                 holder.mImageView = (SelectableRoundedImageView) convertView.findViewById(R.id.share_icon);
                 holder.title = (TextView) convertView.findViewById(R.id.share_name);
                 convertView.setTag(holder);

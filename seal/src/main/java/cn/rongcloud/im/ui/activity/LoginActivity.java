@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import cn.rongcloud.im.R;
+import cn.rongcloud.im.SealConst;
 import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.response.GetTokenResponse;
@@ -101,8 +102,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             }
         });
 
-        String oldPhone = sp.getString("loginphone", "");
-        String oldPassword = sp.getString("loginpassword", "");
+        String oldPhone = sp.getString(SealConst.SEALTALK_LOGING_PHONE, "");
+        String oldPassword = sp.getString(SealConst.SEALTALK_LOGING_PASSWORD, "");
 
         if (!TextUtils.isEmpty(oldPhone) && !TextUtils.isEmpty(oldPassword)) {
             mPhoneEdit.setText(oldPhone);
@@ -156,7 +157,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 LoadDialog.show(mContext);
                 editor.putBoolean("exit", false);
                 editor.apply();
-                String oldPhone = sp.getString("loginphone", "");
+                String oldPhone = sp.getString(SealConst.SEALTALK_LOGING_PHONE, "");
                 request(LOGIN, true);
                 break;
             case R.id.de_login_register:
@@ -184,10 +185,10 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             if (!TextUtils.isEmpty(phone) && !TextUtils.isEmpty(password) && !TextUtils.isEmpty(id) && !TextUtils.isEmpty(nickname)) {
                 mPhoneEdit.setText(phone);
                 mPasswordEdit.setText(password);
-                editor.putString("loginphone", phone);
-                editor.putString("loginpassword", password);
-                editor.putString("loginid", id);
-                editor.putString("loginnickname", nickname);
+                editor.putString(SealConst.SEALTALK_LOGING_PHONE, phone);
+                editor.putString(SealConst.SEALTALK_LOGING_PASSWORD, password);
+                editor.putString(SealConst.SEALTALK_LOGIN_ID, id);
+                editor.putString(SealConst.SEALTALK_LOGIN_NAME, nickname);
                 editor.apply();
             }
 
@@ -229,7 +230,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                                 public void onSuccess(String s) {
                                     connectResultId = s;
                                     NLog.e("connect", "onSuccess userid:" + s);
-                                    editor.putString("loginid", s);
+                                    editor.putString(SealConst.SEALTALK_LOGIN_ID, s);
                                     editor.apply();
                                     SealUserInfoManager.getInstance().openDB();
                                     request(SYNC_USER_INFO, true);
@@ -257,8 +258,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                         }
                         String nickName = userInfoByIdResponse.getResult().getNickname();
                         String portraitUri = userInfoByIdResponse.getResult().getPortraitUri();
-                        editor.putString("loginnickname", nickName);
-                        editor.putString("loginPortrait", portraitUri);
+                        editor.putString(SealConst.SEALTALK_LOGIN_NAME, nickName);
+                        editor.putString(SealConst.SEALTALK_LOGING_PORTRAIT, portraitUri);
                         editor.apply();
                         RongIM.getInstance().refreshUserInfoCache(new UserInfo(connectResultId, nickName, Uri.parse(portraitUri)));
                     }
@@ -281,7 +282,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                                 public void onSuccess(String s) {
                                     connectResultId = s;
                                     NLog.e("connect", "onSuccess userid:" + s);
-                                    editor.putString("loginid", s);
+                                    editor.putString(SealConst.SEALTALK_LOGIN_ID, s);
                                     editor.apply();
                                     SealUserInfoManager.getInstance().openDB();
                                     request(SYNC_USER_INFO, true);
@@ -333,8 +334,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
     private void goToMain() {
         editor.putString("loginToken", loginToken);
-        editor.putString("loginphone", phoneString);
-        editor.putString("loginpassword", passwordString);
+        editor.putString(SealConst.SEALTALK_LOGING_PHONE, phoneString);
+        editor.putString(SealConst.SEALTALK_LOGING_PASSWORD, passwordString);
         editor.apply();
         LoadDialog.dismiss(mContext);
         NToast.shortToast(mContext, R.string.login_success);

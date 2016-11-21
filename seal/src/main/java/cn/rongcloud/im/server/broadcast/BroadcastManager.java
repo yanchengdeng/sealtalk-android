@@ -57,7 +57,7 @@ public class BroadcastManager {
      * @param context
      */
     private BroadcastManager(Context context) {
-        this.mContext = context;
+        this.mContext = context.getApplicationContext();
         receiverMap = new HashMap<String, BroadcastReceiver>();
     }
 

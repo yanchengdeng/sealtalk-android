@@ -137,11 +137,12 @@
     <string name="you">你</string>
     <string name="request_friends">请求添加你为好友</string>
     <string name="edit_phone">请输入 11 位手机号</string>
-    <string name="original_password">初始密码不能为空</string>
+    <string name="original_password">原密码不能为空</string>
     <string name="new_password_not_null">新密码不能为空</string>
     <string name="confirm_password_not_null">确认密码不能为空</string>
-    <string name="original_password_mistake">初始密码不正确</string>
-    <string name="passwords_do_not_match">两次密码不一致</string>
+    <string name="original_password_mistake">原密码填写错误</string>
+    <string name="passwords_invalid">密码必须为6-16位字符，区分大小写</string>
+    <string name="passwords_do_not_match">填写的确认密码与新密码不一致</string>
     <string name="original_password_text">初始密码</string>
     <string name="new_password">新密码</string>
     <string name="confirm_new_password">确认新密码</string>
@@ -154,7 +155,7 @@
     <string name="set_top">会话置顶</string>
     <string name="message_notice">消息免打扰</string>
     <string name="search_message">查找聊天记录</string>
-    <string name="clean_message">清空聊天信息</string>
+    <string name="clean_message">清除聊天记录</string>
     <string name="send_message">发起聊天</string>
     <string name="quit_group">删除并退出</string>
     <string name="dismiss_group">解散并退出</string>
@@ -266,6 +267,7 @@
     <string name="ac_search_chat_detail_one">共</string>
     <string name="ac_search_chat_detail_two">条与</string>
     <string name="ac_search_chat_detail_three">相关的聊天记录</string>
+    <string name="ac_search_nick_name">昵称： </string>
     <string name="ac_contact_nick_name">昵称:</string>
 
     <string name="ac_search_friend">联系人</string>
@@ -281,8 +283,8 @@
     <string name="pc_online">电脑在线</string>
     <string name="phone_online">手机在线</string>
     <string name="read_receipt_detail">回执详情</string>
-    <string name="read_receipt_unread_persons">%1$s人未读</string>
-    <string name="read_receipt_read_persons">%1$s人已读</string>
+    <string name="read_receipt_unread_persons">%1$d人未读</string>
+    <string name="read_receipt_read_persons">%1$d人已读</string>
     <string name="read_receipt_no_person_read">全部未读</string>
     <string name="read_receipt_no_person_unread">全部已读</string>
     <string name="des_add_friend_to_black_list">你将不再收到对方的消息</string>
@@ -291,4 +293,51 @@
     <string name="clean_group_chat_history">确定删除群聊天记录吗</string>
     <string name="clean_discussion_chat_history">确定删除讨论组聊天记录吗</string>
     <string name="join_chat_room_error_toast">聊天室ID为空,请稍后重试</string>
+
+    <string name="activity_detail_discussion_to_top">置顶</string>
+    <string name="activity_detail_discussion_not_disturb">消息免打扰</string>
+    <string name="ac_about_seal_talk_version">SealTalk 版本</string>
+    <string name="ac_about_sdk_version">SDK 版本</string>
+    <string name="ac_about_shut_down_debug_mode">关闭debug模式</string>
+    <string name="ac_detail_discussion_member_size">讨论组成员()</string>
+    <string name="ac_detail_discussion_clear_messages">清空聊天信息</string>
+    <string name="ac_detail_discussion_start_group_conversation">开启群组会话</string>
+    <string name="ac_detail_discussion_group_display_name">群组昵称</string>
+    <string name="ac_detail_discussion_start_chat">发起聊天</string>
+    <string name="ac_detail_discussion_delete_and_quit_discussion">删除并退出讨论组</string>
+    <string name="ac_detail_discussion_dismiss_group">解散群组</string>
+    <string name="ac_detail_discussion_no">无</string>
+
+    <string name="fr_chat_room">聊天室</string>
+    <string name="fr_chat_room_one">聊天室 I</string>
+    <string name="fr_chat_room_two">聊天室 II</string>
+    <string name="fr_chat_room_three">聊天室 III</string>
+    <string name="fr_chat_room_four">聊天室 IV</string>
+    
+    <string name="ac_new_friend_list_no_data">暂无数据</string>
+    <string name="share_dialog_share">分享</string>
+    <string name="share_dialog_cancel">取消</string>
+    <string name="share_dialog_hint">说些什么</string>
+    <string name="share_dialog_from">来自：UC浏览器</string>
+
+    <string name="dialog_bottom_picture">拍照</string>
+    <string name="dialog_bottom_import_from_local">从本地导入</string>
+    <string name="fr_group_list_not_join_the_group">暂未加入群组</string>
+    <string name="ac_select_friend">选择联系人</string>
+    <string name="ac_select_friend_sure">确定</string>
+
+    <string name="ac_note_info_name">备注名</string>
+    <string name="ac_note_info">备注信息</string>
+    <string name="ac_note_info_save">保存</string>
+
+    <string name="contact_notification_someone_agree_your_request">%1$s已同意你的好友请求</string>
+    <string name="contact_notification_agree_your_request">对方已同意你的好友请求</string>
+    <string name="ac_group_list_group_number">%1$d个群组</string>
+    <string name="ac_share_receiver_from">来自：%1$s</string>
+
+    <string name="ac_search_phone_number">手机号</string>
+    <string name="layout_dialog_loading">正在加载</string>
+    <string name="seal_mine_fragment_user_portrait">用户头像</string>
+    <string name="item_filter_group_list_include">包含：</string>
+    <string name="rs_ada_user_ship_add">已添加</string>
 </resources>

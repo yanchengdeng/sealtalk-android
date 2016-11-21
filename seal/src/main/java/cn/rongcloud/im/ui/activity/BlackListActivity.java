@@ -92,7 +92,7 @@ public class BlackListActivity extends BaseActivity {
             UserInfo userInfo = userInfoList.get(position);
             if (convertView == null) {
                 viewHolder = new ViewHolder();
-                convertView = LayoutInflater.from(mContext).inflate(R.layout.black_item_new, null);
+                convertView = LayoutInflater.from(mContext).inflate(R.layout.black_item_new, parent, false);
                 viewHolder.mName = (TextView) convertView.findViewById(R.id.blackname);
                 viewHolder.mHead = (ImageView) convertView.findViewById(R.id.blackuri);
                 convertView.setTag(viewHolder);

@@ -27,7 +27,6 @@ import cn.rongcloud.im.server.response.ContactNotificationMessageData;
 import cn.rongcloud.im.server.utils.NLog;
 import cn.rongcloud.im.server.utils.RongGenerate;
 import cn.rongcloud.im.server.utils.json.JsonMananger;
-import cn.rongcloud.im.ui.activity.LoginActivity;
 import cn.rongcloud.im.ui.activity.MainActivity;
 import cn.rongcloud.im.ui.activity.NewFriendListActivity;
 import cn.rongcloud.im.ui.activity.UserDetailActivity;
@@ -77,7 +76,7 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
 
     private static SealAppContext mRongCloudInstance;
 
-    private RongIM.LocationProvider.LocationCallback mLastLocationCallback;
+    private LocationCallback mLastLocationCallback;
 
     private static ArrayList<Activity> mActivities;
 
@@ -456,11 +455,11 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
     }
 
 
-    public RongIM.LocationProvider.LocationCallback getLastLocationCallback() {
+    public LocationCallback getLastLocationCallback() {
         return mLastLocationCallback;
     }
 
-    public void setLastLocationCallback(RongIM.LocationProvider.LocationCallback lastLocationCallback) {
+    public void setLastLocationCallback(LocationCallback lastLocationCallback) {
         this.mLastLocationCallback = lastLocationCallback;
     }
 
@@ -503,7 +502,7 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
             public void onSuccess(String s) {
                 NLog.d(TAG, "ConnectCallback connect onSuccess");
                 SharedPreferences sp = mContext.getSharedPreferences("config", Context.MODE_PRIVATE);
-                sp.edit().putString("loginid", s).apply();
+                sp.edit().putString(SealConst.SEALTALK_LOGIN_ID, s).apply();
             }
 
             @Override

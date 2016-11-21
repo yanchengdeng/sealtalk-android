@@ -1358,7 +1358,7 @@ public class SealUserInfoManager implements OnDataListener {
                             @Override
                             public void onSuccess(String s) {
                                 SharedPreferences sp = mContext.getSharedPreferences("config", Context.MODE_PRIVATE);
-                                sp.edit().putString("loginid", s).apply();
+                                sp.edit().putString(SealConst.SEALTALK_LOGIN_ID, s).apply();
                             }
 
                             @Override

@@ -61,7 +61,7 @@ public class ContactsFragment extends Fragment implements View.OnClickListener {
     /**
      * 中部展示的字母提示
      */
-    public TextView mDialogTextView;
+    private TextView mDialogTextView;
 
     private List<Friend> mSourceFriendList;
     private List<Friend> mFriendList;
@@ -118,9 +118,9 @@ public class ContactsFragment extends Fragment implements View.OnClickListener {
         mSelectableRoundedImageView = (SelectableRoundedImageView) mHeadView.findViewById(R.id.contact_me_img);
         mNameTextView = (TextView) mHeadView.findViewById(R.id.contact_me_name);
         SharedPreferences sp = getActivity().getSharedPreferences("config", Context.MODE_PRIVATE);
-        mId = sp.getString("loginid", "");
-        mCacheName = sp.getString("loginnickname", "");
-        final String header = sp.getString("loginPortrait", "");
+        mId = sp.getString(SealConst.SEALTALK_LOGIN_ID, "");
+        mCacheName = sp.getString(SealConst.SEALTALK_LOGIN_NAME, "");
+        final String header = sp.getString(SealConst.SEALTALK_LOGING_PORTRAIT, "");
         mNameTextView.setText(mCacheName);
         ImageLoader.getInstance().displayImage(TextUtils.isEmpty(header) ? RongGenerate.generateDefaultAvatar(mCacheName, mId) : header, mSelectableRoundedImageView, App.getOptions());
         mListView.addHeaderView(mHeadView);
@@ -282,9 +282,9 @@ public class ContactsFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onReceive(Context context, Intent intent) {
                 SharedPreferences sp = context.getSharedPreferences("config", Context.MODE_PRIVATE);
-                mId = sp.getString("loginid", "");
-                mCacheName = sp.getString("loginnickname", "");
-                String header = sp.getString("loginPortrait", "");
+                mId = sp.getString(SealConst.SEALTALK_LOGIN_ID, "");
+                mCacheName = sp.getString(SealConst.SEALTALK_LOGIN_NAME, "");
+                String header = sp.getString(SealConst.SEALTALK_LOGING_PORTRAIT, "");
                 mNameTextView.setText(mCacheName);
                 ImageLoader.getInstance().displayImage(TextUtils.isEmpty(header) ? RongGenerate.generateDefaultAvatar(mCacheName, mId) : header, mSelectableRoundedImageView, App.getOptions());
             }

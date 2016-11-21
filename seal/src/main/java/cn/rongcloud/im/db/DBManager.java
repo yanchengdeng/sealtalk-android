@@ -7,6 +7,7 @@ import android.text.TextUtils;
 
 import java.io.File;
 
+import cn.rongcloud.im.SealConst;
 import io.rong.common.RLog;
 import io.rong.imkit.userInfoCache.RongDatabaseContext;
 
@@ -110,7 +111,7 @@ public class DBManager {
     }
 
     private static String getDbPath () {
-        String currentUserId = mContext.getSharedPreferences("config", MODE_PRIVATE).getString("loginid", null);
+        String currentUserId = mContext.getSharedPreferences("config", MODE_PRIVATE).getString(SealConst.SEALTALK_LOGIN_ID, null);
         String dbPath = mContext.getFilesDir().getAbsolutePath();
         dbPath = dbPath + File.separator + getAppKey() + File.separator + currentUserId;
         RLog.d(TAG, "DBManager dbPath = " + dbPath);

@@ -21,6 +21,8 @@ public class NestedListView extends ListView implements View.OnTouchListener, Ab
 
     private int listViewTouchAction;
     private static final int MAXIMUM_LIST_ITEMS_VIEWABLE = 100000000;
+    private ViewGroup.LayoutParams mParams = new LayoutParams(
+        LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 
     public NestedListView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -59,8 +61,7 @@ public class NestedListView extends ListView implements View.OnTouchListener, Ab
                     View listItem = listAdapter.getView(listPosition, null, this);
                     //now it will not throw a NPE if listItem is a ViewGroup instance
                     if (listItem instanceof ViewGroup) {
-                        listItem.setLayoutParams(new LayoutParams(
-                                                     LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+                        listItem.setLayoutParams(mParams);
                     }
                     listItem.measure(widthMeasureSpec, heightMeasureSpec);
                     newHeight += listItem.getMeasuredHeight();

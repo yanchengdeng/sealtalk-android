@@ -40,6 +40,7 @@ import java.util.concurrent.TimeUnit;
 
 import cn.rongcloud.im.App;
 import cn.rongcloud.im.R;
+import cn.rongcloud.im.SealConst;
 import cn.rongcloud.im.db.DBManager;
 import cn.rongcloud.im.db.Friend;
 import cn.rongcloud.im.db.FriendDao;
@@ -689,9 +690,9 @@ public class SealSearchActivity extends Activity {
             if (conversation.getConversationType() == Conversation.ConversationType.PRIVATE) {
                 Friend friend = DBManager.getInstance().getDaoSession().getFriendDao().queryBuilder().where(FriendDao.Properties.UserId.eq(conversation.getTargetId())).unique();
                 SharedPreferences sp = getSharedPreferences("config", Context.MODE_PRIVATE);
-                String currentUserId = sp.getString("loginid", "");
-                String currentUserName = sp.getString("loginnickname", "");
-                String currentUserPortrait = sp.getString("loginPortrait", "");
+                String currentUserId = sp.getString(SealConst.SEALTALK_LOGIN_ID, "");
+                String currentUserName = sp.getString(SealConst.SEALTALK_LOGIN_NAME, "");
+                String currentUserPortrait = sp.getString(SealConst.SEALTALK_LOGING_PORTRAIT, "");
                 if (friend != null) {
                     String portraitUri = friend.getPortraitUri();
                     searchResult.setId(friend.getUserId());

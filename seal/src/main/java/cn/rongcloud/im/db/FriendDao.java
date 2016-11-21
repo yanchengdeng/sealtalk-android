@@ -32,7 +32,7 @@ public class FriendDao extends AbstractDao<Friend, String> {
         public final static Property Timestamp = new Property(7, Long.class, "timestamp", false, "TIMESTAMP");
         public final static Property NameSpelling = new Property(8, String.class, "nameSpelling", false, "NAME_SPELLING");
         public final static Property DisplayNameSpelling = new Property(9, String.class, "displayNameSpelling", false, "DISPLAY_NAME_SPELLING");
-    };
+    }
 
 
     public FriendDao(DaoConfig config) {

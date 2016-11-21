@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.rongcloud.im.R;
+import cn.rongcloud.im.SealConst;
 import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.db.Friend;
 import cn.rongcloud.im.db.Groups;
@@ -71,7 +72,7 @@ public class CreateGroupActivity extends BaseActivity implements View.OnClickLis
         initView();
         setPortraitChangeListener();
         if (memberList != null && memberList.size() > 0) {
-            groupIds.add(getSharedPreferences("config", MODE_PRIVATE).getString("loginid", ""));
+            groupIds.add(getSharedPreferences("config", MODE_PRIVATE).getString(SealConst.SEALTALK_LOGIN_ID, ""));
             for (Friend f : memberList) {
                 groupIds.add(f.getUserId());
             }

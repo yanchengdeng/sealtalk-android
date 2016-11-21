@@ -249,7 +249,7 @@ public class UpdateService extends Service {
     private void buildNotification() {
         manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         builder = new NotificationCompat.Builder(this);
-        builder.setContentTitle(getString(R.string.update_app_model_prepare, appName))
+        builder.setContentTitle(getString(R.string.update_app_model_prepare))
         .setWhen(System.currentTimeMillis())
         .setProgress(100, 1, false)
         .setSmallIcon(icoSmallResId)
@@ -262,7 +262,7 @@ public class UpdateService extends Service {
 
     private void start() {
         builder.setContentTitle(appName);
-        builder.setContentText(getString(R.string.update_app_model_prepare, 1));
+        builder.setContentText(getString(R.string.update_app_model_prepare));
         manager.notify(notifyId, builder.build());
         sendLocalBroadcast(UPDATE_PROGRESS_STATUS, 1);
         if (updateProgressListener != null) {

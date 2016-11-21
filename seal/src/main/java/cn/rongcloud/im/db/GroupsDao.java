@@ -30,7 +30,7 @@ public class GroupsDao extends AbstractDao<Groups, String> {
         public final static Property Bulletin = new Property(5, String.class, "bulletin", false, "BULLETIN");
         public final static Property Timestamp = new Property(6, String.class, "timestamp", false, "TIMESTAMP");
         public final static Property NameSpelling = new Property(7, String.class, "nameSpelling", false, "NAME_SPELLING");
-    };
+    }
 
 
     public GroupsDao(DaoConfig config) {

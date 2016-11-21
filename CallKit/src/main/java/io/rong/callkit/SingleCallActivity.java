@@ -622,6 +622,9 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
 
     @Override
     public void onBackPressed() {
+        if (callSession == null) {
+            return;
+        }
         List<CallUserProfile> participantProfiles = callSession.getParticipantProfileList();
         RongCallCommon.CallStatus callStatus = null;
         for (CallUserProfile item : participantProfiles) {

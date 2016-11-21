@@ -34,8 +34,8 @@
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="14dp"
             android:ellipsize="end"
-            android:singleLine="true"
-            android:text="用户头像"
+            android:maxLines="1"
+            android:text="@string/seal_mine_fragment_user_portrait"
             android:textColor="@color/text_color"
             android:textSize="16sp" />
 

@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
@@ -27,6 +28,7 @@ import java.util.Map;
 
 import cn.rongcloud.im.App;
 import cn.rongcloud.im.R;
+import cn.rongcloud.im.SealConst;
 import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.db.Friend;
 import cn.rongcloud.im.db.GroupMember;
@@ -79,8 +81,6 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
      */
     private PinyinComparator pinyinComparator;
     private TextView mNoFriends;
-    private TextView mConfirmTextView;
-    private TextView mTitleTextView;
     private List<Friend> data_list = new ArrayList<>();
     private List<Friend> sourceDataList = new ArrayList<>();
     private LinearLayout mSelectedFriendsLinearLayout;
@@ -104,12 +104,13 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_disc);
-        setHeadVisibility(View.GONE);
+        Button rightButton = getHeadRightButton();
+        rightButton.setVisibility(View.GONE);
+        mHeadRightText.setVisibility(View.VISIBLE);
+        mHeadRightText.setText("确定");
+        mHeadRightText.setOnClickListener(this);
         mSelectedFriend = new ArrayList<>();
-        mTitleTextView = (TextView) findViewById(R.id.select_title);
-        mConfirmTextView = (TextView) findViewById(R.id.select_ok);
         mSelectedFriendsLinearLayout = (LinearLayout) findViewById(R.id.ll_selected_friends);
-        mConfirmTextView.setOnClickListener(this);
         isCrateGroup = getIntent().getBooleanExtra("createGroup", false);
         isConversationActivityStartDiscussion = getIntent().getBooleanExtra("CONVERSATION_DISCUSSION", false);
         isConversationActivityStartPrivate = getIntent().getBooleanExtra("CONVERSATION_PRIVATE", false);
@@ -158,24 +159,24 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
         if (isConversationActivityStartPrivate) {
             conversationStartType = "PRIVATE";
             conversationStartId = getIntent().getStringExtra("DEMO_FRIEND_TARGETID");
-            mTitleTextView.setText("选择讨论组成员");
+            setTitle("选择讨论组成员");
         } else if (isConversationActivityStartDiscussion) {
             conversationStartType = "DISCUSSION";
             conversationStartId = getIntent().getStringExtra("DEMO_FRIEND_TARGETID");
             discListMember = getIntent().getStringArrayListExtra("DISCUSSIONMEMBER");
-            mTitleTextView.setText("选择讨论组成员");
+            setTitle("选择讨论组成员");
         } else if (isDeleteGroupMember) {
-            mTitleTextView.setText(getString(R.string.remove_group_member));
+            setTitle(getString(R.string.remove_group_member));
         } else if (isAddGroupMember) {
-            mTitleTextView.setText(getString(R.string.add_group_member));
+            setTitle(getString(R.string.add_group_member));
         } else if (isCrateGroup) {
-            mTitleTextView.setText(getString(R.string.select_group_member));
+            setTitle(getString(R.string.select_group_member));
         } else if (addDisList != null) {
-            mTitleTextView.setText("增加讨论组成员");
+            setTitle("增加讨论组成员");
         } else if (deleDisList != null) {
-            mTitleTextView.setText("移除讨论组成员");
+            setTitle("移除讨论组成员");
         } else {
-            mTitleTextView.setText(getString(R.string.select_contact));
+            setTitle(getString(R.string.select_contact));
             if (!getSharedPreferences("config", MODE_PRIVATE).getBoolean("isDebug", false)) {
                 isStartPrivateChat = true;
             }
@@ -211,7 +212,7 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
     private void initData() {
         if (deleDisList != null && deleDisList.size() > 0) {
             for (int i = 0; i < deleDisList.size(); i++) {
-                if (deleDisList.get(i).getUserId().contains(getSharedPreferences("config", MODE_PRIVATE).getString("loginid", ""))) {
+                if (deleDisList.get(i).getUserId().contains(getSharedPreferences("config", MODE_PRIVATE).getString(SealConst.SEALTALK_LOGIN_ID, ""))) {
                     continue;
                 }
                 data_list.add(new Friend(deleDisList.get(i).getUserId(),
@@ -320,7 +321,7 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
     private void fillSourceDataListForDeleteGroupMember() {
         if (deleteGroupMemberList != null && deleteGroupMemberList.size() > 0) {
             for (GroupMember deleteMember : deleteGroupMemberList) {
-                if (deleteMember.getUserId().contains(getSharedPreferences("config", MODE_PRIVATE).getString("loginid", ""))) {
+                if (deleteMember.getUserId().contains(getSharedPreferences("config", MODE_PRIVATE).getString(SealConst.SEALTALK_LOGIN_ID, ""))) {
                     continue;
                 }
                 data_list.add(new Friend(deleteMember.getUserId(),
@@ -393,7 +394,7 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
             final Friend friend = adapterList.get(position);
             if (convertView == null) {
                 viewHolder = new ViewHolder();
-                convertView = LayoutInflater.from(context).inflate(R.layout.item_start_discussion, null);
+                convertView = LayoutInflater.from(context).inflate(R.layout.item_start_discussion, parent, false);
                 viewHolder.tvTitle = (TextView) convertView.findViewById(R.id.dis_friendname);
                 viewHolder.tvLetter = (TextView) convertView.findViewById(R.id.dis_catalog);
                 viewHolder.mImageView = (SelectableRoundedImageView) convertView.findViewById(R.id.dis_frienduri);
@@ -487,21 +488,17 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
                     }
                 }
                 if (size == 0) {
-                    mConfirmTextView.setText("确定");
-//                mSelectedListView.setVisibility(View.GONE);
+                    mHeadRightText.setText("确定");
                     mSelectedFriendsLinearLayout.setVisibility(View.GONE);
                 } else {
-                    mConfirmTextView.setText("确定(" + size + ")");
+                    mHeadRightText.setText("确定(" + size + ")");
                     List<Friend> selectedList = new ArrayList<>();
                     for (int i = 0; i < sourceDataList.size(); i++) {
                         if (mCBFlag.get(i)) {
                             selectedList.add(sourceDataList.get(i));
                         }
                     }
-//                mSelectedListView.setVisibility(View.VISIBLE);
                     mSelectedFriendsLinearLayout.setVisibility(View.GONE);
-//                selectAdapter.updateListView(selectedList);
-//                    updateSelectedFriendsView(selectedList);
                 }
             }
         }
@@ -676,8 +673,8 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.select_ok:
-                mConfirmTextView.setClickable(false);
+            case R.id.text_right:
+                mHeadRightText.setClickable(false);
                 if (mCBFlag != null && sourceDataList != null && sourceDataList.size() > 0) {
                     startDisList = new ArrayList<>();
                     List<String> disNameList = new ArrayList<>();
@@ -722,7 +719,7 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
                             });
                         }
                     } else if (deleteGroupMemberList != null && startDisList != null && sourceDataList.size() > 0) {
-                        mConfirmTextView.setClickable(true);
+                        mHeadRightText.setClickable(true);
                         DialogWithYesOrNoUtils.getInstance().showDialog(mContext, getString(R.string.remove_group_members), new DialogWithYesOrNoUtils.DialogCallBack() {
 
                             @Override
@@ -808,10 +805,4 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
                 break;
         }
     }
-
-
-    public void selectFinish(View view) {
-        finish();
-    }
-
 }

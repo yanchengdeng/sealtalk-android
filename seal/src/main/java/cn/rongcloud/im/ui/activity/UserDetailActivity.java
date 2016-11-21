@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import cn.rongcloud.im.App;
 import cn.rongcloud.im.R;
 import cn.rongcloud.im.SealAppContext;
+import cn.rongcloud.im.SealConst;
 import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.db.Friend;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
@@ -81,7 +82,7 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
     private static final int CLICK_CONTACT_FRAGMENT_FRIEND = 2;
 
 
-    private MyHandler handler = new MyHandler(this);
+    private UserDetailActivityHandler mHandler = new UserDetailActivityHandler(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,18 +131,18 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
                 public void onSuccess(final ArrayList<UserOnlineStatusInfo> userOnlineStatusInfoList) {
                     if (userOnlineStatusInfoList != null) {
                         if (userOnlineStatusInfoList.size() > 1) {
-                            Message message = handler.obtainMessage();
+                            Message message = mHandler.obtainMessage();
                             message.arg1 = 0;
-                            handler.sendMessage(message);
+                            mHandler.sendMessage(message);
                         } else if (userOnlineStatusInfoList.size() == 1) {
-                            Message message = handler.obtainMessage();
+                            Message message = mHandler.obtainMessage();
                             message.arg1 = userOnlineStatusInfoList.get(0).getPlatform().getValue();
-                            handler.sendMessage(message);
+                            mHandler.sendMessage(message);
                         }
                     } else {
-                        Message message = handler.obtainMessage();
+                        Message message = mHandler.obtainMessage();
                         message.arg1 = 5;
-                        handler.sendMessage(message);
+                        mHandler.sendMessage(message);
                     }
 
                 }
@@ -155,7 +156,7 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
         syncPersonalInfo();
 
         if (!TextUtils.isEmpty(mFriend.getUserId())) {
-            String mySelf = getSharedPreferences("config", MODE_PRIVATE).getString("loginid", "");
+            String mySelf = getSharedPreferences("config", MODE_PRIVATE).getString(SealConst.SEALTALK_LOGIN_ID, "");
             if (mySelf.equals(mFriend.getUserId())) {
                 mChatButtonGroupLinearLayout.setVisibility(View.VISIBLE);
                 mAddFriendButton.setVisibility(View.GONE);
@@ -287,9 +288,9 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
                     public void executeEditEvent(String editText) {
                         if (TextUtils.isEmpty(editText)) {
                             if (mGroupName != null && !TextUtils.isEmpty(mGroupName)) {
-                                addMessage = "我是" + mGroupName + "群的" + getSharedPreferences("config", MODE_PRIVATE).getString("loginnickname", "");
+                                addMessage = "我是" + mGroupName + "群的" + getSharedPreferences("config", MODE_PRIVATE).getString(SealConst.SEALTALK_LOGIN_NAME, "");
                             } else {
-                                addMessage = "我是" + getSharedPreferences("config", MODE_PRIVATE).getString("loginnickname", "");
+                                addMessage = "我是" + getSharedPreferences("config", MODE_PRIVATE).getString(SealConst.SEALTALK_LOGIN_NAME, "");
                             }
                         } else {
                             addMessage = editText;
@@ -387,7 +388,7 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
                                 //当前app server返回的displayName为空,先不使用
                                 String displayName = resultEntity.getdisplayName();
                                 //如果没有设置头像,好友数据库的头像地址和用户信息提供者的头像处理不一致,这个不一致是seal app代码处理的问题,未来应该矫正回来
-                                String userInfoPortraitUri;
+                                String userInfoPortraitUri = mFriend.getPortraitUri();
                                 //更新UI
                                 //if (TextUtils.isEmpty(displayName) && hasDisplayNameChanged(displayName)) {
                                 if (!TextUtils.isEmpty(mFriend.getDisplayName())) {
@@ -404,8 +405,6 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
                                 if (hasPortraitUriChanged(portraitUri)) {
                                     ImageLoader.getInstance().displayImage(portraitUri, mUserPortrait, App.getOptions());
                                     userInfoPortraitUri = portraitUri;
-                                } else {
-                                    userInfoPortraitUri = RongGenerate.generateDefaultAvatar(nickName, mFriend.getUserId());
                                 }
                                 //更新好友数据库
                                 SealUserInfoManager.getInstance().addFriend(
@@ -425,6 +424,9 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
                                     //如果备注存在,UserInfo设置备注
                                     if (mFriend.isExitsDisplayName())
                                         nickName = mFriend.getDisplayName();
+                                    if (TextUtils.isEmpty(userInfoPortraitUri)) {
+                                        userInfoPortraitUri = RongGenerate.generateDefaultAvatar(nickName, mFriend.getUserId());
+                                    }
                                     UserInfo newUserInfo = new UserInfo(mFriend.getUserId(),
                                                                         nickName,
                                                                         Uri.parse(userInfoPortraitUri));
@@ -442,51 +444,29 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
 
     private boolean hasNickNameChanged(String nickName) {
         if (mFriend.getName() == null) {
-            if (nickName == null) {
-                return false;
-            } else {
-                return true;
-            }
+            return nickName != null;
         } else {
-            if (mFriend.getName().equals(nickName))
-                return false;
-            else {
-                return true;
-            }
+            return !mFriend.getName().equals(nickName);
         }
     }
 
     private boolean hasPortraitUriChanged(String portraitUri) {
         if (mFriend.getPortraitUri() == null) {
-            if (portraitUri == null) {
-                return false;
-            } else {
-                return true;
-            }
+            return portraitUri != null;
         } else {
             if (mFriend.getPortraitUri().equals(portraitUri)) {
                 return false;
             } else {
-                if (TextUtils.isEmpty(portraitUri))
-                    return false;
-                return true;
+                return !TextUtils.isEmpty(portraitUri);
             }
         }
     }
 
     private boolean hasDisplayNameChanged(String displayName) {
         if (mFriend.getDisplayName() == null) {
-            if (displayName == null) {
-                return false;
-            } else {
-                return true;
-            }
+            return displayName != null;
         } else {
-            if (mFriend.getDisplayName().equals(displayName)) {
-                return false;
-            } else {
-                return true;
-            }
+            return !mFriend.getDisplayName().equals(displayName);
         }
     }
 
@@ -495,11 +475,9 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
         String nickName = userEntity.getNickname();
         String portraitUri = userEntity.getPortraitUri();
         String displayName = resultEntity.getdisplayName();
-        if (hasNickNameChanged(nickName) ||
-                hasPortraitUriChanged(portraitUri) ||
-                hasDisplayNameChanged(displayName))
-            return true;
-        return false;
+        return hasNickNameChanged(nickName) ||
+               hasPortraitUriChanged(portraitUri) ||
+               hasDisplayNameChanged(displayName);
     }
 
     @Override
@@ -524,10 +502,10 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
         super.onHeadLeftButtonClick(v);
     }
 
-    private static class MyHandler extends Handler {
+    private static class UserDetailActivityHandler extends Handler {
         private final WeakReference<UserDetailActivity> mActivity;
 
-        public MyHandler(UserDetailActivity activity) {
+        public UserDetailActivityHandler(UserDetailActivity activity) {
             mActivity = new WeakReference<UserDetailActivity>(activity);
         }
 
@@ -560,5 +538,11 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
                 }
             }
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        mHandler.removeCallbacksAndMessages(null);
+        super.onDestroy();
     }
 }

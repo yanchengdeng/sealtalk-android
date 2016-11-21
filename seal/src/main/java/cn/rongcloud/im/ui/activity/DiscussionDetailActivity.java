@@ -249,7 +249,7 @@ public class DiscussionDetailActivity extends BaseActivity implements CompoundBu
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
-                convertView = LayoutInflater.from(context).inflate(R.layout.social_chatsetting_gridview_item, null);
+                convertView = LayoutInflater.from(context).inflate(R.layout.social_chatsetting_gridview_item, parent, false);
             }
             SelectableRoundedImageView iv_avatar = (SelectableRoundedImageView) convertView.findViewById(R.id.iv_avatar);
             TextView tv_username = (TextView) convertView.findViewById(R.id.tv_username);
@@ -420,8 +420,8 @@ public class DiscussionDetailActivity extends BaseActivity implements CompoundBu
                     for (GetUserInfosResponse.ResultEntity g : infos) {
                         memberList.add(new UserInfo(g.getId(), g.getNickname(), Uri.parse(g.getPortraitUri())));
                     }
-                    String loginid = getSharedPreferences("config", MODE_PRIVATE).getString("loginid", "");
-                    if (loginid.equals(createId)) {
+                    String loginId = getSharedPreferences("config", MODE_PRIVATE).getString(SealConst.SEALTALK_LOGIN_ID, "");
+                    if (loginId.equals(createId)) {
                         isCreated = true;
                     }
                     if (memberList != null && memberList.size() > 1) {

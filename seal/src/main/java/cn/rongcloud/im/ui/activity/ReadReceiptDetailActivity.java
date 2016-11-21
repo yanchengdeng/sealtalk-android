@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.MotionEvent;
@@ -17,6 +18,9 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +40,7 @@ import cn.rongcloud.im.server.widget.LoadDialog;
 import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
 import cn.rongcloud.im.ui.widget.ReadReceiptViewPager;
 import io.rong.imkit.RongIM;
+import io.rong.imkit.emoticon.AndroidEmoji;
 import io.rong.imkit.userInfoCache.RongUserInfoManager;
 import io.rong.imkit.utilities.RongUtils;
 import io.rong.imkit.utils.RongDateUtils;
@@ -158,42 +163,61 @@ public class ReadReceiptDetailActivity extends BaseActivity {
                 if (member.getUserId().equals(RongIM.getInstance().getCurrentUserId())) {
                     continue;
                 }
+
                 if (isReadMember(member)) {
-                    mReadMember.add(member);
+                    continue;
                 } else {
                     mUnreadMember.add(member);
                 }
             }
 
-            //添加已经退群的已读人员
-            Map map = mMessage.getReadReceiptInfo().getRespondUserIdList();
-            if (map != null) {
-                Iterator iter = map.entrySet().iterator();
-                GroupMember quitMember;
-                while (iter.hasNext()) {
-                    Map.Entry entry = (Map.Entry) iter.next();
-                    Object key = entry.getKey();
-                    if (!isMember(key.toString(), groupMember) && !isMember(key.toString(), mReadMember)) {
-                        quitMember = new GroupMember();
-                        UserInfo userInfo = RongUserInfoManager.getInstance().getUserInfo(key.toString());
-                        if (userInfo != null) {
-                            quitMember.setUserId(key.toString());
-                            quitMember.setDisplayName(userInfo.getName());
-                            quitMember.setPortraitUri(userInfo.getPortraitUri().toString());
-                            quitMember.setName(userInfo.getName());
+            //添加已读，按照阅读时间排序
+            try {
+                Map map = mMessage.getReadReceiptInfo().getRespondUserIdList();
+                List mHashMapEntryList = new ArrayList<Map.Entry<String, Integer>>(map.entrySet());
+                Collections.sort(mHashMapEntryList, new Comparator<Map.Entry<String, Long>>() {
+
+                    @Override
+                    public int compare(Map.Entry<String, Long> firstMapEntry,
+                                       Map.Entry<String, Long> secondMapEntry) {
+                        return firstMapEntry.getValue().compareTo(secondMapEntry.getValue());
+                    }
+                });
+                if (mHashMapEntryList != null) {
+                    Iterator iter = mHashMapEntryList.iterator();
+                    GroupMember readMember;
+                    while (iter.hasNext()) {
+                        Map.Entry entry = (Map.Entry) iter.next();
+                        Object key = entry.getKey();
+                        readMember = new GroupMember();
+                        if (getMemberIndex(key.toString(), groupMember) == -1) { //不在群组中
+                            UserInfo userInfo = RongUserInfoManager.getInstance().getUserInfo(key.toString());
+                            if (userInfo != null) {
+                                readMember.setUserId(key.toString());
+                                readMember.setDisplayName(userInfo.getName());
+                                readMember.setPortraitUri(userInfo.getPortraitUri().toString());
+                                readMember.setName(userInfo.getName());
+                            } else {
+                                readMember.setUserId(key.toString());
+                                readMember.setDisplayName(key.toString());
+                                readMember.setPortraitUri("");
+                                readMember.setName(key.toString());
+                            }
+                            if (mReadMember != null) {
+                                mReadMember.add(readMember);
+                            }
                         } else {
-                            quitMember.setUserId(key.toString());
-                            quitMember.setDisplayName(key.toString());
-                            quitMember.setPortraitUri("");
-                            quitMember.setName(key.toString());
-                        }
-                        if (mReadMember != null) {
-                            mReadMember.add(quitMember);
+                            if (mReadMember != null) {
+                                mReadMember.add(groupMember.get(getMemberIndex(key.toString(), groupMember)));
+                            }
                         }
                     }
                 }
+            } catch (NullPointerException e) {
+
             }
         }
+
 
     }
 
@@ -208,15 +232,22 @@ public class ReadReceiptDetailActivity extends BaseActivity {
         return false;
     }
 
-    private boolean isMember(String userId, List<GroupMember> groupMember) {
+    /**
+     * 获得在 groupMember 中的位置,如果不在则返回 -1
+     *
+     * @param userId
+     * @param groupMember
+     * @return
+     */
+    private int getMemberIndex(String userId, List<GroupMember> groupMember) {
         if (groupMember != null && groupMember.size() > 0) {
-            for (GroupMember member : groupMember) {
-                if (userId.equals(member.getUserId())) {
-                    return true;
+            for (int i = 0; i < groupMember.size(); i++) {
+                if (userId.equals(groupMember.get(i).getUserId())) {
+                    return i;
                 }
             }
         }
-        return false;
+        return -1;
     }
 
     private void setSolidHeight(int solidHeight) {
@@ -285,9 +316,9 @@ public class ReadReceiptDetailActivity extends BaseActivity {
             tv_time.setText(RongDateUtils.getConversationFormatDate(mMessage.getSentTime(), this));
         }
         if (mTextMessage != null) {
-            tv_message.setText(mTextMessage.getContent());
-        }
-        if (tv_message.getLineCount() >= 4) {
+            SpannableStringBuilder spannable = new SpannableStringBuilder(mTextMessage.getContent());
+            AndroidEmoji.ensure(spannable);
+            tv_message.setText(spannable);
         }
 
         mScrollView = (ScrollView) this.findViewById(R.id.rc_read_receipt_scroll_view);
@@ -461,7 +492,7 @@ public class ReadReceiptDetailActivity extends BaseActivity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
-                convertView = LayoutInflater.from(context).inflate(R.layout.read_receipt_gridview_item, null);
+                convertView = LayoutInflater.from(context).inflate(R.layout.read_receipt_gridview_item, parent, false);
             }
             SelectableRoundedImageView iv_avatar = (SelectableRoundedImageView) convertView.findViewById(R.id.iv_avatar);
             TextView tv_username = (TextView) convertView.findViewById(R.id.tv_username);
@@ -550,12 +581,12 @@ public class ReadReceiptDetailActivity extends BaseActivity {
         @Override
         public void destroyItem(ViewGroup container, int position,
                                 Object object) {
-            ((ViewPager) container).removeView(viewContainter.get(position));
+            (container).removeView(viewContainter.get(position));
         }
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
-            ((ViewPager) container).addView(viewContainter.get(position));
+            (container).addView(viewContainter.get(position));
             return viewContainter.get(position);
         }
 

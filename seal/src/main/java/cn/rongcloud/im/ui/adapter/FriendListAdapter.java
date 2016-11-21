@@ -71,7 +71,7 @@ public class FriendListAdapter extends BaseAdapter implements SectionIndexer {
         final Friend mContent = list.get(position);
         if (convertView == null) {
             viewHolder = new ViewHolder();
-            convertView = LayoutInflater.from(context).inflate(R.layout.friend_item, null);
+            convertView = LayoutInflater.from(context).inflate(R.layout.friend_item, parent, false);
             viewHolder.tvTitle = (TextView) convertView.findViewById(R.id.friendname);
             viewHolder.tvLetter = (TextView) convertView.findViewById(R.id.catalog);
             viewHolder.mImageView = (SelectableRoundedImageView) convertView.findViewById(R.id.frienduri);

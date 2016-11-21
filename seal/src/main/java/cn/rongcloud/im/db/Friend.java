@@ -244,25 +244,18 @@ public class Friend implements Parcelable {
     };
 
     public boolean isExitsDisplayName() {
-        if (TextUtils.isEmpty(displayName)) {
-            return false;
-        }
-        return true;
+        return !TextUtils.isEmpty(displayName);
     }
     //todo：这个地方还有点问题
     @Override
     public boolean equals(Object o) {
         if (o != null) {
             Friend friendInfo = (Friend) o;
-            if (this.userId == friendInfo.getUserId()
-                    && this.name == friendInfo.getName()
-                    && this.portraitUri == friendInfo.getPortraitUri()
-                    && this.phoneNumber == friendInfo.getPhoneNumber()
-                    && this.displayName == friendInfo.getDisplayName()) {
-                return true;
-            } else {
-                return false;
-            }
+            return this.userId == friendInfo.getUserId()
+                   && this.name == friendInfo.getName()
+                   && this.portraitUri == friendInfo.getPortraitUri()
+                   && this.phoneNumber == friendInfo.getPhoneNumber()
+                   && this.displayName == friendInfo.getDisplayName();
         } else {
             return false;
         }

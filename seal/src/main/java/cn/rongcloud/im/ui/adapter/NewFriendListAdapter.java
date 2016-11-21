@@ -26,7 +26,7 @@ public class NewFriendListAdapter extends BaseAdapters {
         ViewHolder holder;
         if (convertView == null) {
             holder = new ViewHolder();
-            convertView = mInflater.inflate(R.layout.rs_ada_user_ship, null);
+            convertView = mInflater.inflate(R.layout.rs_ada_user_ship, parent, false);
             holder.mName = (TextView) convertView.findViewById(R.id.ship_name);
             holder.mMessage = (TextView) convertView.findViewById(R.id.ship_message);
             holder.mHead = (SelectableRoundedImageView) convertView.findViewById(R.id.new_header);

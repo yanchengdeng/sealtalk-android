@@ -555,6 +555,8 @@ public class ConversationActivity extends BaseActivity implements View.OnClickLi
     }
 
 
+
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -676,6 +678,10 @@ public class ConversationActivity extends BaseActivity implements View.OnClickLi
 
     @Override
     public void onHeadLeftButtonClick(View v) {
+        if (fragment.isLocationSharing()) {
+            fragment.showQuitLocationSharingDialog(this);
+            return;
+        }
         hintKbTwo();
         if (mConversationType.equals(Conversation.ConversationType.CHATROOM)
                 || mConversationType.equals(Conversation.ConversationType.CUSTOMER_SERVICE)) {

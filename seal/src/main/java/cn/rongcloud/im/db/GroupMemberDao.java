@@ -32,7 +32,7 @@ public class GroupMemberDao extends AbstractDao<GroupMember, Void> {
         public final static Property GroupName = new Property(7, String.class, "groupName", false, "GROUP_NAME");
         public final static Property GroupNameSpelling = new Property(8, String.class, "groupNameSpelling", false, "GROUP_NAME_SPELLING");
         public final static Property GroupPortraitUri = new Property(9, String.class, "groupPortraitUri", false, "GROUP_PORTRAIT_URI");
-    };
+    }
 
 
     public GroupMemberDao(DaoConfig config) {

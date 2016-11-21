@@ -57,17 +57,14 @@ public class App extends MultiDexApplication {
              */
             //RongIM.setServerInfo("nav.cn.ronghub.com", "img.cn.ronghub.com");
             RongIM.init(this);
+            NLog.setDebug(true);//Seal Module Log 开关
             SealAppContext.init(this);
             SharedPreferencesContext.init(this);
             Thread.setDefaultUncaughtExceptionHandler(new RongExceptionHandler(this));
 
             try {
-                RongIM.registerMessageType(GroupNotificationMessage.class);
-                RongIM.registerMessageType(FileMessage.class);
                 RongIM.registerMessageTemplate(new ContactNotificationMessageProvider());
                 RongIM.registerMessageTemplate(new RealTimeLocationMessageProvider());
-                RongIM.registerMessageTemplate(new GroupNotificationMessageItemProvider());
-                RongIM.registerMessageTemplate(new FileMessageItemProvider());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -75,9 +72,9 @@ public class App extends MultiDexApplication {
             openSealDBIfHasCachedToken();
 
             options = new DisplayImageOptions.Builder()
-            .showImageForEmptyUri(cn.rongcloud.im.R.drawable.de_default_portrait)
-            .showImageOnFail(cn.rongcloud.im.R.drawable.de_default_portrait)
-            .showImageOnLoading(cn.rongcloud.im.R.drawable.de_default_portrait)
+            .showImageForEmptyUri(R.drawable.de_default_portrait)
+            .showImageOnFail(R.drawable.de_default_portrait)
+            .showImageOnLoading(R.drawable.de_default_portrait)
             .displayer(new FadeInBitmapDisplayer(300))
             .cacheInMemory(true)
             .cacheOnDisk(true)

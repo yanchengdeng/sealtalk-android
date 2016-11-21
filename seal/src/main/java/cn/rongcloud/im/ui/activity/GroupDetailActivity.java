@@ -260,7 +260,7 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
         }
 
         for (GroupMember member : mGroupMember) {
-            if (member.getUserId().equals(getSharedPreferences("config", MODE_PRIVATE).getString("loginid", ""))) {
+            if (member.getUserId().equals(getSharedPreferences("config", MODE_PRIVATE).getString(SealConst.SEALTALK_LOGIN_ID, ""))) {
                 if (!TextUtils.isEmpty(member.getDisplayName())) {
                     mGroupDisplayNameText.setText(member.getDisplayName());
                 } else {
@@ -655,7 +655,7 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
-                convertView = LayoutInflater.from(context).inflate(R.layout.social_chatsetting_gridview_item, null);
+                convertView = LayoutInflater.from(context).inflate(R.layout.social_chatsetting_gridview_item, parent, false);
             }
             SelectableRoundedImageView iv_avatar = (SelectableRoundedImageView) convertView.findViewById(R.id.iv_avatar);
             TextView tv_username = (TextView) convertView.findViewById(R.id.tv_username);

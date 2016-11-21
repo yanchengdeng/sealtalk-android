@@ -42,7 +42,7 @@
             android:includeFontPadding="false"
             android:layout_marginTop="6dp"
             android:gravity="center"
-            android:singleLine="true"
+            android:maxLines="1"
             android:textColor="#AAAAAA"
             android:textSize="14sp"/>
     </RelativeLayout>

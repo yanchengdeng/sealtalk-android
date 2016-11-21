@@ -87,8 +87,8 @@
     <string name="dv_document">Dev Document</string>
     <string name="rongcloud_web">RongCloud Web</string>
     <string name="new_version_update">Current Version</string>
-    <string name="select_group_member">Select Group Member</string>
-    <string name="remove_group_member">Remove Group Member</string>
+    <string name="select_group_member">Select Group Members</string>
+    <string name="remove_group_member">Remove Group Members</string>
     <string name="add_group_member">Add Group Member</string>
     <string name="edit_group_name">Edit Group Name</string>
     <string name="create_group"> Create a Group</string>
@@ -100,6 +100,7 @@
     <string name="new_password_not_null">The new password cannot be empty</string>
     <string name="confirm_password_not_null">Confirm password cannot be empty</string>
     <string name="original_password_mistake">The original password mistake</string>
+    <string name="passwords_invalid">Password length must be between 6 and 16,case sensitive </string>
     <string name="passwords_do_not_match">The two passwords do not match</string>
     <string name="original_password_text">Original Password</string>
     <string name="new_password">New Password</string>
@@ -120,7 +121,7 @@
     <string name="black_state">BlackList Status</string>
     <string name="divided_string">,</string>
     <string name="change_group_name">&#160;changed the group name to&#160;</string>
-    <string name="quit_groups">&#160;quitted the group</string>
+    <string name="quit_groups">&#160;quited the group</string>
     <string name="dismiss_groups">&#160;dismissed the group</string>
     <string name="join_group">&#160;joined the group</string>
     <string name="to_join_group">&#160;to join the group</string>
@@ -226,12 +227,12 @@
     <string name="pc_online">PC online</string>
     <string name="phone_online">Phone online</string>
     <string name="read_receipt_detail">read receipt detail</string>
-    <string name="read_receipt_unread_persons">%1$s unread</string>
-    <string name="read_receipt_read_persons">%1$s read</string>
+    <string name="read_receipt_unread_persons">%1$d unread</string>
+    <string name="read_receipt_read_persons">%1$d read</string>
     <string name="read_receipt_no_person_read">all are read</string>
     <string name="read_receipt_no_person_unread">all are unread</string>
     <string name="ac_contact_nick_name">Nickname:</string>
-    <string name="ac_item_friend_nick_name">Nickname:</string>
+    <string name="ac_item_friend_nick_name">Nickname:%1$s</string>
     <string name="ac_search_chat_detail_three">.</string>
     <string name="ac_search_chat_title">chatting records</string>
     <string name="ac_search_no_result">"There\'re no results related to %f1$s."</string>
@@ -262,6 +263,7 @@
     <string name="ac_search_chat_detail_two">" related chatting records of "</string>
     <string name="ac_search_chat_detail_one">"Total "</string>
     <string name="ac_search_chat_detail">Total %1$d related records of </string>
+    <string name="ac_search_nick_name">Nickname： </string>
 
     <string name="ac_search_friend">Friends</string>
     <string name="ac_search_group">Groups</string>
@@ -274,6 +276,51 @@
     <string name="clean_private_chat_history">Whether to delete private chat history</string>
     <string name="clean_group_chat_history">Whether to delete group chat history</string>
     <string name="clean_discussion_chat_history">Whether to delete discussion chat history</string>
-    <string name="join_chat_room_error_toast">chatroom ID is empty,please try again later</string>
+    <string name="join_chat_room_error_toast">Chat room ID is empty,please try again later</string>
 
+    <string name="activity_detail_discussion_to_top">To top</string>
+    <string name="activity_detail_discussion_not_disturb">Not to disturb</string>
+    <string name="ac_about_seal_talk_version">SealTalk version</string>
+    <string name="ac_about_sdk_version">SDK version</string>
+    <string name="ac_about_shut_down_debug_mode">Shut down debug mode</string>
+    <string name="ac_detail_discussion_member_size">Discussion members()</string>
+    <string name="ac_detail_discussion_clear_messages">Clear messages</string>
+    <string name="ac_detail_discussion_start_group_conversation">Start group conversation</string>
+    <string name="ac_detail_discussion_group_display_name">Group Display Name</string>
+    <string name="ac_detail_discussion_start_chat">Start chat</string>
+    <string name="ac_detail_discussion_delete_and_quit_discussion">Delete and quit discussion</string>
+    <string name="ac_detail_discussion_dismiss_group">Dismiss group</string>
+    <string name="ac_detail_discussion_no">None</string>
+
+    <string name="fr_chat_room">ChatRoom</string>
+    <string name="fr_chat_room_one">ChatRoom I</string>
+    <string name="fr_chat_room_two">ChatRoom II</string>
+    <string name="fr_chat_room_three">ChatRoom III</string>
+    <string name="fr_chat_room_four">ChatRoom IV</string>
+
+    <string name="ac_new_friend_list_no_data">No data</string>
+    <string name="share_dialog_share">Share</string>
+    <string name="share_dialog_cancel">Cancel</string>
+    <string name="share_dialog_hint">Say something</string>
+    <string name="share_dialog_from">From: UC browser</string>
+    <string name="dialog_bottom_picture">Take picture</string>
+    <string name="dialog_bottom_import_from_local">Import from local</string>
+    <string name="fr_group_list_not_join_the_group">Not yet joined any groups</string>
+
+    <string name="ac_select_friend">Select contact</string>
+    <string name="ac_select_friend_sure">OK</string>
+    <string name="ac_note_info_name">Remark</string>
+    <string name="ac_note_info">Remark info</string>
+    <string name="ac_note_info_save">Save</string>
+
+    <string name="contact_notification_someone_agree_your_request">%1$s has accepted your friend request.</string>
+    <string name="contact_notification_agree_your_request">The other has agreed your friend request.</string>
+    <string name="ac_group_list_group_number">%1$d groups</string>
+    <string name="ac_share_receiver_from">From：%1$s</string>
+
+    <string name="ac_search_phone_number">Phone Number</string>
+    <string name="layout_dialog_loading">Loading</string>
+    <string name="seal_mine_fragment_user_portrait">User Portrait</string>
+    <string name="item_filter_group_list_include">Include:</string>
+    <string name="rs_ada_user_ship_add">Added</string>
 </resources>

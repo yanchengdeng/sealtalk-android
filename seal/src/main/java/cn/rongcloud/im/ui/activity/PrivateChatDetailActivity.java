@@ -17,6 +17,7 @@ import java.util.ArrayList;
 
 import cn.rongcloud.im.App;
 import cn.rongcloud.im.R;
+import cn.rongcloud.im.SealConst;
 import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.db.DBManager;
 import cn.rongcloud.im.db.Friend;
@@ -136,9 +137,9 @@ public class PrivateChatDetailActivity extends BaseActivity implements View.OnCl
                 mResult.setConversation(conversation);
                 Friend friend = DBManager.getInstance().getDaoSession().getFriendDao().queryBuilder().where(FriendDao.Properties.UserId.eq(fromConversationId)).unique();
                 SharedPreferences sp = getSharedPreferences("config", Context.MODE_PRIVATE);
-                String currentUserId = sp.getString("loginid", "");
-                String currentUserName = sp.getString("loginnickname", "");
-                String currentUserPortrait = sp.getString("loginPortrait", "");
+                String currentUserId = sp.getString(SealConst.SEALTALK_LOGIN_ID, "");
+                String currentUserName = sp.getString(SealConst.SEALTALK_LOGIN_NAME, "");
+                String currentUserPortrait = sp.getString(SealConst.SEALTALK_LOGING_PORTRAIT, "");
                 if (friend != null) {
                     String portraitUri = friend.getPortraitUri();
                     mResult.setId(friend.getUserId());
