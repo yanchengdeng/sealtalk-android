@@ -50,9 +50,6 @@ Read Android [Android Dev Doc](http://www.rongcloud.cn/docs/android.html), Learn
 #### Step 4:
 [Download RongCloud Demo](https://github.com/sealtalk/sealtalk-android) , After finishing integrating IMKit and adding dependency, read demo source code,and get the functional section you want.
 
-## Eclipse
-![image](https://github.com/sealtalk/sealtalk-android/blob/master/screenshots/eclipse_icon.png)<br/>
-[eclipse link](https://github.com/AnOneTable/sealtalk-eclipse)
 
 ## Support
  - [App Parser Doc](https://github.com/sealtalk/sealtalk-android/blob/master/sealtalk_parser.md)
