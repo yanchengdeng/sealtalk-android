@@ -22,7 +22,6 @@
         android:dividerHeight="0.5dp">
     </ListView>
 
-
     <TextView
         android:id="@+id/refresh"
         style="@style/text_gray_16"

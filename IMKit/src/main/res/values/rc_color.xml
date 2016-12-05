@@ -36,7 +36,4 @@
 
     <color name="rc_read_receipt_status">#96c4ec</color>
 
-    <color name="popup_dialog_prompt_ok_color">#0099ff</color>
-    <color name="popup_dialog_prompt_cancel_color">#999999</color>
-    <color name="popup_dialog_prompt_clear_color">#f43530</color>
 </resources>

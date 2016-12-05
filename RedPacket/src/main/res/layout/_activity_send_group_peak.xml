@@ -79,8 +79,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/base_padding"
-                android:layout_marginTop="7dip"
                 android:visibility="gone"
+                android:layout_marginTop="7dip"
                 android:text="" />
 
 
@@ -144,6 +144,8 @@
                 android:background="@drawable/_bg_white_round"
                 android:gravity="left|top"
                 android:hint="@string/_bribery_message"
+                android:textColorHint="@color/color_b7b7b7"
+                android:inputType="text"
                 android:paddingLeft="@dimen/base_padding"
                 android:paddingRight="@dimen/base_padding"
                 android:textCursorDrawable="@drawable/selector_cursor"

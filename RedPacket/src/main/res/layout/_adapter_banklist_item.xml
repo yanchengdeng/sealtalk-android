@@ -18,6 +18,7 @@
         android:id="@+id/tv_bank_name"
         android:layout_width="match_parent"
         android:layout_height="@dimen/actionbar_height"
+        android:textColor="@color/black"
         android:text="中国银行"
         android:gravity="center_vertical"
         android:layout_marginLeft="@dimen/base_padding"/>

@@ -21,7 +21,7 @@ import cn.rongcloud.im.server.network.async.OnDataListener;
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.utils.NToast;
 import io.rong.imkit.RongIM;
-import io.rong.imkit.widget.PromptPopupDialog;
+import io.rong.imkit.utilities.PromptPopupDialog;
 import io.rong.imlib.RongIMClient;
 
 /**

@@ -162,13 +162,12 @@ public class MyAccountActivity extends BaseActivity implements View.OnClickListe
                         editor.commit();
                         ImageLoader.getInstance().displayImage(imageUrl, mImageView, App.getOptions());
                         if (RongIM.getInstance() != null) {
-                            RongIM.getInstance().refreshUserInfoCache(new UserInfo(sp.getString(SealConst.SEALTALK_LOGIN_ID, ""), sp.getString(SealConst.SEALTALK_LOGIN_NAME, ""), Uri.parse(imageUrl)));
                             RongIM.getInstance().setCurrentUserInfo(new UserInfo(sp.getString(SealConst.SEALTALK_LOGIN_ID, ""), sp.getString(SealConst.SEALTALK_LOGIN_NAME, ""), Uri.parse(imageUrl)));
                         }
                         BroadcastManager.getInstance(mContext).sendBroadcast(SealConst.CHANGEINFO);
                         NToast.shortToast(mContext, getString(R.string.portrait_update_success));
-                        LoadDialog.dismiss(mContext);
                     }
+                    LoadDialog.dismiss(mContext);
                     break;
                 case GET_QI_NIU_TOKEN:
                     QiNiuTokenResponse response = (QiNiuTokenResponse) result;

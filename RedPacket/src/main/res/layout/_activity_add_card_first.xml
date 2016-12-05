@@ -76,6 +76,7 @@
                 android:id="@+id/tv_protocol"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/gray"
                 android:layout_marginTop="25dp"
                 android:paddingBottom="3dip"
                 android:text="点击下一步视为您同意《金融魔方用户协议》" />

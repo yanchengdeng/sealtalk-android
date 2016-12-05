@@ -126,7 +126,6 @@
     <string name="rc_file_not_exist">文件不存在</string>
     <string name="rc_network_is_busy">网络繁忙</string>
     <string name="rc_network_error">网络连接错误</string>
-    <string name="rc_network_exception">网络异常请稍后再试</string>
     <string name="rc_called_on_hook">对方已挂机</string>
     <string name="rc_called_is_calling">对方正在通话中</string>
     <string name="rc_exit_calling">是否退出通话界面？</string>
@@ -148,13 +147,6 @@
     <string name="rc_save_picture_at">图片保存在%s</string>
     <string name="rc_src_file_not_found">源文件不存在</string>
 
-    <string name="rc_confirm">确认</string>
-    <string name="rc_cancel">取消</string>
-
-    <string name="rc_permission_grant_needed">您需要在设置中打开权限</string>
-    <string name="rc_permission_microphone">（麦克风）。</string>
-    <string name="rc_permission_microphone_and_camera">（麦克风，相机）。</string>
-    <string name="rc_permission_camera">（相机）。</string>
     <string name="rc_blacklist_prompt">您已被加入黑名单</string>
     <string name="rc_cs_select_group">请选择咨询内容</string>
     <string name="rc_search">搜索</string>

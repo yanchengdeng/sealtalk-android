@@ -678,16 +678,18 @@ public class ConversationActivity extends BaseActivity implements View.OnClickLi
 
     @Override
     public void onHeadLeftButtonClick(View v) {
-        if (fragment.isLocationSharing()) {
-            fragment.showQuitLocationSharingDialog(this);
-            return;
-        }
-        hintKbTwo();
-        if (mConversationType.equals(Conversation.ConversationType.CHATROOM)
-                || mConversationType.equals(Conversation.ConversationType.CUSTOMER_SERVICE)) {
-            SealAppContext.getInstance().popActivity(this);
-        } else {
-            SealAppContext.getInstance().popAllActivity();
+        if (fragment != null && !fragment.onBackPressed()) {
+            if (fragment.isLocationSharing()) {
+                fragment.showQuitLocationSharingDialog(this);
+                return;
+            }
+            hintKbTwo();
+            if (mConversationType.equals(Conversation.ConversationType.CHATROOM)
+                    || mConversationType.equals(Conversation.ConversationType.CUSTOMER_SERVICE)) {
+                SealAppContext.getInstance().popActivity(this);
+            } else {
+                SealAppContext.getInstance().popAllActivity();
+            }
         }
     }
 }

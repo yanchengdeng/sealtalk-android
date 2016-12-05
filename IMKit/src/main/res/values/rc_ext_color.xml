@@ -25,4 +25,9 @@
     <color name="rc_main_theme">#0195ff</color>
 
     <color name="rc_popup_dialog_list_divider_color">#dfdfdd</color>
+
+    <color name="rc_popup_dialog_prompt_ok_color">#0099ff</color>
+    <color name="rc_popup_dialog_prompt_cancel_color">#999999</color>
+    <color name="rc_popup_dialog_prompt_clear_color">#f43530</color>
+    <color name="rc_popup_dialog_text_color">#353535</color>
 </resources>

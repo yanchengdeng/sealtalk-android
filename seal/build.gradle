@@ -8,8 +8,8 @@ android {
         applicationId "cn.rongcloud.im"
         minSdkVersion 11
         targetSdkVersion 23
-        versionCode 2016112112
-        versionName "2.8.1 Stable"
+        versionCode 2016112511 
+        versionName "2.8.2 Stable"
 
         multiDexEnabled true
     }
@@ -54,15 +54,23 @@ android {
     }
 }
 
+preBuild << {
+}
+//task astyle(type: Exec) {
+//    commandLine 'bash', './script/format_code.sh'
+//}
+//preBuild.dependsOn astyle
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile 'com.android.support:support-v4:21.0.3'
-    // libs 中 happy dns.jar - okhttp.jar - okio.jar 为 qiniu存储所需依赖jar 融云 sdk 和你的 app 中都无需依赖
-    compile 'com.android.support:multidex:1.0.1'
+    compile project(':IMKit')
     compile project(':CallKit')
     compile project(':RedPacket')
     compile project(':Recognizer')
+    // libs 中 happy dns.jar - okhttp.jar - okio.jar 为 qiniu存储所需依赖jar 融云 sdk 和你的 app 中都无需依赖
+    // org.apache.http.legacy.jar 为适配 Android tagetId 22 以上 jar
+    compile 'com.android.support:multidex:1.0.1'
 }
 apply plugin: 'com.google.gms.google-services'

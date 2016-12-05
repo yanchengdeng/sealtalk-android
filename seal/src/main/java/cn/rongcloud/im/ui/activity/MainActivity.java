@@ -25,8 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.rongcloud.im.R;
-import cn.rongcloud.im.SealConst;
-import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.server.HomeWatcherReceiver;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.utils.NToast;
@@ -52,7 +50,6 @@ public class MainActivity extends FragmentActivity implements
     ViewPager.OnPageChangeListener,
     View.OnClickListener,
     DragPointView.OnDragListencer,
-    RongIMClient.ConnectionStatusListener,
     IUnReadMessageObserver {
 
     public static ViewPager mViewPager;
@@ -106,7 +103,6 @@ public class MainActivity extends FragmentActivity implements
         mineRLayout.setOnClickListener(this);
         moreImage.setOnClickListener(this);
         mSearchImageView.setOnClickListener(this);
-        RongIM.setConnectionStatusListener(this);
         BroadcastManager.getInstance(mContext).addAction(MineFragment.SHOW_RED, new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -306,12 +302,6 @@ public class MainActivity extends FragmentActivity implements
         RongIM.getInstance().addUnReadMessageCountChangedObserver(this, conversationTypes);
         getConversationPush();// 获取 push 的 id 和 target
         getPushMessage();
-        BroadcastManager.getInstance(mContext).addAction(SealConst.EXIT, new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                quit(false);
-            }
-        });
     }
 
     private void getConversationPush() {
@@ -360,7 +350,7 @@ public class MainActivity extends FragmentActivity implements
                 if (TextUtils.isEmpty(cacheToken)) {
                     startActivity(new Intent(MainActivity.this, LoginActivity.class));
                 } else {
-                    if (!RongIM.getInstance().getCurrentConnectionStatus().equals(ConnectionStatus.CONNECTED)) {
+                    if (!RongIM.getInstance().getCurrentConnectionStatus().equals(RongIMClient.ConnectionStatusListener.ConnectionStatus.CONNECTED)) {
                         LoadDialog.show(mContext);
                         RongIM.connect(cacheToken, new RongIMClient.ConnectCallback() {
                             @Override
@@ -461,37 +451,5 @@ public class MainActivity extends FragmentActivity implements
             final IntentFilter homeFilter = new IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
             context.registerReceiver(mHomeKeyReceiver, homeFilter);
         }
-    }
-
-
-    @Override
-    public void onChanged(ConnectionStatus connectionStatus) {
-        if (connectionStatus.equals(ConnectionStatus.KICKED_OFFLINE_BY_OTHER_CLIENT)) {
-            quit(true);
-        }
-    }
-
-    private void quit(boolean isKicked) {
-        SharedPreferences.Editor editor = getSharedPreferences("config", MODE_PRIVATE).edit();
-        if (!isKicked) {
-            editor.putBoolean("exit", true);
-        }
-        editor.putString("loginToken", "");
-        editor.putString(SealConst.SEALTALK_LOGIN_ID, "");
-        editor.putInt("getAllUserInfoState", 0);
-        editor.apply();
-        /*//这些数据清除操作之前一直是在login界面,因为app的数据库改为按照userID存储,退出登录时先直接删除
-        //这种方式是很不友好的方式,未来需要修改同app server的数据同步方式
-        //SealUserInfoManager.getInstance().deleteAllUserInfo();*/
-        SealUserInfoManager.getInstance().closeDB();
-        RongIM.getInstance().logout();
-        Intent loginActivityIntent = new Intent(MainActivity.this, LoginActivity.class);
-        if (isKicked) {
-            loginActivityIntent.putExtra("kickedByOtherClient", true);
-            loginActivityIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-        } else {
-            finish();
-        }
-        startActivity(loginActivityIntent);
     }
 }

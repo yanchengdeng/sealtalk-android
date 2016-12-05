@@ -1,6 +1,7 @@
 package cn.rongcloud.im;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -27,6 +28,7 @@ import cn.rongcloud.im.server.response.ContactNotificationMessageData;
 import cn.rongcloud.im.server.utils.NLog;
 import cn.rongcloud.im.server.utils.RongGenerate;
 import cn.rongcloud.im.server.utils.json.JsonMananger;
+import cn.rongcloud.im.ui.activity.LoginActivity;
 import cn.rongcloud.im.ui.activity.MainActivity;
 import cn.rongcloud.im.ui.activity.NewFriendListActivity;
 import cn.rongcloud.im.ui.activity.UserDetailActivity;
@@ -60,6 +62,7 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
     RongIM.GroupInfoProvider,
     RongIM.GroupUserInfoProvider,
     RongIM.LocationProvider,
+    RongIMClient.ConnectionStatusListener,
     RongIM.ConversationBehaviorListener {
 
     private static final int CLICK_CONVERSATION_USER_PORTRAIT = 1;
@@ -120,6 +123,7 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
     private void initListener() {
         RongIM.setConversationBehaviorListener(this);//设置会话界面操作的监听器。
         RongIM.setConversationListBehaviorListener(this);
+        RongIM.setConnectionStatusListener(this);
         RongIM.setUserInfoProvider(this, true);
         RongIM.setGroupInfoProvider(this, true);
         RongIM.setLocationProvider(this);//设置地理位置提供者,不用位置的同学可以注掉此行代码
@@ -129,6 +133,12 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
         RongIM.getInstance().enableNewComingMessageIcon(true);
         RongIM.getInstance().enableUnreadMessageIcon(true);
 //        RongIM.setGroupUserInfoProvider(this, true);
+        BroadcastManager.getInstance(mContext).addAction(SealConst.EXIT, new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                quit(false);
+            }
+        });
     }
 
     private void setReadReceiptConversationType() {
@@ -421,15 +431,10 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
         /**
          * demo 代码  开发者需替换成自己的代码。
          */
-        if (message.getContent() instanceof LocationMessage) {
-            Intent intent = new Intent(context, AMapPreviewActivity.class);
-            intent.putExtra("location", message.getContent());
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(intent);
-        } else if (message.getContent() instanceof ImageMessage) {
-//            Intent intent = new Intent(context, PhotoActivity.class);
-//            intent.putExtra("message", message);
-//            context.startActivity(intent);
+        if (message.getContent() instanceof ImageMessage) {
+            /*Intent intent = new Intent(context, PhotoActivity.class);
+            intent.putExtra("message", message);
+            context.startActivity(intent);*/
         }
 
         return false;
@@ -461,6 +466,14 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
 
     public void setLastLocationCallback(LocationCallback lastLocationCallback) {
         this.mLastLocationCallback = lastLocationCallback;
+    }
+
+    @Override
+    public void onChanged(ConnectionStatus connectionStatus) {
+        NLog.d(TAG, "ConnectionStatus onChanged = " + connectionStatus.getMessage());
+        if (connectionStatus.equals(ConnectionStatus.KICKED_OFFLINE_BY_OTHER_CLIENT)) {
+            quit(true);
+        }
     }
 
     public void pushActivity(Activity activity) {
@@ -555,5 +568,29 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
             e.printStackTrace();
         }
         return dataEntity;
+    }
+
+    private void quit(boolean isKicked) {
+        Log.d(TAG, "quit isKicked " + isKicked);
+        SharedPreferences.Editor editor = mContext.getSharedPreferences("config", Context.MODE_PRIVATE).edit();
+        if (!isKicked) {
+            editor.putBoolean("exit", true);
+        }
+        editor.putString("loginToken", "");
+        editor.putString(SealConst.SEALTALK_LOGIN_ID, "");
+        editor.putInt("getAllUserInfoState", 0);
+        editor.apply();
+        /*//这些数据清除操作之前一直是在login界面,因为app的数据库改为按照userID存储,退出登录时先直接删除
+        //这种方式是很不友好的方式,未来需要修改同app server的数据同步方式
+        //SealUserInfoManager.getInstance().deleteAllUserInfo();*/
+        SealUserInfoManager.getInstance().closeDB();
+        RongIM.getInstance().logout();
+        Intent loginActivityIntent = new Intent();
+        loginActivityIntent.setClass(mContext, LoginActivity.class);
+        loginActivityIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        if (isKicked) {
+            loginActivityIntent.putExtra("kickedByOtherClient", true);
+        }
+        mContext.startActivity(loginActivityIntent);
     }
 }

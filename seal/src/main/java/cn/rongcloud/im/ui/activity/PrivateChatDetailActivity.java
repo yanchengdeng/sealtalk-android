@@ -30,7 +30,7 @@ import cn.rongcloud.im.ui.widget.switchbutton.SwitchButton;
 import io.rong.eventbus.EventBus;
 import io.rong.imkit.RongIM;
 import io.rong.imkit.userInfoCache.RongUserInfoManager;
-import io.rong.imkit.widget.PromptPopupDialog;
+import io.rong.imkit.utilities.PromptPopupDialog;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.Message;

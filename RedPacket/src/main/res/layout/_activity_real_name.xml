@@ -24,7 +24,6 @@
         android:padding="@dimen/base_padding">
 
         <com.jrmf360.rylib.widget.FloatingLabelTextView
-
             android:id="@+id/ftv_realname"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

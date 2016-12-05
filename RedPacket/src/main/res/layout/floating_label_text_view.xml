@@ -9,6 +9,7 @@
         android:id="@+id/textViewHintTop"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:textColor="@color/color_b7b7b7"
         android:gravity="top" />
 
     <EditText
@@ -16,7 +17,9 @@
         android:id="@+id/editText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textCursorDrawable="@drawable/selector_cursor"
         android:singleLine="true"
+        android:textColor="@color/black"
         android:layout_marginTop="22dp"
         android:background="@drawable/bg_search_input"/>
 
