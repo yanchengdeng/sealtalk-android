@@ -47,9 +47,6 @@ Android 应用 SealTalk 由 融云 RongCloud 出品
 #### Step 4:
 [下载融云 Demo](https://github.com/sealtalk/sealtalk-android) , 在初步集成和依赖好 IMKit 包后, 阅读 demo 源码 Get 你需要的功能模块
 
-## Eclipse
-![image](https://github.com/sealtalk/sealtalk-android/blob/master/screenshots/eclipse_icon.png)<br/>
-[eclipse link](https://github.com/AnOneTable/sealtalk-eclipse)
 
 ## 支持
  - [App 解析文档](https://github.com/sealtalk/sealtalk-android/blob/master/sealtalk_parser.md)
