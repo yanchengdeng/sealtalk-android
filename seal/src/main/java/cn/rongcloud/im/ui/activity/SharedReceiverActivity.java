@@ -22,8 +22,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,6 +38,7 @@ import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
 import cn.rongcloud.im.ui.widget.linkpreview.LinkPreviewCallback;
 import cn.rongcloud.im.ui.widget.linkpreview.SourceContent;
 import cn.rongcloud.im.ui.widget.linkpreview.TextCrawler;
+import io.rong.imageloader.core.ImageLoader;
 import io.rong.imkit.RongIM;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;

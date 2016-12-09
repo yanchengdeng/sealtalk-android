@@ -11,14 +11,8 @@ import io.rong.common.ParcelUtils;
 /**
  * Entity mapped to table FRIEND.
  */
-public class Friend implements Parcelable {
+public class Friend extends UserInfoBean implements Parcelable {
 
-    /**
-     * Not-null value.
-     */
-    private String userId;
-    private String name;
-    private String portraitUri;
     private String displayName;
     private String region;
     private String phoneNumber;
@@ -29,16 +23,15 @@ public class Friend implements Parcelable {
     private String displayNameSpelling;
 
     public Friend() {
+        super();
     }
 
     public Friend(String userId) {
-        this.userId = userId;
+        super(userId);
     }
 
     public Friend(String userId, String name, String portraitUri, String displayName, String region, String phoneNumber, String status, Long timestamp, String nameSpelling, String displayNameSpelling, String letters) {
-        this.userId = userId;
-        this.name = name;
-        this.portraitUri = portraitUri;
+        super(userId, name, portraitUri);
         this.displayName = displayName;
         this.region = region;
         this.phoneNumber = phoneNumber;
@@ -50,9 +43,7 @@ public class Friend implements Parcelable {
     }
 
     public Friend(String userId, String name, String portraitUri, String displayName, String region, String phoneNumber, String status, Long timestamp, String nameSpelling, String displayNameSpelling) {
-        this.userId = userId;
-        this.name = name;
-        this.portraitUri = portraitUri;
+        super(userId, name, portraitUri);
         this.displayName = displayName;
         this.region = region;
         this.phoneNumber = phoneNumber;
@@ -63,9 +54,7 @@ public class Friend implements Parcelable {
     }
 
     public Friend(String userId, String name, String portraitUri, String displayName, String region, String phoneNumber, String status, Long timestamp) {
-        this.userId = userId;
-        this.name = name;
-        this.portraitUri = portraitUri;
+        super(userId, name, portraitUri);
         this.displayName = displayName;
         this.region = region;
         this.phoneNumber = phoneNumber;
@@ -74,63 +63,25 @@ public class Friend implements Parcelable {
     }
 
     public Friend(String userId, String name, String portraitUri, String displayName, String status, Long timestamp) {
-        this.userId = userId;
-        this.name = name;
-        this.portraitUri = portraitUri;
+        super(userId, name, portraitUri);
         this.displayName = displayName;
         this.status = status;
         this.timestamp = timestamp;
     }
 
     public Friend(String userId, String name, String portraitUri, String phoneNumber, String displayName) {
-        this.userId = userId;
-        this.name = name;
+        super(userId, name, portraitUri);
         this.phoneNumber = phoneNumber;
-        this.portraitUri = portraitUri;
         this.displayName = displayName;
     }
 
     public Friend(String userId, String name, String portraitUri, String displayName) {
-        this.userId = userId;
-        this.name = name;
-        this.portraitUri = portraitUri;
+        super(userId, name, portraitUri);
         this.displayName = displayName;
     }
 
     public Friend(String userId, String name, String portraitUri) {
-        this.userId = userId;
-        this.name = name;
-        this.portraitUri = portraitUri;
-    }
-
-    /**
-     * Not-null value.
-     */
-    public String getUserId() {
-        return userId;
-    }
-
-    /**
-     * Not-null value; ensure this value is available before it is saved to the database.
-     */
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getPortraitUri() {
-        return portraitUri;
-    }
-
-    public void setPortraitUri(String portraitUri) {
-        this.portraitUri = portraitUri;
+        super(userId, name, portraitUri);
     }
 
     public String getDisplayName() {
@@ -246,16 +197,16 @@ public class Friend implements Parcelable {
     public boolean isExitsDisplayName() {
         return !TextUtils.isEmpty(displayName);
     }
-    //todo：这个地方还有点问题
+
     @Override
     public boolean equals(Object o) {
         if (o != null) {
             Friend friendInfo = (Friend) o;
-            return this.userId == friendInfo.getUserId()
-                   && this.name == friendInfo.getName()
-                   && this.portraitUri == friendInfo.getPortraitUri()
-                   && this.phoneNumber == friendInfo.getPhoneNumber()
-                   && this.displayName == friendInfo.getDisplayName();
+            return (getUserId() != null && getUserId().equals(friendInfo.getUserId()))
+                   && (getName() != null && getName().equals(friendInfo.getName()))
+                   && (getPortraitUri() != null && getPortraitUri().equals(friendInfo.getPortraitUri()))
+                   && (phoneNumber != null && phoneNumber.equals(friendInfo.getPhoneNumber()))
+                   && (displayName != null && displayName.equals(friendInfo.getDisplayName()));
         } else {
             return false;
         }

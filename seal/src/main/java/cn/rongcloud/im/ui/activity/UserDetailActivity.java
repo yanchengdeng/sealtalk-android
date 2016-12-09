@@ -17,8 +17,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
-
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
@@ -47,6 +45,7 @@ import io.rong.calllib.RongCallClient;
 import io.rong.calllib.RongCallSession;
 //CallKit end 1
 
+import io.rong.imageloader.core.ImageLoader;
 import io.rong.imkit.RongIM;
 import io.rong.imlib.IRongCallback;
 import io.rong.imlib.RongIMClient;
@@ -123,7 +122,8 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
             } else {
                 mUserDisplayName.setText(mFriend.getName());
             }
-            ImageLoader.getInstance().displayImage(TextUtils.isEmpty(mFriend.getPortraitUri()) ? RongGenerate.generateDefaultAvatar(mFriend.getName(), mFriend.getUserId()) : mFriend.getPortraitUri(), mUserPortrait, App.getOptions());
+            String portraitUri = SealUserInfoManager.getInstance().getPortraitUri(mFriend);
+            ImageLoader.getInstance().displayImage(portraitUri, mUserPortrait, App.getOptions());
         }
         if (getSharedPreferences("config", MODE_PRIVATE).getBoolean("isDebug", false)) {
             RongIMClient.getInstance().getUserOnlineStatus(mFriend.getUserId(), new IRongCallback.IGetUserOnlineStatusCallback() {

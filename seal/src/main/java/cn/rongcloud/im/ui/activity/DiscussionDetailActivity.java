@@ -15,8 +15,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,12 +28,12 @@ import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.response.GetUserInfosResponse;
 import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.server.utils.OperationRong;
-import cn.rongcloud.im.server.utils.RongGenerate;
 import cn.rongcloud.im.server.widget.DialogWithYesOrNoUtils;
 import cn.rongcloud.im.server.widget.LoadDialog;
 import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
 import cn.rongcloud.im.ui.widget.DemoGridView;
 import cn.rongcloud.im.ui.widget.switchbutton.SwitchButton;
+import io.rong.imageloader.core.ImageLoader;
 import io.rong.imkit.RongIM;
 import io.rong.imkit.utilities.PromptPopupDialog;
 import io.rong.imlib.RongIMClient;
@@ -292,11 +290,9 @@ public class DiscussionDetailActivity extends BaseActivity implements CompoundBu
                 if (!TextUtils.isEmpty(bean.getName())) {
                     tv_username.setText(bean.getName());
                 }
-                if (TextUtils.isEmpty(bean.getPortraitUri().toString())) {
-                    ImageLoader.getInstance().displayImage(RongGenerate.generateDefaultAvatar(bean.getName(), bean.getUserId()), iv_avatar, App.getOptions());
-                } else {
-                    ImageLoader.getInstance().displayImage(String.valueOf(bean.getPortraitUri()), iv_avatar, App.getOptions());
-                }
+
+                String portraitUri = SealUserInfoManager.getInstance().getPortraitUri(bean);
+                ImageLoader.getInstance().displayImage(portraitUri, iv_avatar, App.getOptions());
                 iv_avatar.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

@@ -7,13 +7,12 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
-
 import java.util.List;
 import java.util.Map;
 
 import cn.rongcloud.im.App;
 import cn.rongcloud.im.R;
+import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.db.DBManager;
 import cn.rongcloud.im.db.GroupMember;
 import cn.rongcloud.im.db.Groups;
@@ -21,6 +20,7 @@ import cn.rongcloud.im.db.GroupsDao;
 import cn.rongcloud.im.server.pinyin.CharacterParser;
 import cn.rongcloud.im.server.utils.RongGenerate;
 import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
+import io.rong.imageloader.core.ImageLoader;
 
 /**
  * Created by tiankui on 16/10/7.
@@ -67,12 +67,8 @@ public class GroupListAdapter extends android.widget.BaseAdapter {
             viewHolder = (GroupViewHolder) convertView.getTag();
         }
         if (groupInfo != null) {
-            if (TextUtils.isEmpty(groupInfo.getPortraitUri())) {
-                String s = RongGenerate.generateDefaultAvatar(groupInfo.getName(), groupInfo.getGroupsId());
-                ImageLoader.getInstance().displayImage(s, viewHolder.portraitImageView, App.getOptions());
-            } else {
-                ImageLoader.getInstance().displayImage(groupInfo.getPortraitUri(), viewHolder.portraitImageView, App.getOptions());
-            }
+            String portraitUri = SealUserInfoManager.getInstance().getPortraitUri(groupInfo);
+            ImageLoader.getInstance().displayImage(portraitUri, viewHolder.portraitImageView, App.getOptions());
             List<GroupMember> filterGroupMemberNameList = filterGroupMemberNameListMap.get(groupId);
             if (filterGroupNameListMap.get(groupId) != null) {
                 viewHolder.nameSingleTextView.setVisibility(View.VISIBLE);

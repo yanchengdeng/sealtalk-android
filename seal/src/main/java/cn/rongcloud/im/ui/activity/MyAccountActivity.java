@@ -20,7 +20,6 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
 import com.qiniu.android.http.ResponseInfo;
 import com.qiniu.android.storage.UpCompletionHandler;
 import com.qiniu.android.storage.UploadManager;
@@ -33,16 +32,17 @@ import java.io.File;
 import cn.rongcloud.im.App;
 import cn.rongcloud.im.R;
 import cn.rongcloud.im.SealConst;
+import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.response.QiNiuTokenResponse;
 import cn.rongcloud.im.server.response.SetPortraitResponse;
 import cn.rongcloud.im.server.utils.NToast;
-import cn.rongcloud.im.server.utils.RongGenerate;
 import cn.rongcloud.im.server.utils.photo.PhotoUtils;
 import cn.rongcloud.im.server.widget.BottomMenuDialog;
 import cn.rongcloud.im.server.widget.LoadDialog;
 import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
+import io.rong.imageloader.core.ImageLoader;
 import io.rong.imkit.RongIM;
 import io.rong.imlib.model.UserInfo;
 
@@ -88,11 +88,10 @@ public class MyAccountActivity extends BaseActivity implements View.OnClickListe
         }
         if (!TextUtils.isEmpty(cacheName)) {
             mName.setText(cacheName);
-            if (TextUtils.isEmpty(cachePortrait)) {
-                ImageLoader.getInstance().displayImage(RongGenerate.generateDefaultAvatar(cacheName, sp.getString(SealConst.SEALTALK_LOGIN_ID, "a")), mImageView, App.getOptions());
-            } else {
-                ImageLoader.getInstance().displayImage(cachePortrait, mImageView, App.getOptions());
-            }
+            String cacheId = sp.getString(SealConst.SEALTALK_LOGIN_ID, "a");
+            String portraitUri = SealUserInfoManager.getInstance().getPortraitUri(new UserInfo(
+                                     cacheId, cacheName, Uri.parse(cachePortrait)));
+            ImageLoader.getInstance().displayImage(portraitUri, mImageView, App.getOptions());
         }
         setPortraitChangeListener();
         BroadcastManager.getInstance(mContext).addAction(SealConst.CHANGEINFO, new BroadcastReceiver() {

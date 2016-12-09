@@ -567,15 +567,6 @@ public class ConversationActivity extends BaseActivity implements View.OnClickLi
     }
 
     @Override
-    public void onBackPressed() {
-        if (isFromPush) {
-            isFromPush = false;
-            startActivity(new Intent(this, MainActivity.class));
-            SealAppContext.getInstance().popAllActivity();
-        }
-    }
-
-    @Override
     protected void onDestroy() {
         //CallKit start 3
         RongCallKit.setGroupMemberProvider(null);
@@ -585,6 +576,7 @@ public class ConversationActivity extends BaseActivity implements View.OnClickLi
         RongIM.getInstance().setRequestPermissionListener(null);
         RongIMClient.setTypingStatusListener(null);
         RongIM.getInstance().setRequestPermissionListener(null);
+        SealAppContext.getInstance().popActivity(this);
         super.onDestroy();
     }
 
@@ -595,6 +587,7 @@ public class ConversationActivity extends BaseActivity implements View.OnClickLi
                 if (isFromPush) {
                     isFromPush = false;
                     startActivity(new Intent(this, MainActivity.class));
+                    SealAppContext.getInstance().popAllActivity();
                 } else {
                     if (fragment.isLocationSharing()) {
                         fragment.showQuitLocationSharingDialog(this);
@@ -684,6 +677,10 @@ public class ConversationActivity extends BaseActivity implements View.OnClickLi
                 return;
             }
             hintKbTwo();
+            if (isFromPush) {
+                isFromPush = false;
+                startActivity(new Intent(this, MainActivity.class));
+            }
             if (mConversationType.equals(Conversation.ConversationType.CHATROOM)
                     || mConversationType.equals(Conversation.ConversationType.CUSTOMER_SERVICE)) {
                 SealAppContext.getInstance().popActivity(this);

@@ -111,6 +111,10 @@ public class MultiAudioCallActivity extends BaseCallActivity {
             FrameLayout controller = (FrameLayout) maudioContainer.findViewById(R.id.rc_voip_control_layout);
             controller.addView(outgoingController);
             callSession = RongCallClient.getInstance().getCallSession();
+            if (callSession == null){
+                setShouldShowFloat(false);
+                finish();
+            }
             memberContainer.enableShowState(true);
 
             List<CallUserProfile> participantProfiles = callSession.getParticipantProfileList();
@@ -348,7 +352,7 @@ public class MultiAudioCallActivity extends BaseCallActivity {
         minimizeV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MultiAudioCallActivity.this.finish();
+                MultiAudioCallActivity.super.onMinimizeClick(v);
             }
         });
     }

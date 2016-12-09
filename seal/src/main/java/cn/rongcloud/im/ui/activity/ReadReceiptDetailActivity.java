@@ -39,6 +39,7 @@ import cn.rongcloud.im.server.utils.RongGenerate;
 import cn.rongcloud.im.server.widget.LoadDialog;
 import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
 import cn.rongcloud.im.ui.widget.ReadReceiptViewPager;
+import io.rong.imageloader.core.ImageLoader;
 import io.rong.imkit.RongIM;
 import io.rong.imkit.emoticon.AndroidEmoji;
 import io.rong.imkit.userInfoCache.RongUserInfoManager;
@@ -52,8 +53,6 @@ import io.rong.message.TextMessage;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.nostra13.universalimageloader.core.ImageLoader;
 
 /**
  * Created by Yuejunhong on 16/10/10.
@@ -505,11 +504,8 @@ public class ReadReceiptDetailActivity extends BaseActivity {
                 tv_username.setText(bean.getName());
             }
 
-            if (TextUtils.isEmpty(bean.getPortraitUri())) {
-                ImageLoader.getInstance().displayImage(RongGenerate.generateDefaultAvatar(bean.getName(), bean.getUserId()), iv_avatar, App.getOptions());
-            } else {
-                ImageLoader.getInstance().displayImage(bean.getPortraitUri(), iv_avatar, App.getOptions());
-            }
+            String portraitUri = SealUserInfoManager.getInstance().getPortraitUri(bean);
+            ImageLoader.getInstance().displayImage(portraitUri, iv_avatar, App.getOptions());
             iv_avatar.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

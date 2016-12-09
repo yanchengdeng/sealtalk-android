@@ -16,8 +16,6 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +27,7 @@ import cn.rongcloud.im.db.GroupMember;
 import cn.rongcloud.im.server.pinyin.CharacterParser;
 import cn.rongcloud.im.server.utils.RongGenerate;
 import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
+import io.rong.imageloader.core.ImageLoader;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.UserInfo;
 
@@ -170,7 +169,8 @@ public class TotalGroupMemberActivity extends BaseActivity {
             } else {
                 holder.title.setText(bean.getName());
             }
-            ImageLoader.getInstance().displayImage(TextUtils.isEmpty(bean.getPortraitUri()) ? RongGenerate.generateDefaultAvatar(bean.getName(), bean.getUserId()) : bean.getPortraitUri(), holder.mImageView, App.getOptions());
+            String portraitUri = SealUserInfoManager.getInstance().getPortraitUri(bean);
+            ImageLoader.getInstance().displayImage(portraitUri, holder.mImageView, App.getOptions());
             return convertView;
         }
 

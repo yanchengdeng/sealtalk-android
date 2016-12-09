@@ -1,5 +1,6 @@
 package io.rong.callkit;
 
+import android.util.Log;
 import android.view.SurfaceView;
 
 import java.util.Queue;
@@ -8,12 +9,15 @@ import java.util.concurrent.LinkedBlockingQueue;
 import io.rong.calllib.IRongCallListener;
 import io.rong.calllib.RongCallCommon;
 import io.rong.calllib.RongCallSession;
+import io.rong.common.RLog;
 
 /**
  * Created by jiangecho on 2016/10/27.
  */
 
 public class RongCallProxy implements IRongCallListener {
+
+    private static final String TAG = "RongCallProxy";
     private IRongCallListener mCallListener;
     private Queue<CallDisconnectedInfo> mCachedCallQueue;
     private static RongCallProxy mInstance;
@@ -30,6 +34,7 @@ public class RongCallProxy implements IRongCallListener {
     }
 
     public void setCallListener(IRongCallListener listener) {
+        RLog.d(TAG, "setCallListener listener = " + listener);
         this.mCallListener = listener;
         if (listener != null) {
             CallDisconnectedInfo callDisconnectedInfo = mCachedCallQueue.poll();
@@ -55,6 +60,7 @@ public class RongCallProxy implements IRongCallListener {
 
     @Override
     public void onCallDisconnected(RongCallSession callSession, RongCallCommon.CallDisconnectedReason reason) {
+        RLog.d(TAG, "RongCallProxy onCallDisconnected mCallListener = " + mCallListener);
         if (mCallListener != null) {
             mCallListener.onCallDisconnected(callSession, reason);
         } else {

@@ -354,8 +354,8 @@ public class CharacterParser {
                     builder.append(spannableStringBuilder);
                     return finalBuilder.append(builder);
                 } else {
-                    String smallerString = content.substring(firstIndex - 6, firstIndex + 6);
-                    String smallerStringLowerCase = lowerCaseText.substring(firstIndex - 6, firstIndex + 6);
+                    String smallerString = content.substring(firstIndex - 5, firstIndex + 7);
+                    String smallerStringLowerCase = lowerCaseText.substring(firstIndex - 5, firstIndex + 7);
                     int index = smallerStringLowerCase.indexOf(lowerCaseFilterStr);
                     SpannableStringBuilder builder = new SpannableStringBuilder("...");
                     SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(smallerString);

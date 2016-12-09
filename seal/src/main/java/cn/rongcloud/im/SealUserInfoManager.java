@@ -15,6 +15,7 @@ import com.alibaba.fastjson.JSONException;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import cn.rongcloud.im.db.BlackList;
@@ -26,6 +27,7 @@ import cn.rongcloud.im.db.GroupMember;
 import cn.rongcloud.im.db.GroupMemberDao;
 import cn.rongcloud.im.db.Groups;
 import cn.rongcloud.im.db.GroupsDao;
+import cn.rongcloud.im.db.UserInfoBean;
 import cn.rongcloud.im.server.SealAction;
 import cn.rongcloud.im.server.network.async.AsyncTaskManager;
 import cn.rongcloud.im.server.network.async.OnDataListener;
@@ -38,9 +40,11 @@ import cn.rongcloud.im.server.response.GetGroupResponse;
 import cn.rongcloud.im.server.response.GetTokenResponse;
 import cn.rongcloud.im.server.response.UserRelationshipResponse;
 import cn.rongcloud.im.server.utils.NLog;
+import cn.rongcloud.im.server.utils.RongGenerate;
 import io.rong.common.RLog;
 import io.rong.imkit.RongIM;
 import io.rong.imlib.RongIMClient;
+import io.rong.imlib.model.Group;
 import io.rong.imlib.model.UserInfo;
 
 /**
@@ -105,6 +109,7 @@ public class SealUserInfoManager implements OnDataListener {
     private GroupsDao mGroupsDao;
     private GroupMemberDao mGroupMemberDao;
     private BlackListDao mBlackListDao;
+    private LinkedHashMap<String, UserInfo> mUserInfoCache;
 
     public static SealUserInfoManager getInstance() {
         return sInstance;
@@ -139,6 +144,8 @@ public class SealUserInfoManager implements OnDataListener {
             mGroupsDao = getGroupsDao();
             mGroupMemberDao = getGroupMemberDao();
             mBlackListDao = getBlackListDao();
+            mUserInfoCache = new LinkedHashMap<>();
+            setUserInfoEngineListener();
         }
         mGetAllUserInfoState = sp.getInt("getAllUserInfoState", 0);
         RLog.d(TAG, "SealUserInfoManager mGetAllUserInfoState = " + mGetAllUserInfoState);
@@ -159,6 +166,116 @@ public class SealUserInfoManager implements OnDataListener {
             mWorkThread = null;
             mWorkHandler = null;
         }
+        if (mUserInfoCache != null) {
+            mUserInfoCache.clear();
+            mUserInfoCache = null;
+        }
+        mGroupsList = null;
+        UserInfoEngine.getInstance(mContext).setListener(null);
+        GroupInfoEngine.getInstance(mContext).setmListener(null);
+    }
+
+    /**
+     * kit中提供用户信息的用户信息提供者
+     * 1.读缓存
+     * 2.读好友数据库
+     * 3.读群组成员数据库
+     * 4.网络获取
+     */
+    public void getUserInfo(final String userId) {
+        if (TextUtils.isEmpty(userId)) {
+            return;
+        }
+        if (mUserInfoCache != null) {
+            UserInfo userInfo = mUserInfoCache.get(userId);
+            if (userInfo != null) {
+                RongIM.getInstance().refreshUserInfoCache(userInfo);
+                NLog.d(TAG, "SealUserInfoManager getUserInfo from cache " + userId + " "
+                       + userInfo.getName() + " " + userInfo.getPortraitUri());
+                return;
+            }
+        }
+        mWorkHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                UserInfo userInfo;
+                Friend friend = getFriendByID(userId);
+                if (friend != null) {
+                    String name = friend.getName();
+                    if (friend.isExitsDisplayName()) {
+                        name = friend.getDisplayName();
+                    }
+                    userInfo = new UserInfo(friend.getUserId(), name,
+                                            Uri.parse(friend.getPortraitUri()));
+                    NLog.d(TAG, "SealUserInfoManager getUserInfo from Friend db " + userId + " "
+                           + userInfo.getName() + " " + userInfo.getPortraitUri());
+                    RongIM.getInstance().refreshUserInfoCache(userInfo);
+                    return;
+                }
+                List<GroupMember> groupMemberList = getGroupMembersWithUserId(userId);
+                if (groupMemberList != null && groupMemberList.size() > 0) {
+                    GroupMember groupMember = groupMemberList.get(0);
+                    userInfo = new UserInfo(groupMember.getUserId(), groupMember.getName(),
+                                            Uri.parse(groupMember.getPortraitUri()));
+                    NLog.d(TAG, "SealUserInfoManager getUserInfo from GroupMember db " + userId + " "
+                           + userInfo.getName() + " " + userInfo.getPortraitUri());
+                    RongIM.getInstance().refreshUserInfoCache(userInfo);
+                    return;
+                }
+                UserInfoEngine.getInstance(mContext).startEngine(userId);
+            }
+        });
+    }
+
+    public void getGroupInfo(final String groupsId) {
+        if (TextUtils.isEmpty(groupsId)) {
+            return;
+        }
+        mWorkHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                Group groupInfo;
+                Groups group = getGroupsByID(groupsId);
+                if (group != null) {
+                    groupInfo = new Group(groupsId, group.getName(), Uri.parse(group.getPortraitUri()));
+                    RongIM.getInstance().refreshGroupInfoCache(groupInfo);
+                    NLog.d(TAG, "SealUserInfoManager getGroupInfo from db " + groupsId + " "
+                           + groupInfo.getName() + " " + groupInfo.getPortraitUri());
+                    return;
+                }
+                GroupInfoEngine.getInstance(mContext).startEngine(groupsId);
+            }
+        });
+    }
+
+    /**
+     * 需要 rongcloud connect 成功后设置的 listener
+     */
+    public void setUserInfoEngineListener() {
+        UserInfoEngine.getInstance(mContext).setListener(new UserInfoEngine.UserInfoListener() {
+            @Override
+            public void onResult(UserInfo info) {
+                if (info != null && RongIM.getInstance() != null) {
+                    if (TextUtils.isEmpty(String.valueOf(info.getPortraitUri()))) {
+                        info.setPortraitUri(Uri.parse(RongGenerate.generateDefaultAvatar(info.getName(), info.getUserId())));
+                    }
+                    NLog.d(TAG, "SealUserInfoManager getUserInfo from network " + info.getUserId() + " " + info.getName() + " " + info.getPortraitUri());
+                    RongIM.getInstance().refreshUserInfoCache(info);
+                }
+            }
+        });
+        GroupInfoEngine.getInstance(mContext).setmListener(new GroupInfoEngine.GroupInfoListeners() {
+            @Override
+            public void onResult(Group info) {
+                if (info != null && RongIM.getInstance() != null) {
+                    NLog.d(TAG, "SealUserInfoManager getGroupInfo from network " + info.getId() + " " + info.getName() + " " + info.getPortraitUri());
+                    if (TextUtils.isEmpty(String.valueOf(info.getPortraitUri()))) {
+                        info.setPortraitUri(Uri.parse(RongGenerate.generateDefaultAvatar(info.getName(), info.getId())));
+                    }
+                    RongIM.getInstance().refreshGroupInfoCache(info);
+                }
+            }
+        });
     }
 
     /**
@@ -417,7 +534,7 @@ public class SealUserInfoManager implements OnDataListener {
                     return false;
                 }
             }
-            if (fetchGroupCount == mGroupsList.size()) {
+            if (mGroupsList != null && fetchGroupCount == mGroupsList.size()) {
                 setGetAllUserInfoWtihAllGroupMembersState();
                 return true;
             }
@@ -431,7 +548,6 @@ public class SealUserInfoManager implements OnDataListener {
     /**
      *从server获取群组成员信息,群组create时使用
      *注意这个接口同其它getGroupMember接口的区别,此方法只是写数据库不返回数据
-     *
      * @param groupID 群组ID
      */
     public void getGroupMember(final String groupID) {
@@ -612,7 +728,13 @@ public class SealUserInfoManager implements OnDataListener {
             @Override
             public void run() {
                 if (mFriendDao != null) {
-                    mFriendDao.insertOrReplace(friend);
+                    if (friend != null) {
+                        if (TextUtils.isEmpty(friend.getPortraitUri())) {
+                            String portrait = getPortrait(friend);
+                            friend.setPortraitUri(portrait);
+                        }
+                        mFriendDao.insertOrReplace(friend);
+                    }
                 }
             }
         });
@@ -622,16 +744,21 @@ public class SealUserInfoManager implements OnDataListener {
         mWorkHandler.post(new Runnable() {
             @Override
             public void run() {
-                if (mGroupsDao != null) {
-                    mGroupsDao.insertOrReplace(groups);
-                }
+                syncAddGroup(groups);
             }
         });
     }
 
     private void syncAddGroup(final Groups groups) {
         if (mGroupsDao != null) {
-            mGroupsDao.insertOrReplace(groups);
+            if (groups != null) {
+                String portrait = groups.getPortraitUri();
+                if (TextUtils.isEmpty(portrait)) {
+                    portrait = RongGenerate.generateDefaultAvatar(groups.getName(), groups.getGroupsId());
+                    groups.setPortraitUri(portrait);
+                }
+                mGroupsDao.insertOrReplace(groups);
+            }
         }
     }
 
@@ -640,7 +767,14 @@ public class SealUserInfoManager implements OnDataListener {
             @Override
             public void run() {
                 if (mGroupMemberDao != null) {
-                    mGroupMemberDao.insertOrReplace(groupMember);
+                    if (groupMember != null) {
+                        String portrait = groupMember.getPortraitUri();
+                        if (TextUtils.isEmpty(portrait)) {
+                            portrait = getPortrait(groupMember);
+                            groupMember.setPortraitUri(portrait);
+                        }
+                        mGroupMemberDao.insertOrReplace(groupMember);
+                    }
                 }
             }
         });
@@ -655,17 +789,21 @@ public class SealUserInfoManager implements OnDataListener {
     private List<Friend> addFriends(final List<UserRelationshipResponse.ResultEntity> list) {
         if (list != null && list.size() > 0) {
             List<Friend> friendsList = new ArrayList<>();
-            for (UserRelationshipResponse.ResultEntity friend : list) {
-                if (friend.getStatus() == 20) {
-                    friendsList.add(new Friend(
-                                        friend.getUser().getId(),
-                                        friend.getUser().getNickname(),
-                                        friend.getUser().getPortraitUri(),
-                                        friend.getDisplayName(),
-                                        null, null, null, null,
-                                        CharacterParser.getInstance().getSpelling(friend.getUser().getNickname()),
-                                        CharacterParser.getInstance().getSpelling(friend.getDisplayName())
-                                    ));
+            for (UserRelationshipResponse.ResultEntity resultEntity : list) {
+                if (resultEntity.getStatus() == 20) {
+                    Friend friend = new Friend(
+                        resultEntity.getUser().getId(),
+                        resultEntity.getUser().getNickname(),
+                        resultEntity.getUser().getPortraitUri(),
+                        resultEntity.getDisplayName(),
+                        null, null, null, null,
+                        CharacterParser.getInstance().getSpelling(resultEntity.getUser().getNickname()),
+                        CharacterParser.getInstance().getSpelling(resultEntity.getDisplayName()));
+                    if (TextUtils.isEmpty(friend.getPortraitUri())) {
+                        String portrait = getPortrait(friend);
+                        friend.setPortraitUri(portrait);
+                    }
+                    friendsList.add(friend);
                 }
             }
             if (friendsList.size() > 0) {
@@ -689,9 +827,13 @@ public class SealUserInfoManager implements OnDataListener {
         if (list != null && list.size() > 0) {
             mGroupsList = new ArrayList<>();
             for (GetGroupResponse.ResultEntity groups : list) {
+                String portrait = groups.getGroup().getPortraitUri();
+                if (TextUtils.isEmpty(portrait)) {
+                    portrait = RongGenerate.generateDefaultAvatar(groups.getGroup().getName(), groups.getGroup().getId());
+                }
                 mGroupsList.add(new Groups(groups.getGroup().getId(),
                                            groups.getGroup().getName(),
-                                           groups.getGroup().getPortraitUri(),
+                                           portrait,
                                            String.valueOf(groups.getRole())
                                           ));
             }
@@ -732,6 +874,12 @@ public class SealUserInfoManager implements OnDataListener {
             List<GroupMember> groupsMembersList = setCreatedToTop(list, groupID);
             if (groupsMembersList != null && groupsMembersList.size() > 0) {
                 if (mGroupMemberDao != null) {
+                    for (GroupMember groupMember : groupsMembersList) {
+                        if (groupMember != null && TextUtils.isEmpty(groupMember.getPortraitUri())) {
+                            String portrait = getPortrait(groupMember);
+                            groupMember.setPortraitUri(portrait);
+                        }
+                    }
                     mGroupMemberDao.insertOrReplaceInTx(groupsMembersList);
                 }
             }
@@ -837,9 +985,7 @@ public class SealUserInfoManager implements OnDataListener {
                 NLog.d(TAG, "getFriends occurs HttpException e=" + e.toString() + "mGetAllUserInfoState=" + mGetAllUserInfoState);
             }
         } else {
-            if (mFriendDao != null) {
-                friendsList = getFriends();
-            }
+            friendsList = getFriends();
         }
         return friendsList;
     }
@@ -902,6 +1048,25 @@ public class SealUserInfoManager implements OnDataListener {
             if (mGroupMemberDao != null) {
                 return mGroupMemberDao.queryBuilder().
                        where(GroupMemberDao.Properties.GroupId.eq(groupID)).list();
+            } else {
+                return null;
+            }
+        }
+    }
+
+    /**
+     * 同步获取群组成员信息
+     *
+     * @param  userId 用户Id
+     * @return List<GroupMember> 群组成员列表
+     */
+    public List<GroupMember> getGroupMembersWithUserId(String userId) {
+        if (TextUtils.isEmpty(userId)) {
+            return null;
+        } else {
+            if (mGroupMemberDao != null) {
+                return mGroupMemberDao.queryBuilder().
+                       where(GroupMemberDao.Properties.UserId.eq(userId)).list();
             } else {
                 return null;
             }
@@ -1513,5 +1678,147 @@ public class SealUserInfoManager implements OnDataListener {
         ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo ni = cm.getActiveNetworkInfo();
         return ni != null && ni.isConnectedOrConnecting();
+    }
+
+    /**
+     * app中获取用户头像的接口,此前这部分调用分散在app显示头像的每处代码中,整理写一个方法使app代码更整洁
+     * 这个方法不涉及读数据库,头像空时直接生成默认头像
+     */
+    public String getPortraitUri(UserInfo userInfo) {
+        if (userInfo != null) {
+            if (userInfo.getPortraitUri() != null) {
+                if (TextUtils.isEmpty(userInfo.getPortraitUri().toString())) {
+                    if (userInfo.getName() != null) {
+                        return RongGenerate.generateDefaultAvatar(userInfo);
+                    } else {
+                        return null;
+                    }
+                } else {
+                    return userInfo.getPortraitUri().toString();
+                }
+            } else {
+                if (userInfo.getName() != null) {
+                    return RongGenerate.generateDefaultAvatar(userInfo);
+                } else {
+                    return null;
+                }
+            }
+
+        }
+        return null;
+    }
+
+    public String getPortraitUri(UserInfoBean bean) {
+        if (bean != null) {
+            if (bean.getPortraitUri() != null) {
+                if (TextUtils.isEmpty(bean.getPortraitUri().toString())) {
+                    if (bean.getName() != null) {
+                        return RongGenerate.generateDefaultAvatar(bean.getName(), bean.getUserId());
+                    } else {
+                        return null;
+                    }
+                } else {
+                    return bean.getPortraitUri().toString();
+                }
+            } else {
+                if (bean.getName() != null) {
+                    return RongGenerate.generateDefaultAvatar(bean.getName(), bean.getUserId());
+                } else {
+                    return null;
+                }
+            }
+
+        }
+        return null;
+    }
+
+    public String getPortraitUri(GetGroupInfoResponse groupInfoResponse) {
+        if (groupInfoResponse.getResult() != null) {
+            Groups groups = new Groups(groupInfoResponse.getResult().getId(),
+                                       groupInfoResponse.getResult().getName(),
+                                       groupInfoResponse.getResult().getPortraitUri());
+            return getPortraitUri(groups);
+        }
+        return null;
+    }
+
+    /**
+     * 获取用户头像,头像为空时会生成默认的头像,此默认头像可能已经存在数据库中,不重新生成
+     * 先从缓存读,再从数据库读
+     */
+    private String getPortrait(Friend friend) {
+        if (friend != null) {
+            if (TextUtils.isEmpty(friend.getPortraitUri())) {
+                if (TextUtils.isEmpty(friend.getUserId())) {
+                    return null;
+                } else {
+                    UserInfo userInfo = mUserInfoCache.get(friend.getUserId());
+                    if (userInfo != null) {
+                        if (!TextUtils.isEmpty(userInfo.getPortraitUri().toString())) {
+                            return userInfo.getPortraitUri().toString();
+                        } else {
+                            mUserInfoCache.remove(friend.getUserId());
+                        }
+                    }
+                    List<GroupMember> groupMemberList = getGroupMembersWithUserId(friend.getUserId());
+                    if (groupMemberList != null && groupMemberList.size() > 0) {
+                        GroupMember groupMember = groupMemberList.get(0);
+                        if (!TextUtils.isEmpty(groupMember.getPortraitUri()))
+                            return groupMember.getPortraitUri();
+                    }
+                    String portrait = RongGenerate.generateDefaultAvatar(friend.getName(), friend.getUserId());
+                    //缓存信息kit会使用,备注名存在时需要缓存displayName
+                    String name = friend.getName();
+                    if (friend.isExitsDisplayName()) {
+                        name = friend.getDisplayName();
+                    }
+                    userInfo = new UserInfo(friend.getUserId(), name, Uri.parse(portrait));
+                    mUserInfoCache.put(friend.getUserId(), userInfo);
+                    return portrait;
+                }
+            } else {
+                return friend.getPortraitUri();
+            }
+        }
+        return null;
+    }
+
+    private String getPortrait(GroupMember groupMember) {
+        if (groupMember != null) {
+            if (TextUtils.isEmpty(groupMember.getPortraitUri())) {
+                if (TextUtils.isEmpty(groupMember.getUserId())) {
+                    return null;
+                } else {
+                    UserInfo userInfo = mUserInfoCache.get(groupMember.getUserId());
+                    if (userInfo != null) {
+                        if (!TextUtils.isEmpty(userInfo.getPortraitUri().toString())) {
+                            return userInfo.getPortraitUri().toString();
+                        } else {
+                            mUserInfoCache.remove(groupMember.getUserId());
+                        }
+                    }
+                    Friend friend = getFriendByID(groupMember.getUserId());
+                    if (friend != null) {
+                        if (!TextUtils.isEmpty(friend.getPortraitUri())) {
+                            return friend.getPortraitUri();
+                        }
+                    }
+                    List<GroupMember> groupMemberList = getGroupMembersWithUserId(groupMember.getUserId());
+                    if (groupMemberList != null && groupMemberList.size() > 0) {
+                        GroupMember member = groupMemberList.get(0);
+                        if (!TextUtils.isEmpty(member.getPortraitUri())) {
+                            return member.getPortraitUri();
+                        }
+                    }
+                    String portrait = RongGenerate.generateDefaultAvatar(groupMember.getName(), groupMember.getUserId());
+                    userInfo = new UserInfo(groupMember.getUserId(), groupMember.getName(), Uri.parse(portrait));
+                    mUserInfoCache.put(groupMember.getUserId(), userInfo);
+                    return portrait;
+                }
+            } else {
+                return groupMember.getPortraitUri();
+            }
+        }
+        return null;
     }
 }

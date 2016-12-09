@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
@@ -26,7 +25,6 @@ import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.pinyin.CharacterParser;
 import cn.rongcloud.im.server.response.ContactNotificationMessageData;
 import cn.rongcloud.im.server.utils.NLog;
-import cn.rongcloud.im.server.utils.RongGenerate;
 import cn.rongcloud.im.server.utils.json.JsonMananger;
 import cn.rongcloud.im.ui.activity.LoginActivity;
 import cn.rongcloud.im.ui.activity.MainActivity;
@@ -39,7 +37,6 @@ import io.rong.imkit.RongIM;
 import io.rong.imkit.model.GroupNotificationMessageData;
 import io.rong.imkit.model.GroupUserInfo;
 import io.rong.imkit.model.UIConversation;
-import io.rong.imkit.plugin.location.AMapPreviewActivity;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.Group;
@@ -49,7 +46,6 @@ import io.rong.imlib.model.UserInfo;
 import io.rong.message.ContactNotificationMessage;
 import io.rong.message.GroupNotificationMessage;
 import io.rong.message.ImageMessage;
-import io.rong.message.LocationMessage;
 
 /**
  * 融云相关监听 事件集合类
@@ -79,7 +75,7 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
 
     private static SealAppContext mRongCloudInstance;
 
-    private LocationCallback mLastLocationCallback;
+    private RongIM.LocationProvider.LocationCallback mLastLocationCallback;
 
     private static ArrayList<Activity> mActivities;
 
@@ -117,6 +113,10 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
         return mRongCloudInstance;
     }
 
+    public Context getContext(){
+        return mContext;
+    }
+
     /**
      * init 后就能设置的监听
      */
@@ -128,11 +128,11 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
         RongIM.setGroupInfoProvider(this, true);
         RongIM.setLocationProvider(this);//设置地理位置提供者,不用位置的同学可以注掉此行代码
         setInputProvider();
-        setUserInfoEngineListener();
+        //setUserInfoEngineListener();//移到SealUserInfoManager
         setReadReceiptConversationType();
         RongIM.getInstance().enableNewComingMessageIcon(true);
         RongIM.getInstance().enableUnreadMessageIcon(true);
-//        RongIM.setGroupUserInfoProvider(this, true);
+        //RongIM.setGroupUserInfoProvider(this, true);//seal app暂时未使用这种方式,目前使用UserInfoProvider
         BroadcastManager.getInstance(mContext).addAction(SealConst.EXIT, new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -167,36 +167,6 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
                 RongExtensionManager.getInstance().registerExtensionModule(new SealExtensionModule());
             }
         }
-    }
-
-    /**
-     * 需要 rongcloud connect 成功后设置的 listener
-     */
-    public void setUserInfoEngineListener() {
-        UserInfoEngine.getInstance(mContext).setListener(new UserInfoEngine.UserInfoListener() {
-            @Override
-            public void onResult(UserInfo info) {
-                if (info != null && RongIM.getInstance() != null) {
-                    if (TextUtils.isEmpty(String.valueOf(info.getPortraitUri()))) {
-                        info.setPortraitUri(Uri.parse(RongGenerate.generateDefaultAvatar(info.getName(), info.getUserId())));
-                    }
-                    NLog.e("UserInfoEngine", info.getName() + info.getPortraitUri());
-                    RongIM.getInstance().refreshUserInfoCache(info);
-                }
-            }
-        });
-        GroupInfoEngine.getInstance(mContext).setmListener(new GroupInfoEngine.GroupInfoListeners() {
-            @Override
-            public void onResult(Group info) {
-                if (info != null && RongIM.getInstance() != null) {
-                    NLog.e("GroupInfoEngine:" + info.getId() + "----" + info.getName() + "----" + info.getPortraitUri());
-                    if (TextUtils.isEmpty(String.valueOf(info.getPortraitUri()))) {
-                        info.setPortraitUri(Uri.parse(RongGenerate.generateDefaultAvatar(info.getName(), info.getId())));
-                    }
-                    RongIM.getInstance().refreshGroupInfoCache(info);
-                }
-            }
-        });
     }
 
     @Override
@@ -274,9 +244,9 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
                 BroadcastManager.getInstance(mContext).sendBroadcast(UPDATE_FRIEND);
                 BroadcastManager.getInstance(mContext).sendBroadcast(UPDATE_RED_DOT);
             }
-//                // 发广播通知更新好友列表
-//            BroadcastManager.getInstance(mContext).sendBroadcast(UPDATE_RED_DOT);
-//            }
+            /*// 发广播通知更新好友列表
+            BroadcastManager.getInstance(mContext).sendBroadcast(UPDATE_RED_DOT);
+            }*/
         } else if (messageContent instanceof GroupNotificationMessage) {
             GroupNotificationMessage groupNotificationMessage = (GroupNotificationMessage) messageContent;
             NLog.e("onReceived:" + groupNotificationMessage.getMessage());
@@ -337,6 +307,11 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
                         groupNameList.add(data.getTargetGroupName());
                         groupNameList.add(data.getOperatorNickname());
                         BroadcastManager.getInstance(mContext).sendBroadcast(UPDATE_GROUP_NAME, groupNameList);
+                        Groups oldGroup=SealUserInfoManager.getInstance().getGroupsByID(groupID);
+                        if(oldGroup!=null){
+                            Group group=new Group(groupID,data.getTargetGroupName(), Uri.parse(oldGroup.getPortraitUri()));
+                            RongIM.getInstance().refreshGroupInfoCache(group);
+                        }
                     }
                 }
             } catch (Exception e) {
@@ -345,7 +320,7 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
 
 
         } else if (messageContent instanceof ImageMessage) {
-            ImageMessage imageMessage = (ImageMessage) messageContent;
+            //ImageMessage imageMessage = (ImageMessage) messageContent;
         }
         return false;
     }
@@ -378,20 +353,27 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
         BroadcastManager.getInstance(mContext).sendBroadcast(GROUP_DISMISS, groupID);
     }
 
+    /**
+     * 用户信息提供者的逻辑移到SealUserInfoManager
+     * 先从数据库读,没有数据时从网络获取
+     */
     @Override
     public UserInfo getUserInfo(String s) {
-        UserInfoEngine.getInstance(mContext).startEngine(s);
+        //UserInfoEngine.getInstance(mContext).startEngine(s);
+        SealUserInfoManager.getInstance().getUserInfo(s);
         return null;
     }
 
     @Override
     public Group getGroupInfo(String s) {
-        return GroupInfoEngine.getInstance(mContext).startEngine(s);
+        //return GroupInfoEngine.getInstance(mContext).startEngine(s);
+        SealUserInfoManager.getInstance().getGroupInfo(s);
+        return null;
     }
 
     @Override
     public GroupUserInfo getGroupUserInfo(String groupId, String userId) {
-//        return GroupUserInfoEngine.getInstance(mContext).startEngine(groupId, userId);
+        //return GroupUserInfoEngine.getInstance(mContext).startEngine(groupId, userId);
         return null;
     }
 
@@ -460,11 +442,11 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
     }
 
 
-    public LocationCallback getLastLocationCallback() {
+    public RongIM.LocationProvider.LocationCallback getLastLocationCallback() {
         return mLastLocationCallback;
     }
 
-    public void setLastLocationCallback(LocationCallback lastLocationCallback) {
+    public void setLastLocationCallback(RongIM.LocationProvider.LocationCallback lastLocationCallback) {
         this.mLastLocationCallback = lastLocationCallback;
     }
 

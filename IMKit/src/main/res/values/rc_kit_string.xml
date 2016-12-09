@@ -161,6 +161,8 @@
     <string name="rc_ac_file_manager_dir_title">按目录查找</string>
     <string name="rc_ac_file_manager_mobile_memory">手机内存</string>
     <string name="rc_ac_file_manager_SD_card">SD卡</string>
+    <string name="rc_ac_file_manager_SD_card_one">SD卡1</string>
+    <string name="rc_ac_file_manager_SD_card_two">SD卡2</string>
     <string name="rc_fr_storage_folder_list_search">搜索</string>
     <string name="rc_fr_storage_folder_list_no_files">无法读取%1$s中的文件</string>
     <string name="rc_ad_folder_files_number">%1$s个文件</string>
@@ -220,4 +222,6 @@
     <string name="rc_real_time_location_summary">我发起了位置共享</string>
     <string name="rc_real_time_location_sharing">发起了位置共享</string>
     <string name="rc_dialog_button_clear">清空</string>
+
+    <string name="rc_user_recalled_message">%s撤回了一条消息</string>
 </resources>

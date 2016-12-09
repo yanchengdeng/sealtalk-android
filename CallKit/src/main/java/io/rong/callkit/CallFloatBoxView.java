@@ -29,6 +29,7 @@ import io.rong.calllib.RongCallSession;
 import io.rong.calllib.message.CallSTerminateMessage;
 import io.rong.common.RLog;
 import io.rong.imkit.RongIM;
+import io.rong.imkit.utils.NotificationUtil;
 import io.rong.imlib.model.Conversation;
 
 /**
@@ -64,8 +65,8 @@ public class CallFloatBoxView {
         }
         params.type = type;
         params.flags = WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM
-                       | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-                       | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
+                | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
 
         params.format = PixelFormat.TRANSLUCENT;
         params.width = ViewGroup.LayoutParams.WRAP_CONTENT;
@@ -112,9 +113,9 @@ public class CallFloatBoxView {
             }
         });
         wm.addView(mView, params);
-        TextView timeV = (TextView)mView.findViewById(R.id.rc_time);
+        TextView timeV = (TextView) mView.findViewById(R.id.rc_time);
         setupTime(timeV);
-        ImageView mediaIconV = (ImageView)mView.findViewById(R.id.rc_voip_media_type);
+        ImageView mediaIconV = (ImageView) mView.findViewById(R.id.rc_voip_media_type);
         RongCallCommon.CallMediaType mediaType = RongCallCommon.CallMediaType.valueOf(bundle.getInt("mediaType"));
         if (mediaType.equals(RongCallCommon.CallMediaType.AUDIO)) {
             mediaIconV.setImageResource(R.drawable.rc_voip_float_audio);
@@ -170,7 +171,8 @@ public class CallFloatBoxView {
                     mView = null;
                     mTime = 0;
                 }
-                RongCallClient.getInstance().setVoIPCallListener(null);
+                NotificationUtil.clearNotification(mContext, BaseCallActivity.CALL_NOTIFICATION_ID);
+                RongCallClient.getInstance().setVoIPCallListener(RongCallProxy.getInstance());
             }
 
             @Override
@@ -212,6 +214,7 @@ public class CallFloatBoxView {
 
     public static int hideFloatBox() {
         int t = mTime;
+        RongCallClient.getInstance().setVoIPCallListener(RongCallProxy.getInstance());
         if (isShown && null != mView) {
             wm.removeView(mView);
             timer.cancel();
@@ -224,7 +227,20 @@ public class CallFloatBoxView {
         return t;
     }
 
-    private static void onClickToResume() {
+    public static Intent getResumeIntent() {
+        if (mBundle == null) {
+            return null;
+        }
+        RongCallClient.getInstance().setVoIPCallListener(RongCallProxy.getInstance());
+        Intent intent = new Intent(mBundle.getString("action"));
+        intent.putExtra("floatbox", mBundle);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra("callAction", RongCallAction.ACTION_RESUME_CALL.getName());
+
+        return intent;
+    }
+
+    public static void onClickToResume() {
         //当快速双击悬浮窗时，第一次点击之后会把mBundle置为空，第二次点击的时候出现NPE
         if (mBundle == null) {
             RLog.d(TAG, "onClickToResume mBundle is null");
@@ -236,6 +252,7 @@ public class CallFloatBoxView {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("callAction", RongCallAction.ACTION_RESUME_CALL.getName());
         mContext.startActivity(intent);
+        mBundle = null;
     }
 
     private static void setupTime(final TextView timeView) {

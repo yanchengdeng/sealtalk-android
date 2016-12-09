@@ -3,6 +3,8 @@ package io.rong.callkit;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -15,24 +17,27 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.view.SurfaceView;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import io.rong.calllib.IRongCallListener;
 import io.rong.calllib.RongCallCommon;
 import io.rong.calllib.RongCallSession;
+import io.rong.common.RLog;
 import io.rong.imkit.utilities.PermissionCheckUtil;
+import io.rong.imkit.utils.NotificationUtil;
 
 /**
  * Created by weiqinxiao on 16/3/9.
  */
 public class BaseCallActivity extends Activity implements IRongCallListener {
+
+    private static final String TAG = "BaseCallActivity";
     private final static long DELAY_TIME = 1000;
     static final int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 100;
     private static final String SYSTEM_DIALOG_REASON_KEY = "reason";
@@ -40,14 +45,17 @@ public class BaseCallActivity extends Activity implements IRongCallListener {
 
     private MediaPlayer mMediaPlayer;
     private int time = 0;
+    private Runnable updateTimeRunnable;
     private boolean shouldShowFloat;
     private boolean shouldRestoreFloat;
-    private Handler handler;
+    protected Handler handler;
     private BroadcastReceiver mHomeKeyReceiver;
     protected boolean isFinishing;
 
     static final String[] VIDEO_CALL_PERMISSIONS = {Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA};
     static final String[] AUDIO_CALL_PERMISSIONS = {Manifest.permission.RECORD_AUDIO};
+
+    public static final int CALL_NOTIFICATION_ID = 4000;
 
     public void setShouldShowFloat(boolean shouldShowFloat) {
         this.shouldShowFloat = shouldShowFloat;
@@ -64,12 +72,12 @@ public class BaseCallActivity extends Activity implements IRongCallListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        RLog.d(TAG, "BaseCallActivity onCreate");
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN,
-                             WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+                WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
-        RongCallProxy.getInstance().setCallListener(this);
         shouldRestoreFloat = true;
 
         PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
@@ -86,7 +94,7 @@ public class BaseCallActivity extends Activity implements IRongCallListener {
                 String action = intent.getAction();
                 if (action.equals(Intent.ACTION_CLOSE_SYSTEM_DIALOGS)) {
                     String reason = intent.getStringExtra(SYSTEM_DIALOG_REASON_KEY);
-                    if (SYSTEM_DIALOG_REASON_HOME_KEY.equals(reason)) {
+                    if (SYSTEM_DIALOG_REASON_HOME_KEY.equals(reason) && shouldShowFloat) {
                         finish();
                     }
                 }
@@ -98,6 +106,7 @@ public class BaseCallActivity extends Activity implements IRongCallListener {
             e.printStackTrace();
         }
         isFinishing = false;
+        RongCallProxy.getInstance().setCallListener(this);
     }
 
     @Override
@@ -105,8 +114,9 @@ public class BaseCallActivity extends Activity implements IRongCallListener {
         super.onStart();
         Intent intent = getIntent();
         Bundle bundle = intent.getBundleExtra("floatbox");
-        if (shouldRestoreFloat)
+        if (shouldRestoreFloat && bundle != null){
             onRestoreFloatBox(bundle);
+        }
         shouldRestoreFloat = true;
     }
 
@@ -131,25 +141,11 @@ public class BaseCallActivity extends Activity implements IRongCallListener {
     }
 
     public void setupTime(final TextView timeView) {
-        TimerTask task = new TimerTask() {
-            @Override
-            public void run() {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        time++;
-                        if (time >= 3600) {
-                            timeView.setText(String.format("%d:%02d:%02d", time / 3600, (time % 3600) / 60, (time % 60)));
-                        } else {
-                            timeView.setText(String.format("%02d:%02d", (time % 3600) / 60, (time % 60)));
-                        }
-                    }
-                });
-            }
-        };
-
-        Timer timer = new Timer();
-        timer.schedule(task, 0, 1000);
+        if(updateTimeRunnable != null) {
+            handler.removeCallbacks(updateTimeRunnable);
+        }
+        updateTimeRunnable = new UpdateTimeRunnable(timeView);
+        handler.post(updateTimeRunnable);
     }
 
     public int getTime() {
@@ -209,6 +205,7 @@ public class BaseCallActivity extends Activity implements IRongCallListener {
         if (text != null) {
             showShortToast(text);
         }
+        NotificationUtil.clearNotification(this, BaseCallActivity.CALL_NOTIFICATION_ID);
         RongCallProxy.getInstance().setCallListener(null);
     }
 
@@ -244,17 +241,15 @@ public class BaseCallActivity extends Activity implements IRongCallListener {
     @Override
     protected void onPause() {
         super.onPause();
-//        RongCallSession session = RongCallClient.getInstance().getCallSession();
-//        if (session == null) {
-//            finish();
-//            return;
-//        }
         if (shouldShowFloat) {
             Bundle bundle = new Bundle();
             String action = onSaveFloatBoxState(bundle);
             if (action != null) {
                 bundle.putString("action", action);
                 CallFloatBoxView.showFloatBox(getApplicationContext(), bundle, time);
+                int mediaType = bundle.getInt("mediaType");
+                showOnGoingNotification(getString(R.string.rc_call_on_going),
+                        mediaType == RongCallCommon.CallMediaType.AUDIO.getValue() ? getString(R.string.rc_audio_call_on_going) : getString(R.string.rc_video_call_on_going));
             }
         }
     }
@@ -262,12 +257,8 @@ public class BaseCallActivity extends Activity implements IRongCallListener {
     @Override
     protected void onResume() {
         super.onResume();
+        RLog.d(TAG, "BaseCallActivity onResume");
         RongCallProxy.getInstance().setCallListener(this);
-//        RongCallSession session = RongCallClient.getInstance().getCallSession();
-//        if (session == null) {
-//            finish();
-//            return;
-//        }
         time = CallFloatBoxView.hideFloatBox();
     }
 
@@ -287,6 +278,7 @@ public class BaseCallActivity extends Activity implements IRongCallListener {
             e.printStackTrace();
         }
         isFinishing = false;
+        handler.removeCallbacks(updateTimeRunnable);
         super.onDestroy();
     }
 
@@ -303,6 +295,16 @@ public class BaseCallActivity extends Activity implements IRongCallListener {
         return null;
     }
 
+    public void showOnGoingNotification(String title, String content) {
+        Intent intent = new Intent(getIntent().getAction());
+        Bundle bundle = new Bundle();
+        onSaveFloatBoxState(bundle);
+        intent.putExtra("floatbox", bundle);
+        intent.putExtra("callAction", RongCallAction.ACTION_RESUME_CALL.getName());
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 1000, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        NotificationUtil.showNotification(this, title, content, pendingIntent, CALL_NOTIFICATION_ID, Notification.DEFAULT_LIGHTS);
+    }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
@@ -315,13 +317,43 @@ public class BaseCallActivity extends Activity implements IRongCallListener {
 
         String[] permissions;
         if (type.equals(RongCallCommon.CallMediaType.VIDEO)) {
-            permissions = new String[] {Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO};
+            permissions = new String[]{Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO};
         } else if (type.equals(RongCallCommon.CallMediaType.AUDIO)) {
-            permissions = new String[] {Manifest.permission.RECORD_AUDIO};
+            permissions = new String[]{Manifest.permission.RECORD_AUDIO};
         } else {
             return true;
         }
         return PermissionCheckUtil.requestPermissions(this, permissions, requestCode);
     }
 
+    private class UpdateTimeRunnable implements Runnable {
+        private TextView timeView;
+
+        public UpdateTimeRunnable(TextView timeView) {
+            this.timeView = timeView;
+        }
+
+        @Override
+        public void run() {
+            time++;
+            if (time >= 3600) {
+                timeView.setText(String.format("%d:%02d:%02d", time / 3600, (time % 3600) / 60, (time % 60)));
+            } else {
+                timeView.setText(String.format("%02d:%02d", (time % 3600) / 60, (time % 60)));
+            }
+            handler.postDelayed(this, 1000);
+        }
+    }
+
+    void onMinimizeClick(View view) {
+        if (Build.BRAND.toLowerCase().contains("xiaomi")) {
+            if (PermissionCheckUtil.canDrawOverlays(this)) {
+                finish();
+            } else {
+                Toast.makeText(this, R.string.rc_voip_float_window_not_allowed, Toast.LENGTH_LONG).show();
+            }
+        } else {
+            finish();
+        }
+    }
 }

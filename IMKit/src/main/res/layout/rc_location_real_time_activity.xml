@@ -11,11 +11,7 @@
         android:id="@+id/rc_toolbar"
         android:layout_width="match_parent"
         android:layout_height="69dp"
-        android:background="#70000000"
-        android:clickable="false"
-        android:focusable="false"
-        android:focusableInTouchMode="false"
-        android:touchscreenBlocksFocus="false">
+        android:background="#70000000">
 
         <ImageView
             android:id="@+id/rc_toolbar_close"

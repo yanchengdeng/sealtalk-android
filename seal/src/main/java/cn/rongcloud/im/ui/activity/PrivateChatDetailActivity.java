@@ -11,8 +11,6 @@ import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
-
 import java.util.ArrayList;
 
 import cn.rongcloud.im.App;
@@ -24,10 +22,10 @@ import cn.rongcloud.im.db.Friend;
 import cn.rongcloud.im.db.FriendDao;
 import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.server.utils.OperationRong;
-import cn.rongcloud.im.server.utils.RongGenerate;
 import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
 import cn.rongcloud.im.ui.widget.switchbutton.SwitchButton;
 import io.rong.eventbus.EventBus;
+import io.rong.imageloader.core.ImageLoader;
 import io.rong.imkit.RongIM;
 import io.rong.imkit.userInfoCache.RongUserInfoManager;
 import io.rong.imkit.utilities.PromptPopupDialog;
@@ -81,11 +79,8 @@ public class PrivateChatDetailActivity extends BaseActivity implements View.OnCl
 
     private void initData() {
         if (mUserInfo != null) {
-            if (TextUtils.isEmpty(mUserInfo.getPortraitUri().toString())) {
-                ImageLoader.getInstance().displayImage(RongGenerate.generateDefaultAvatar(mUserInfo), mImageView, App.getOptions());
-            } else {
-                ImageLoader.getInstance().displayImage(mUserInfo.getPortraitUri().toString(), mImageView, App.getOptions());
-            }
+            String portraitUri = SealUserInfoManager.getInstance().getPortraitUri(mUserInfo);
+            ImageLoader.getInstance().displayImage(portraitUri, mImageView, App.getOptions());
 
             Friend friend = SealUserInfoManager.getInstance().getFriendByID(mUserInfo.getUserId());
             if (friend != null && !TextUtils.isEmpty(friend.getDisplayName())) {

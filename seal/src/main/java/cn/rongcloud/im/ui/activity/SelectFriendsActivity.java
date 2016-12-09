@@ -17,8 +17,6 @@ import android.widget.SectionIndexer;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,6 +43,7 @@ import cn.rongcloud.im.server.utils.RongGenerate;
 import cn.rongcloud.im.server.widget.DialogWithYesOrNoUtils;
 import cn.rongcloud.im.server.widget.LoadDialog;
 import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
+import io.rong.imageloader.core.ImageLoader;
 import io.rong.imkit.RongIM;
 import io.rong.imkit.userInfoCache.RongUserInfoManager;
 import io.rong.imlib.RongIMClient;
@@ -455,7 +454,8 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
                             mSelectedFriend.add(friend);
                             LinearLayout view = (LinearLayout) View.inflate(SelectFriendsActivity.this, R.layout.item_selected_friends, null);
                             SelectableRoundedImageView asyncImageView = (SelectableRoundedImageView) view.findViewById(R.id.iv_selected_friends);
-                            ImageLoader.getInstance().displayImage(TextUtils.isEmpty(friend.getPortraitUri()) ? RongGenerate.generateDefaultAvatar(friend.getName(), friend.getUserId()) : friend.getPortraitUri(), asyncImageView);
+                            String portraitUri = SealUserInfoManager.getInstance().getPortraitUri(friend);
+                            ImageLoader.getInstance().displayImage(portraitUri, asyncImageView);
                             view.removeView(asyncImageView);
                             mSelectedFriendsLinearLayout.addView(asyncImageView);
                         }
@@ -470,12 +470,8 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
                 viewHolder.tvTitle.setText(adapterList.get(position).getDisplayName());
             }
 
-            String url = adapterList.get(position).getPortraitUri();
-            if (!TextUtils.isEmpty(url)) {
-                ImageLoader.getInstance().displayImage(url, viewHolder.mImageView, App.getOptions());
-            } else {
-                ImageLoader.getInstance().displayImage(RongGenerate.generateDefaultAvatar(adapterList.get(position).getName(), adapterList.get(position).getUserId()), viewHolder.mImageView, App.getOptions());
-            }
+            String portraitUri = SealUserInfoManager.getInstance().getPortraitUri(adapterList.get(position));
+            ImageLoader.getInstance().displayImage(portraitUri, viewHolder.mImageView, App.getOptions());
             return convertView;
         }
 

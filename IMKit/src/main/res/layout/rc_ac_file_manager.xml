@@ -99,4 +99,34 @@
     </LinearLayout>
     <View
         style="@style/rc_ac_file_manager_line"/>
+    <LinearLayout
+        android:id="@+id/rc_ac_ll_sd_card_one"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:visibility="gone">
+        <ImageView
+            style="@style/rc_ac_file_manager_image_style"
+            android:src="@drawable/rc_ac_sd_card_icon"/>
+        <TextView
+            android:id="@+id/rc_ac_tv_file_manager_SD_card_one"
+            android:text="@string/rc_ac_file_manager_SD_card_one"
+            style="@style/rc_ac_file_manager_style"
+            />
+    </LinearLayout>
+    <View
+        style="@style/rc_ac_file_manager_line"/>
+    <LinearLayout
+        android:id="@+id/rc_ac_ll_sd_card_two"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:visibility="gone">
+        <ImageView
+            style="@style/rc_ac_file_manager_image_style"
+            android:src="@drawable/rc_ac_sd_card_icon"/>
+        <TextView
+            android:id="@+id/rc_ac_tv_file_manager_SD_card_two"
+            android:text="@string/rc_ac_file_manager_SD_card_two"
+            style="@style/rc_ac_file_manager_style"
+            />
+    </LinearLayout>
 </LinearLayout>

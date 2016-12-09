@@ -10,8 +10,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
-
 import java.util.List;
 
 import cn.rongcloud.im.App;
@@ -19,6 +17,7 @@ import cn.rongcloud.im.R;
 import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.server.utils.RongGenerate;
 import cn.rongcloud.im.server.widget.LoadDialog;
+import io.rong.imageloader.core.ImageLoader;
 import io.rong.imlib.model.UserInfo;
 
 public class BlackListActivity extends BaseActivity {
@@ -100,7 +99,8 @@ public class BlackListActivity extends BaseActivity {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
             viewHolder.mName.setText(userInfo.getName());
-            ImageLoader.getInstance().displayImage(TextUtils.isEmpty(userInfo.getPortraitUri().toString()) ? RongGenerate.generateDefaultAvatar(userInfo) : userInfo.getPortraitUri().toString(), viewHolder.mHead, App.getOptions());
+            String portraitUri = SealUserInfoManager.getInstance().getPortraitUri(userInfo);
+            ImageLoader.getInstance().displayImage(portraitUri, viewHolder.mHead, App.getOptions());
             return convertView;
         }
 

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.SpannableStringBuilder;
@@ -24,22 +25,23 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
 import cn.rongcloud.im.App;
 import cn.rongcloud.im.R;
+import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.server.pinyin.CharacterParser;
 import cn.rongcloud.im.server.utils.RongGenerate;
 import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
+import io.rong.imageloader.core.ImageLoader;
 import io.rong.imkit.RongIM;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.Message;
 import io.rong.imlib.model.SearchConversationResult;
+import io.rong.imlib.model.UserInfo;
 
 /**
  * Created by tiankui on 16/10/8.
@@ -316,13 +318,9 @@ public class SealSearchChattingDetailActivity extends Activity {
 
             String id = mResult.getId();
             String title = mResult.getTitle();
-            String portraitUri = mResult.getPortraitUri();
-            if (!TextUtils.isEmpty(portraitUri)) {
-                ImageLoader.getInstance().displayImage(portraitUri, viewHolder.portraitImageView, App.getOptions());
-            } else {
-                String s = RongGenerate.generateDefaultAvatar(title, id);
-                ImageLoader.getInstance().displayImage(s, viewHolder.portraitImageView, App.getOptions());
-            }
+            UserInfo userInfo = new UserInfo(id, title, Uri.parse(mResult.getPortraitUri()));
+            String portraitUri = SealUserInfoManager.getInstance().getPortraitUri(userInfo);
+            ImageLoader.getInstance().displayImage(portraitUri, viewHolder.portraitImageView, App.getOptions());
             viewHolder.nameTextView.setText(title);
             viewHolder.chatRecordsDetailTextView.setText(CharacterParser.getInstance().getColoredChattingRecord(mFilterString, message.getContent()));
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");

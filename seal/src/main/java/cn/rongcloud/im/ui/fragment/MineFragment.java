@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -16,23 +17,24 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.jrmf360.rylib.JrmfClient;
-import com.nostra13.universalimageloader.core.ImageLoader;
 
 import cn.rongcloud.im.App;
 import cn.rongcloud.im.R;
 import cn.rongcloud.im.SealConst;
+import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.server.SealAction;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.network.async.AsyncTaskManager;
 import cn.rongcloud.im.server.network.async.OnDataListener;
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.response.VersionResponse;
-import cn.rongcloud.im.server.utils.RongGenerate;
 import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
 import cn.rongcloud.im.ui.activity.AboutRongCloudActivity;
 import cn.rongcloud.im.ui.activity.AccountSettingActivity;
 import cn.rongcloud.im.ui.activity.MyAccountActivity;
+import io.rong.imageloader.core.ImageLoader;
 import io.rong.imkit.RongIM;
+import io.rong.imlib.model.UserInfo;
 
 /**
  * Created by AMing on 16/6/21.
@@ -57,11 +59,7 @@ public class MineFragment extends Fragment implements View.OnClickListener {
         BroadcastManager.getInstance(getActivity()).addAction(SealConst.CHANGEINFO, new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                String userId = sp.getString(SealConst.SEALTALK_LOGIN_ID, "");
-                String username = sp.getString(SealConst.SEALTALK_LOGIN_NAME, "");
-                String userPortrait = sp.getString(SealConst.SEALTALK_LOGING_PORTRAIT, "");
-                mName.setText(username);
-                ImageLoader.getInstance().displayImage(TextUtils.isEmpty(userPortrait) ? RongGenerate.generateDefaultAvatar(username, userId) : userPortrait, imageView, App.getOptions());
+                updateUserInfo();
             }
         });
         compareVersion();
@@ -108,11 +106,7 @@ public class MineFragment extends Fragment implements View.OnClickListener {
 
     private void initData() {
         sp = getActivity().getSharedPreferences("config", Context.MODE_PRIVATE);
-        String userId = sp.getString(SealConst.SEALTALK_LOGIN_ID, "");
-        String username = sp.getString(SealConst.SEALTALK_LOGIN_NAME, "");
-        String userPortrait = sp.getString(SealConst.SEALTALK_LOGING_PORTRAIT, "");
-        mName.setText(username);
-        ImageLoader.getInstance().displayImage(TextUtils.isEmpty(userPortrait) ? RongGenerate.generateDefaultAvatar(username, userId) : userPortrait, imageView, App.getOptions());
+        updateUserInfo();
     }
 
     private void initViews(View mView) {
@@ -161,5 +155,17 @@ public class MineFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onDestroy() {
         super.onDestroy();
+    }
+
+    private void updateUserInfo() {
+        String userId = sp.getString(SealConst.SEALTALK_LOGIN_ID, "");
+        String username = sp.getString(SealConst.SEALTALK_LOGIN_NAME, "");
+        String userPortrait = sp.getString(SealConst.SEALTALK_LOGING_PORTRAIT, "");
+        mName.setText(username);
+        if (!TextUtils.isEmpty(userId)) {
+            String portraitUri = SealUserInfoManager.getInstance().getPortraitUri
+                                 (new UserInfo(userId, username, Uri.parse(userPortrait)));
+            ImageLoader.getInstance().displayImage(portraitUri, imageView, App.getOptions());
+        }
     }
 }

@@ -185,8 +185,10 @@ public class MultiVideoCallActivity extends BaseCallActivity {
             if (!callAction.equals(RongCallAction.ACTION_RESUME_CALL))
                 return;
             localViewUserId = bundle.getString("localViewUserId");
-            if (callSession == null)
-                return;
+            if (callSession == null){
+                setShouldShowFloat(false);
+                finish();
+            }
 
             boolean isLocalViewExist = false;
             for (CallUserProfile profile : callSession.getParticipantProfileList()) {
@@ -498,7 +500,7 @@ public class MultiVideoCallActivity extends BaseCallActivity {
         minimizeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                MultiVideoCallActivity.super.onMinimizeClick(v);
             }
         });
     }

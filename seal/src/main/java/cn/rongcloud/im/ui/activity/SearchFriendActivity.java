@@ -1,6 +1,7 @@
 package cn.rongcloud.im.ui.activity;
 
 import android.content.Context;
+import android.net.Uri;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -14,25 +15,23 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
-
 import cn.rongcloud.im.App;
 import cn.rongcloud.im.R;
+import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.SealAppContext;
 import cn.rongcloud.im.SealConst;
-import cn.rongcloud.im.db.DBManager;
 import cn.rongcloud.im.db.Friend;
-import cn.rongcloud.im.db.FriendDao;
 import cn.rongcloud.im.server.network.async.AsyncTaskManager;
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.response.FriendInvitationResponse;
 import cn.rongcloud.im.server.response.GetUserInfoByPhoneResponse;
 import cn.rongcloud.im.server.utils.AMUtils;
 import cn.rongcloud.im.server.utils.NToast;
-import cn.rongcloud.im.server.utils.RongGenerate;
 import cn.rongcloud.im.server.widget.DialogWithYesOrNoUtils;
 import cn.rongcloud.im.server.widget.LoadDialog;
 import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
+import io.rong.imageloader.core.ImageLoader;
+import io.rong.imlib.model.UserInfo;
 
 public class SearchFriendActivity extends BaseActivity {
 
@@ -105,18 +104,22 @@ public class SearchFriendActivity extends BaseActivity {
         if (result != null) {
             switch (requestCode) {
                 case SEARCH_PHONE:
-                    final GetUserInfoByPhoneResponse guifres = (GetUserInfoByPhoneResponse) result;
-                    if (guifres.getCode() == 200) {
+                    final GetUserInfoByPhoneResponse userInfoByPhoneResponse = (GetUserInfoByPhoneResponse) result;
+                    if (userInfoByPhoneResponse.getCode() == 200) {
                         LoadDialog.dismiss(mContext);
                         NToast.shortToast(mContext, "success");
-                        mFriendId = guifres.getResult().getId();
+                        mFriendId = userInfoByPhoneResponse.getResult().getId();
                         searchItem.setVisibility(View.VISIBLE);
-                        if (TextUtils.isEmpty(guifres.getResult().getPortraitUri())) {
-                            ImageLoader.getInstance().displayImage(RongGenerate.generateDefaultAvatar(guifres.getResult().getNickname(), guifres.getResult().getId()), searchImage, App.getOptions());
-                        } else {
-                            ImageLoader.getInstance().displayImage(guifres.getResult().getPortraitUri(), searchImage, App.getOptions());
+                        String portraitUri = null;
+                        if (userInfoByPhoneResponse.getResult() != null) {
+                            GetUserInfoByPhoneResponse.ResultEntity userInfoByPhoneResponseResult = userInfoByPhoneResponse.getResult();
+                            UserInfo userInfo = new UserInfo(userInfoByPhoneResponseResult.getId(),
+                                                             userInfoByPhoneResponseResult.getNickname(),
+                                                             Uri.parse(userInfoByPhoneResponseResult.getPortraitUri()));
+                            portraitUri = SealUserInfoManager.getInstance().getPortraitUri(userInfo);
                         }
-                        searchName.setText(guifres.getResult().getNickname());
+                        ImageLoader.getInstance().displayImage(portraitUri, searchImage, App.getOptions());
+                        searchName.setText(userInfoByPhoneResponse.getResult().getNickname());
                         searchItem.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -218,7 +221,7 @@ public class SearchFriendActivity extends BaseActivity {
                 mFriend.setPortraitUri(sp.getString(SealConst.SEALTALK_LOGING_PORTRAIT, ""));
                 return true;
             } else {
-                mFriend = DBManager.getInstance().getDaoSession().getFriendDao().queryBuilder().where(FriendDao.Properties.UserId.eq(id)).build().unique();
+                mFriend = SealUserInfoManager.getInstance().getFriendByID(id);
                 if (mFriend != null) {
                     return true;
                 }

@@ -105,20 +105,24 @@ public class NoteInformationActivity extends BaseActivity {
             if (requestCode == SET_DISPLAYNAME) {
                 SetFriendDisplayNameResponse response = (SetFriendDisplayNameResponse) result;
                 if (response.getCode() == 200) {
+                    String displayName = mNoteEdit.getText().toString();
+                    if(displayName != null){
+                        displayName = displayName.trim();
+                    }
                     SealUserInfoManager.getInstance().addFriend(
                         new Friend(mFriend.getUserId(),
                                    mFriend.getName(),
                                    mFriend.getPortraitUri(),
-                                   mNoteEdit.getText().toString().trim(),
+                                   displayName,
                                    null, null,
                                    mFriend.getStatus(),
                                    mFriend.getTimestamp(),
                                    CharacterParser.getInstance().getSpelling(mFriend.getName()),
-                                   CharacterParser.getInstance().getSpelling(mNoteEdit.getText().toString().trim())));
-                    if (mNoteEdit.getText().toString().trim().isEmpty()) {
+                                   CharacterParser.getInstance().getSpelling(displayName)));
+                    if (TextUtils.isEmpty(displayName)) {
                         RongIM.getInstance().refreshUserInfoCache(new UserInfo(mFriend.getUserId(), mFriend.getName(), Uri.parse(mFriend.getPortraitUri())));
                     } else {
-                        RongIM.getInstance().refreshUserInfoCache(new UserInfo(mFriend.getUserId(), mNoteEdit.getText().toString().trim(), Uri.parse(mFriend.getPortraitUri())));
+                        RongIM.getInstance().refreshUserInfoCache(new UserInfo(mFriend.getUserId(), displayName, Uri.parse(mFriend.getPortraitUri())));
                     }
                     BroadcastManager.getInstance(mContext).sendBroadcast(SealAppContext.UPDATE_FRIEND);
                     Intent intent = new Intent(mContext, UserDetailActivity.class);

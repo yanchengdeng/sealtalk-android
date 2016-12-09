@@ -171,6 +171,8 @@
     <string name="rc_ac_file_manager_dir_title">Search according to directory</string>
     <string name="rc_ac_file_manager_mobile_memory">Phone memory</string>
     <string name="rc_ac_file_manager_SD_card">SD card</string>
+    <string name="rc_ac_file_manager_SD_card_one">SD card1</string>
+    <string name="rc_ac_file_manager_SD_card_two">SD card2</string>
     <string name="rc_fr_storage_folder_list_search">Search</string>
     <string name="rc_fr_storage_folder_list_no_files">"Can't read files in %1$s"</string>
     <string name="rc_ad_folder_files_number">%1$s files</string>
@@ -222,4 +224,5 @@
     <string name="rc_real_time_location_sharing">Location sharing...</string>
 
     <string name="rc_dialog_button_clear">Clear</string>
+    <string name="rc_user_recalled_message">%s recalled one message</string>
 </resources>

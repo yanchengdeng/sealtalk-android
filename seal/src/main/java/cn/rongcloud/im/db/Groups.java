@@ -4,12 +4,7 @@ package cn.rongcloud.im.db;
 /**
  * Entity mapped to table GROUPS.
  */
-public class Groups {
-
-    /** Not-null value. */
-    private String groupsId;
-    private String name;
-    private String portraitUri;
+public class Groups extends UserInfoBean {
     private String displayName;
     private String role;
     private String bulletin;
@@ -17,16 +12,15 @@ public class Groups {
     private String nameSpelling;
 
     public Groups() {
+        super();
     }
 
     public Groups(String groupsId) {
-        this.groupsId = groupsId;
+        super(groupsId);
     }
 
     public Groups(String groupsId, String name, String portraitUri, String displayName, String role, String bulletin, String timestamp) {
-        this.groupsId = groupsId;
-        this.name = name;
-        this.portraitUri = portraitUri;
+        super(groupsId, name, portraitUri);
         this.displayName = displayName;
         this.role = role;
         this.bulletin = bulletin;
@@ -34,31 +28,23 @@ public class Groups {
     }
 
     public Groups(String timestamp, String role, String displayName, String portraitUri, String name, String groupsId) {
+        super(groupsId, name, portraitUri);
         this.timestamp = timestamp;
         this.role = role;
         this.displayName = displayName;
-        this.portraitUri = portraitUri;
-        this.name = name;
-        this.groupsId = groupsId;
     }
 
     public Groups(String groupsId, String name, String portraitUri, String role) {
-        this.groupsId = groupsId;
-        this.name = name;
-        this.portraitUri = portraitUri;
+        super(groupsId, name, portraitUri);
         this.role = role;
     }
 
     public Groups(String groupsId, String name, String portraitUri) {
-        this.groupsId = groupsId;
-        this.name = name;
-        this.portraitUri = portraitUri;
+        super(groupsId, name, portraitUri);
     }
 
     public Groups(String groupsId, String name, String portraitUri, String displayName, String role, String bulletin, String timestamp, String nameSpelling) {
-        this.groupsId = groupsId;
-        this.name = name;
-        this.portraitUri = portraitUri;
+        super(groupsId, name, portraitUri);
         this.displayName = displayName;
         this.role = role;
         this.bulletin = bulletin;
@@ -67,29 +53,14 @@ public class Groups {
     }
     /** Not-null value. */
     public String getGroupsId() {
-        return groupsId;
+        return getUserId();
     }
 
     /** Not-null value; ensure this value is available before it is saved to the database. */
     public void setGroupsId(String groupsId) {
-        this.groupsId = groupsId;
+        setUserId(groupsId);
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getPortraitUri() {
-        return portraitUri;
-    }
-
-    public void setPortraitUri(String portraitUri) {
-        this.portraitUri = portraitUri;
-    }
 
     public String getDisplayName() {
         return displayName;

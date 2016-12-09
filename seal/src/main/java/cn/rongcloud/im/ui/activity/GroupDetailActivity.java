@@ -18,7 +18,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
 import com.qiniu.android.http.ResponseInfo;
 import com.qiniu.android.storage.UpCompletionHandler;
 import com.qiniu.android.storage.UploadManager;
@@ -62,6 +61,7 @@ import cn.rongcloud.im.server.widget.LoadDialog;
 import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
 import cn.rongcloud.im.ui.widget.DemoGridView;
 import cn.rongcloud.im.ui.widget.switchbutton.SwitchButton;
+import io.rong.imageloader.core.ImageLoader;
 import io.rong.imkit.RongIM;
 import io.rong.imkit.emoticon.AndroidEmoji;
 import io.rong.imkit.utilities.PromptPopupDialog;
@@ -188,11 +188,8 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
     }
 
     private void initGroupData() {
-        if (TextUtils.isEmpty(mGroup.getPortraitUri())) {
-            ImageLoader.getInstance().displayImage(RongGenerate.generateDefaultAvatar(mGroup.getName(), mGroup.getGroupsId()), mGroupHeader, App.getOptions());
-        } else {
-            ImageLoader.getInstance().displayImage(mGroup.getPortraitUri(), mGroupHeader, App.getOptions());
-        }
+        String portraitUri = SealUserInfoManager.getInstance().getPortraitUri(mGroup);
+        ImageLoader.getInstance().displayImage(portraitUri, mGroupHeader, App.getOptions());
         mGroupName.setText(mGroup.getName());
 
         if (RongIM.getInstance() != null) {
@@ -424,17 +421,9 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
                     if (groupInfoResponse.getCode() == 200) {
                         if (groupInfoResponse.getResult() != null) {
                             mGroupName.setText(groupInfoResponse.getResult().getName());
-                            ImageLoader.getInstance().displayImage(TextUtils.isEmpty(groupInfoResponse.getResult().getPortraitUri()) ? RongGenerate.generateDefaultAvatar(groupInfoResponse.getResult().getName(), groupInfoResponse.getResult().getId()) : groupInfoResponse.getResult().getPortraitUri(), mGroupHeader, App.getOptions());
+                            String portraitUri = SealUserInfoManager.getInstance().getPortraitUri(groupInfoResponse);
+                            ImageLoader.getInstance().displayImage(portraitUri, mGroupHeader, App.getOptions());
                             RongIM.getInstance().refreshGroupInfoCache(new Group(fromConversationId, groupInfoResponse.getResult().getName(), TextUtils.isEmpty(groupInfoResponse.getResult().getPortraitUri()) ? Uri.parse(RongGenerate.generateDefaultAvatar(groupInfoResponse.getResult().getName(), groupInfoResponse.getResult().getId())) : Uri.parse(groupInfoResponse.getResult().getPortraitUri())));
-//                            DBManager.getInstance().getDaoSession().getGroupsDao().insertOrReplace(new Groups(fromConversationId,
-//                                    groupInfoResponse.getResult().getName(),
-//                                    TextUtils.isEmpty(groupInfoResponse.getResult().getPortraitUri()) ? RongGenerate.generateDefaultAvatar(groupInfoResponse.getResult().getName(), groupInfoResponse.getResult().getId()) : groupInfoResponse.getResult().getPortraitUri(),
-//                                    mGroup.getDisplayName(),
-//                                    mGroup.getRole(),
-//                                    mGroup.getBulletin(),
-//                                    mGroup.getTimestamp(),
-//                                    mGroup.getNameSpelling()
-//                                                                                                             ));
                         }
                     }
                     break;
@@ -642,8 +631,8 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
 
 
         public GridAdapter(Context context, List<GroupMember> list) {
-            if (list.size() >= 20) {
-                this.list = list.subList(0, 19);
+            if (list.size() >= 31) {
+                this.list = list.subList(0, 30);
             } else {
                 this.list = list;
             }
@@ -702,11 +691,8 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
                     tv_username.setText(bean.getName());
                 }
 
-                if (TextUtils.isEmpty(bean.getPortraitUri())) {
-                    ImageLoader.getInstance().displayImage(RongGenerate.generateDefaultAvatar(bean.getName(), bean.getUserId()), iv_avatar, App.getOptions());
-                } else {
-                    ImageLoader.getInstance().displayImage(bean.getPortraitUri(), iv_avatar, App.getOptions());
-                }
+                String portraitUri = SealUserInfoManager.getInstance().getPortraitUri(bean);
+                ImageLoader.getInstance().displayImage(portraitUri, iv_avatar, App.getOptions());
                 iv_avatar.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

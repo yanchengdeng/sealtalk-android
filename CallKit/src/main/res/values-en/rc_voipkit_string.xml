@@ -40,4 +40,8 @@
     <string name="rc_voip_message_video">[Video call]</string>
     <string name="rc_voip_remote_switch_to_audio">Other user switched to voice call.</string>
     <string name="rc_voip_switch_to_audio">Switch to voice call.</string>
+    <string name="rc_voip_float_window_not_allowed">Please enable floating windows</string>
+    <string name="rc_call_on_going">Call in progress</string>
+    <string name="rc_audio_call_on_going">Tap to continue as voice call in progress</string>
+    <string name="rc_video_call_on_going">Tap to continue as video call is on</string>
 </resources>

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
@@ -28,8 +29,6 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +39,7 @@ import java.util.concurrent.TimeUnit;
 
 import cn.rongcloud.im.App;
 import cn.rongcloud.im.R;
+import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.SealConst;
 import cn.rongcloud.im.db.DBManager;
 import cn.rongcloud.im.db.Friend;
@@ -50,9 +50,9 @@ import cn.rongcloud.im.db.Groups;
 import cn.rongcloud.im.db.GroupsDao;
 import cn.rongcloud.im.model.SearchResult;
 import cn.rongcloud.im.server.pinyin.CharacterParser;
-import cn.rongcloud.im.server.utils.RongGenerate;
 import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
 import de.greenrobot.dao.query.QueryBuilder;
+import io.rong.imageloader.core.ImageLoader;
 import io.rong.imkit.RongIM;
 import io.rong.imkit.userInfoCache.RongUserInfoManager;
 import io.rong.imlib.RongIMClient;
@@ -510,12 +510,8 @@ public class SealSearchActivity extends Activity {
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
-            if (TextUtils.isEmpty(friendInfo.getPortraitUri())) {
-                String s = RongGenerate.generateDefaultAvatar(friendInfo.getName(), friendInfo.getUserId());
-                ImageLoader.getInstance().displayImage(s, viewHolder.portraitImageView, App.getOptions());
-            } else {
-                ImageLoader.getInstance().displayImage(friendInfo.getPortraitUri(), viewHolder.portraitImageView, App.getOptions());
-            }
+            String portraitUri = SealUserInfoManager.getInstance().getPortraitUri(friendInfo);
+            ImageLoader.getInstance().displayImage(portraitUri, viewHolder.portraitImageView, App.getOptions());
             if (!TextUtils.isEmpty(friendInfo.getDisplayName())) {
                 viewHolder.nameSingleTextView.setVisibility(View.GONE);
                 viewHolder.nameDisplayNameLinearLayout.setVisibility(View.VISIBLE);
@@ -592,12 +588,8 @@ public class SealSearchActivity extends Activity {
                 viewHolder = (GroupViewHolder) convertView.getTag();
             }
             if (groupInfo != null) {
-                if (TextUtils.isEmpty(groupInfo.getPortraitUri())) {
-                    String s = RongGenerate.generateDefaultAvatar(groupInfo.getName(), groupInfo.getGroupsId());
-                    ImageLoader.getInstance().displayImage(s, viewHolder.portraitImageView, App.getOptions());
-                } else {
-                    ImageLoader.getInstance().displayImage(groupInfo.getPortraitUri(), viewHolder.portraitImageView, App.getOptions());
-                }
+                String portraitUri = SealUserInfoManager.getInstance().getPortraitUri(groupInfo);
+                ImageLoader.getInstance().displayImage(portraitUri, viewHolder.portraitImageView, App.getOptions());
                 List<GroupMember> filterGroupMemberNameList = filterGroupMemberNameListMap.get(groupId);
                 if (filterGroupNameListMap.get(groupId) != null) {
                     viewHolder.nameSingleTextView.setVisibility(View.VISIBLE);
@@ -694,22 +686,10 @@ public class SealSearchActivity extends Activity {
                 String currentUserName = sp.getString(SealConst.SEALTALK_LOGIN_NAME, "");
                 String currentUserPortrait = sp.getString(SealConst.SEALTALK_LOGING_PORTRAIT, "");
                 if (friend != null) {
-                    String portraitUri = friend.getPortraitUri();
                     searchResult.setId(friend.getUserId());
-                    if (!TextUtils.isEmpty(portraitUri)) {
-                        searchResult.setPortraitUri(portraitUri);
-                        ImageLoader.getInstance().displayImage(portraitUri, viewHolder.portraitImageView, App.getOptions());
-                    } else {
-                        String s;
-                        if (!TextUtils.isEmpty(friend.getDisplayName())) {
-
-                            s = RongGenerate.generateDefaultAvatar(friend.getDisplayName(), friend.getUserId());
-                        } else {
-
-                            s = RongGenerate.generateDefaultAvatar(friend.getName(), friend.getUserId());
-                        }
-                        ImageLoader.getInstance().displayImage(s, viewHolder.portraitImageView, App.getOptions());
-                    }
+                    String portraitUri = SealUserInfoManager.getInstance().getPortraitUri(friend);
+                    searchResult.setPortraitUri(portraitUri);
+                    ImageLoader.getInstance().displayImage(portraitUri, viewHolder.portraitImageView, App.getOptions());
                     if (!TextUtils.isEmpty(friend.getDisplayName())) {
                         searchResult.setTitle(friend.getDisplayName());
                         viewHolder.nameTextView.setText(friend.getDisplayName());
@@ -719,14 +699,10 @@ public class SealSearchActivity extends Activity {
                     }
                 } else if (conversation.getTargetId().equals(currentUserId)) {
                     searchResult.setId(currentUserId);
-                    if (!TextUtils.isEmpty(currentUserPortrait)) {
-                        searchResult.setPortraitUri(currentUserPortrait);
-
-                        ImageLoader.getInstance().displayImage(currentUserPortrait, viewHolder.portraitImageView, App.getOptions());
-                    } else {
-                        String s = RongGenerate.generateDefaultAvatar(currentUserName, currentUserId);
-                        ImageLoader.getInstance().displayImage(s, viewHolder.portraitImageView, App.getOptions());
-                    }
+                    UserInfo currentUserInfo = new UserInfo(currentUserId, currentUserName, Uri.parse(currentUserPortrait));
+                    String portraitUri = SealUserInfoManager.getInstance().getPortraitUri(currentUserInfo);
+                    searchResult.setPortraitUri(portraitUri);
+                    ImageLoader.getInstance().displayImage(portraitUri, viewHolder.portraitImageView, App.getOptions());
                     if (!TextUtils.isEmpty(currentUserName)) {
                         searchResult.setTitle(currentUserName);
                         viewHolder.nameTextView.setText(currentUserName);
@@ -736,16 +712,11 @@ public class SealSearchActivity extends Activity {
                     }
                 } else {
                     UserInfo userInfo = RongUserInfoManager.getInstance().getUserInfo(conversation.getTargetId());
+                    String portraitUri = SealUserInfoManager.getInstance().getPortraitUri(userInfo);
+                    searchResult.setPortraitUri(portraitUri);
+                    ImageLoader.getInstance().displayImage(portraitUri, viewHolder.portraitImageView, App.getOptions());
                     searchResult.setId(conversation.getTargetId());
                     if (userInfo != null) {
-                        String portraitUri = userInfo.getPortraitUri().toString();
-                        if (!TextUtils.isEmpty(portraitUri)) {
-                            searchResult.setPortraitUri(portraitUri);
-                            ImageLoader.getInstance().displayImage(portraitUri, viewHolder.portraitImageView, App.getOptions());
-                        } else {
-                            String s = RongGenerate.generateDefaultAvatar(userInfo.getName(), userInfo.getUserId());
-                            ImageLoader.getInstance().displayImage(s, viewHolder.portraitImageView, App.getOptions());
-                        }
                         if (!TextUtils.isEmpty(userInfo.getName())) {
                             searchResult.setTitle(userInfo.getName());
                             viewHolder.nameTextView.setText(userInfo.getName());
@@ -756,8 +727,6 @@ public class SealSearchActivity extends Activity {
                     } else {
                         searchResult.setId(conversation.getTargetId());
                         searchResult.setTitle(conversation.getTargetId());
-                        String s = RongGenerate.generateDefaultAvatar(conversation.getTargetId(), conversation.getTargetId());
-                        ImageLoader.getInstance().displayImage(s, viewHolder.portraitImageView, App.getOptions());
                         viewHolder.nameTextView.setText(conversation.getTargetId());
                     }
 
@@ -767,17 +736,12 @@ public class SealSearchActivity extends Activity {
             if (conversation.getConversationType() == Conversation.ConversationType.GROUP) {
                 Groups groupInfo = DBManager.getInstance().getDaoSession().getGroupsDao().queryBuilder().where(GroupsDao.Properties.GroupsId.eq(conversation.getTargetId())).unique();
                 if (groupInfo != null) {
-                    String portraitUri = groupInfo.getPortraitUri();
                     searchResult.setId(groupInfo.getGroupsId());
-
+                    String portraitUri = SealUserInfoManager.getInstance().getPortraitUri(groupInfo);
                     if (!TextUtils.isEmpty(portraitUri)) {
                         searchResult.setPortraitUri(portraitUri);
-                        ImageLoader.getInstance().displayImage(portraitUri, viewHolder.portraitImageView, App.getOptions());
-                    } else {
-
-                        String s = RongGenerate.generateDefaultAvatar(groupInfo.getName(), groupInfo.getGroupsId());
-                        ImageLoader.getInstance().displayImage(s, viewHolder.portraitImageView, App.getOptions());
                     }
+                    ImageLoader.getInstance().displayImage(portraitUri, viewHolder.portraitImageView, App.getOptions());
                     if (!TextUtils.isEmpty(groupInfo.getName())) {
                         searchResult.setTitle(groupInfo.getName());
                         viewHolder.nameTextView.setText(groupInfo.getName());

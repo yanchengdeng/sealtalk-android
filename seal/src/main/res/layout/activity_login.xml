@@ -14,7 +14,7 @@
             android:layout_height="match_parent"
             android:layout_marginLeft="-50dp"
             android:layout_marginRight="-300dp"
-            android:scaleType="center"
+            android:scaleType="centerCrop"
             android:src="@drawable/de_bg" />
 
     </FrameLayout>

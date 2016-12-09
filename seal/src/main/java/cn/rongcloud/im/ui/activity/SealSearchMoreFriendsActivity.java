@@ -22,8 +22,6 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -32,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 
 import cn.rongcloud.im.App;
 import cn.rongcloud.im.R;
+import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.db.DBManager;
 import cn.rongcloud.im.db.Friend;
 import cn.rongcloud.im.db.FriendDao;
@@ -40,6 +39,7 @@ import cn.rongcloud.im.server.pinyin.CharacterParser;
 import cn.rongcloud.im.server.utils.RongGenerate;
 import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
 import de.greenrobot.dao.query.QueryBuilder;
+import io.rong.imageloader.core.ImageLoader;
 import io.rong.imkit.RongIM;
 
 /**
@@ -241,12 +241,8 @@ public class SealSearchMoreFriendsActivity extends Activity implements AdapterVi
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
-            if (TextUtils.isEmpty(friend.getPortraitUri())) {
-                String s = RongGenerate.generateDefaultAvatar(friend.getName(), friend.getUserId());
-                ImageLoader.getInstance().displayImage(s, viewHolder.portraitImageView, App.getOptions());
-            } else {
-                ImageLoader.getInstance().displayImage(friend.getPortraitUri(), viewHolder.portraitImageView, App.getOptions());
-            }
+            String portraitUri = SealUserInfoManager.getInstance().getPortraitUri(friend);
+            ImageLoader.getInstance().displayImage(portraitUri, viewHolder.portraitImageView, App.getOptions());
             if (!TextUtils.isEmpty(friend.getDisplayName())) {
                 viewHolder.nameSingleTextView.setVisibility(View.GONE);
                 viewHolder.nameDisplayNameLinearLayout.setVisibility(View.VISIBLE);

@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -21,8 +20,6 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import io.rong.calllib.CallUserProfile;
 import io.rong.calllib.RongCallClient;
@@ -40,22 +37,31 @@ import io.rong.imlib.model.UserInfo;
 
 public class SingleCallActivity extends BaseCallActivity implements Handler.Callback {
     private static final String TAG = "VoIPSingleActivity";
-    LayoutInflater inflater;
-    RongCallSession callSession;
-    FrameLayout mLPreviewContainer;
-    FrameLayout mSPreviewContainer;
-    FrameLayout mButtonContainer;
-    LinearLayout mUserInfoContainer;
-    Boolean isInformationShow = false;
-    Handler mHandler;
-    SurfaceView mLocalVideo = null;
-    boolean muted = false;
-    boolean handFree = false;
-    boolean startForCheckPermissions = false;
+    private LayoutInflater inflater;
+    private RongCallSession callSession;
+    private FrameLayout mLPreviewContainer;
+    private FrameLayout mSPreviewContainer;
+    private FrameLayout mButtonContainer;
+    private LinearLayout mUserInfoContainer;
+    private Boolean isInformationShow = false;
+    private SurfaceView mLocalVideo = null;
+    private boolean muted = false;
+    private boolean handFree = false;
+    private boolean startForCheckPermissions = false;
 
-    static final int EVENT_HIDDEN_INFO = 1;
-    String targetId = null;
+    private int EVENT_FULL_SCREEN = 1;
+
+    private String targetId = null;
     private RongCallCommon.CallMediaType mediaType;
+
+    @Override
+    final public boolean handleMessage(Message msg) {
+        if (msg.what == EVENT_FULL_SCREEN) {
+            hideVideoCallInformation();
+            return true;
+        }
+        return false;
+    }
 
     @Override
     @TargetApi(23)
@@ -64,7 +70,6 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
         setContentView(R.layout.rc_voip_activity_single_call);
 
         Intent intent = getIntent();
-        mHandler = new Handler(Looper.getMainLooper());
         mLPreviewContainer = (FrameLayout) findViewById(R.id.rc_voip_call_large_preview);
         mSPreviewContainer = (FrameLayout) findViewById(R.id.rc_voip_call_small_preview);
         mButtonContainer = (FrameLayout) findViewById(R.id.rc_voip_btn);
@@ -72,9 +77,7 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
 
         startForCheckPermissions = intent.getBooleanExtra("checkPermissions", false);
         RongCallAction callAction = RongCallAction.valueOf(intent.getStringExtra("callAction"));
-        if (callAction == null) {
-            return;
-        }
+
         if (callAction.equals(RongCallAction.ACTION_OUTGOING_CALL)) {
             if (intent.getAction().equals(RongVoIPIntent.RONG_INTENT_ACTION_VOIP_SINGLEAUDIO)) {
                 mediaType = RongCallCommon.CallMediaType.AUDIO;
@@ -86,16 +89,25 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
             mediaType = callSession.getMediaType();
         } else {
             callSession = RongCallClient.getInstance().getCallSession();
-            mediaType = callSession.getMediaType();
+            if (callSession != null) {
+                mediaType = callSession.getMediaType();
+            }
         }
-        inflater = LayoutInflater.from(this);
-        initView(mediaType, callAction);
-        RongContext.getInstance().getEventBus().register(this);
+        if (mediaType != null) {
+            inflater = LayoutInflater.from(this);
+            initView(mediaType, callAction);
+            RongContext.getInstance().getEventBus().register(this);
 
-        if (!requestCallPermissions(mediaType, REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS)) {
-            return;
+            if (!requestCallPermissions(mediaType, REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS)) {
+                return;
+            }
+            setupIntent();
+        } else {
+            RLog.w(TAG, "恢复的瞬间，对方已挂断");
+            setShouldShowFloat(false);
+            CallFloatBoxView.hideFloatBox();
+            finish();
         }
-        setupIntent();
     }
 
     @Override
@@ -122,7 +134,9 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
         if (!requestCallPermissions(mediaType, REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS)) {
             return;
         }
-        setupIntent();
+        if (callSession != null) {
+            setupIntent();
+        }
 
         super.onNewIntent(intent);
     }
@@ -194,9 +208,9 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
         RongCallCommon.CallMediaType mediaType;
         Intent intent = getIntent();
         RongCallAction callAction = RongCallAction.valueOf(intent.getStringExtra("callAction"));
-        if (callAction == null || callAction.equals(RongCallAction.ACTION_RESUME_CALL)) {
-            return;
-        }
+//        if (callAction.equals(RongCallAction.ACTION_RESUME_CALL)) {
+//            return;
+//        }
         if (callAction.equals(RongCallAction.ACTION_INCOMING_CALL)) {
             callSession = intent.getParcelableExtra("callSession");
             mediaType = callSession.getMediaType();
@@ -213,7 +227,7 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
             List<String> userIds = new ArrayList<>();
             userIds.add(targetId);
             RongCallClient.getInstance().startCall(conversationType, targetId, userIds, mediaType, null);
-        } else {
+        } else { // resume call
             callSession = RongCallClient.getInstance().getCallSession();
             mediaType = callSession.getMediaType();
         }
@@ -329,6 +343,8 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
     @Override
     protected void onDestroy() {
         RongContext.getInstance().getEventBus().unregister(this);
+        stopRing();
+        RLog.d(TAG, "SingleCallActivity onDestroy");
         super.onDestroy();
     }
 
@@ -349,16 +365,7 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
                         hideVideoCallInformation();
                     } else {
                         showVideoCallInformation();
-                    }
-
-                    if (isInformationShow) {
-                        Timer timer = new Timer();
-                        timer.schedule(new TimerTask() {
-                            @Override
-                            public void run() {
-                                mHandler.sendEmptyMessage(EVENT_HIDDEN_INFO);
-                            }
-                        }, 5 * 1000);
+                        handler.sendEmptyMessageDelayed(EVENT_FULL_SCREEN, 5 * 1000);
                     }
                 }
             });
@@ -397,6 +404,7 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
         else
             showShortToast(getString(R.string.rc_voip_remote_switch_to_audio));
         initAudioCallView();
+        handler.removeMessages(EVENT_FULL_SCREEN);
     }
 
     private void initAudioCallView() {
@@ -437,7 +445,9 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
     }
 
     public void onHangupBtnClick(View view) {
-        if (callSession == null || isFinishing) {
+        RongCallSession session = RongCallClient.getInstance().getCallSession();
+        if (session == null || isFinishing) {
+            finish();
             return;
         }
         RongCallClient.getInstance().hangUpCall(callSession.getCallId());
@@ -445,18 +455,12 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
     }
 
     public void onReceiveBtnClick(View view) {
-        if (callSession == null || isFinishing) {
+        RongCallSession session = RongCallClient.getInstance().getCallSession();
+        if (session == null || isFinishing) {
+            finish();
             return;
         }
         RongCallClient.getInstance().acceptCall(callSession.getCallId());
-    }
-
-    @Override
-    public boolean handleMessage(Message msg) {
-        if (msg != null && msg.what == EVENT_HIDDEN_INFO) {
-            hideVideoCallInformation();
-        }
-        return false;
     }
 
     public void hideVideoCallInformation() {
@@ -484,6 +488,7 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
             @Override
             public void onClick(View v) {
                 RongCallClient.getInstance().changeCallMediaType(RongCallCommon.CallMediaType.AUDIO);
+                callSession.setMediaType(RongCallCommon.CallMediaType.AUDIO);
                 initAudioCallView();
             }
         });
@@ -507,7 +512,6 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
 
         String senderId;
         String extra = "";
-        stopRing();
 
         isFinishing = true;
         if (callSession == null) {
@@ -561,6 +565,7 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
             return;
         muted = bundle.getBoolean("muted");
         handFree = bundle.getBoolean("handFree");
+        setShouldShowFloat(true);
 
         callSession = RongCallClient.getInstance().getCallSession();
         RongCallCommon.CallMediaType mediaType = callSession.getMediaType();
@@ -613,7 +618,7 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
     }
 
     public void onMinimizeClick(View view) {
-        finish();
+        super.onMinimizeClick(view);
     }
 
     public void onSwitchCameraClick(View view) {
@@ -622,22 +627,20 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
 
     @Override
     public void onBackPressed() {
-        if (callSession == null) {
-            return;
-        }
-        List<CallUserProfile> participantProfiles = callSession.getParticipantProfileList();
-        RongCallCommon.CallStatus callStatus = null;
-        for (CallUserProfile item : participantProfiles) {
-            if (item.getUserId().equals(callSession.getSelfUserId())) {
-                callStatus = item.getCallStatus();
-                break;
-            }
-        }
-        if (callStatus != null && callStatus.equals(RongCallCommon.CallStatus.CONNECTED)) {
-            super.onBackPressed();
-        } else {
-            RongCallClient.getInstance().hangUpCall(callSession.getCallId());
-        }
+        return;
+//        List<CallUserProfile> participantProfiles = callSession.getParticipantProfileList();
+//        RongCallCommon.CallStatus callStatus = null;
+//        for (CallUserProfile item : participantProfiles) {
+//            if (item.getUserId().equals(callSession.getSelfUserId())) {
+//                callStatus = item.getCallStatus();
+//                break;
+//            }
+//        }
+//        if (callStatus != null && callStatus.equals(RongCallCommon.CallStatus.CONNECTED)) {
+//            super.onBackPressed();
+//        } else {
+//            RongCallClient.getInstance().hangUpCall(callSession.getCallId());
+//        }
     }
 
     public void onEventMainThread(UserInfo userInfo) {
@@ -651,4 +654,15 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
             }
         }
     }
+
+//    @Override
+//    public void showOnGoingNotification() {
+//        Intent intent = new Intent(getIntent().getAction());
+//        Bundle bundle = new Bundle();
+//        onSaveFloatBoxState(bundle);
+//        intent.putExtra("floatbox", bundle);
+//        intent.putExtra("callAction", RongCallAction.ACTION_RESUME_CALL.getName());
+//        PendingIntent pendingIntent = PendingIntent.getActivity(this, 1000, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+//        NotificationUtil.showNotification(this, "todo", "coontent", pendingIntent, CALL_NOTIFICATION_ID);
+//    }
 }

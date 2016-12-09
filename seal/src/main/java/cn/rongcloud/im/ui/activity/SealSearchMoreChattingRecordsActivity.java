@@ -25,13 +25,12 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import cn.rongcloud.im.App;
 import cn.rongcloud.im.R;
+import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.SealConst;
 import cn.rongcloud.im.db.DBManager;
 import cn.rongcloud.im.db.Friend;
@@ -39,8 +38,8 @@ import cn.rongcloud.im.db.FriendDao;
 import cn.rongcloud.im.db.Groups;
 import cn.rongcloud.im.db.GroupsDao;
 import cn.rongcloud.im.server.pinyin.CharacterParser;
-import cn.rongcloud.im.server.utils.RongGenerate;
 import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
+import io.rong.imageloader.core.ImageLoader;
 import io.rong.imkit.RongIM;
 import io.rong.imkit.userInfoCache.RongUserInfoManager;
 import io.rong.imlib.RongIMClient;
@@ -275,22 +274,10 @@ public class SealSearchMoreChattingRecordsActivity extends Activity {
                 String currentUserName = sp.getString(SealConst.SEALTALK_LOGIN_NAME, "");
                 String currentUserPortrait = sp.getString(SealConst.SEALTALK_LOGING_PORTRAIT, "");
                 if (friend != null) {
-                    String portraitUri = friend.getPortraitUri();
                     searchResult.setId(friend.getUserId());
-                    if (!TextUtils.isEmpty(portraitUri)) {
-                        searchResult.setPortraitUri(portraitUri);
-                        ImageLoader.getInstance().displayImage(portraitUri, viewHolder.portraitImageView, App.getOptions());
-                    } else {
-                        String s;
-                        if (!TextUtils.isEmpty(friend.getDisplayName())) {
-
-                            s = RongGenerate.generateDefaultAvatar(friend.getDisplayName(), friend.getUserId());
-                        } else {
-
-                            s = RongGenerate.generateDefaultAvatar(friend.getName(), friend.getUserId());
-                        }
-                        ImageLoader.getInstance().displayImage(s, viewHolder.portraitImageView, App.getOptions());
-                    }
+                    String portraitUri = SealUserInfoManager.getInstance().getPortraitUri(friend);
+                    searchResult.setPortraitUri(portraitUri);
+                    ImageLoader.getInstance().displayImage(portraitUri, viewHolder.portraitImageView, App.getOptions());
                     if (!TextUtils.isEmpty(friend.getDisplayName())) {
                         searchResult.setTitle(friend.getDisplayName());
                         viewHolder.nameTextView.setText(friend.getDisplayName());
@@ -300,14 +287,10 @@ public class SealSearchMoreChattingRecordsActivity extends Activity {
                     }
                 } else if (conversation.getTargetId().equals(currentUserId)) {
                     searchResult.setId(currentUserId);
-                    if (!TextUtils.isEmpty(currentUserPortrait)) {
-                        searchResult.setPortraitUri(currentUserPortrait);
-
-                        ImageLoader.getInstance().displayImage(currentUserPortrait, viewHolder.portraitImageView, App.getOptions());
-                    } else {
-                        String s = RongGenerate.generateDefaultAvatar(currentUserName, currentUserId);
-                        ImageLoader.getInstance().displayImage(s, viewHolder.portraitImageView, App.getOptions());
-                    }
+                    UserInfo userInfo = new UserInfo(currentUserId, currentUserName, Uri.parse(currentUserPortrait));
+                    String portraitUri = SealUserInfoManager.getInstance().getPortraitUri(userInfo);
+                    searchResult.setPortraitUri(portraitUri);
+                    ImageLoader.getInstance().displayImage(portraitUri, viewHolder.portraitImageView, App.getOptions());
                     if (!TextUtils.isEmpty(currentUserName)) {
                         searchResult.setTitle(currentUserName);
                         viewHolder.nameTextView.setText(currentUserName);
@@ -317,19 +300,11 @@ public class SealSearchMoreChattingRecordsActivity extends Activity {
                     }
                 } else {
                     UserInfo userInfo = RongUserInfoManager.getInstance().getUserInfo(conversation.getTargetId());
+                    String portraitUri = SealUserInfoManager.getInstance().getPortraitUri(userInfo);
+                    searchResult.setPortraitUri(portraitUri);
                     searchResult.setId(conversation.getTargetId());
+                    ImageLoader.getInstance().displayImage(portraitUri, viewHolder.portraitImageView, App.getOptions());
                     if (userInfo != null) {
-                        Uri portraitUri = userInfo.getPortraitUri();
-                        if (portraitUri != null) {
-                            if (!TextUtils.isEmpty(portraitUri.toString())) {
-                                searchResult.setPortraitUri(portraitUri.toString());
-                                ImageLoader.getInstance().displayImage(portraitUri.toString(), viewHolder.portraitImageView, App.getOptions());
-                            }
-                        }
-                        else {
-                            String s = RongGenerate.generateDefaultAvatar(userInfo.getName(), userInfo.getUserId());
-                            ImageLoader.getInstance().displayImage(s, viewHolder.portraitImageView, App.getOptions());
-                        }
                         if (!TextUtils.isEmpty(userInfo.getName())) {
                             searchResult.setTitle(userInfo.getName());
                             viewHolder.nameTextView.setText(userInfo.getName());
@@ -338,10 +313,7 @@ public class SealSearchMoreChattingRecordsActivity extends Activity {
                             viewHolder.nameTextView.setText(userInfo.getUserId());
                         }
                     } else {
-                        searchResult.setId(conversation.getTargetId());
                         searchResult.setTitle(conversation.getTargetId());
-                        String s = RongGenerate.generateDefaultAvatar(conversation.getTargetId(), conversation.getTargetId());
-                        ImageLoader.getInstance().displayImage(s, viewHolder.portraitImageView, App.getOptions());
                         viewHolder.nameTextView.setText(conversation.getTargetId());
                     }
                 }
@@ -350,17 +322,10 @@ public class SealSearchMoreChattingRecordsActivity extends Activity {
             if (conversation.getConversationType() == Conversation.ConversationType.GROUP) {
                 Groups groupInfo = DBManager.getInstance().getDaoSession().getGroupsDao().queryBuilder().where(GroupsDao.Properties.GroupsId.eq(conversation.getTargetId())).unique();
                 if (groupInfo != null) {
-                    String portraitUri = groupInfo.getPortraitUri();
+                    String portraitUri = SealUserInfoManager.getInstance().getPortraitUri(groupInfo);
                     searchResult.setId(groupInfo.getGroupsId());
-
-                    if (!TextUtils.isEmpty(portraitUri)) {
-                        searchResult.setPortraitUri(portraitUri);
-                        ImageLoader.getInstance().displayImage(portraitUri, viewHolder.portraitImageView, App.getOptions());
-                    } else {
-
-                        String s = RongGenerate.generateDefaultAvatar(groupInfo.getName(), groupInfo.getGroupsId());
-                        ImageLoader.getInstance().displayImage(s, viewHolder.portraitImageView, App.getOptions());
-                    }
+                    searchResult.setPortraitUri(portraitUri);
+                    ImageLoader.getInstance().displayImage(portraitUri, viewHolder.portraitImageView, App.getOptions());
                     if (!TextUtils.isEmpty(groupInfo.getName())) {
                         searchResult.setTitle(groupInfo.getName());
                         viewHolder.nameTextView.setText(groupInfo.getName());

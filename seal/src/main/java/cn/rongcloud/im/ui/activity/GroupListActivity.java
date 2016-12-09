@@ -16,8 +16,6 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +27,7 @@ import cn.rongcloud.im.db.Groups;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.utils.RongGenerate;
 import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
+import io.rong.imageloader.core.ImageLoader;
 import io.rong.imkit.RongIM;
 
 /**
@@ -179,11 +178,8 @@ public class GroupListActivity extends BaseActivity {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
             viewHolder.tvTitle.setText(mContent.getName());
-            if (TextUtils.isEmpty(mContent.getPortraitUri())) {
-                ImageLoader.getInstance().displayImage(RongGenerate.generateDefaultAvatar(mContent.getName(), mContent.getGroupsId()), viewHolder.mImageView, App.getOptions());
-            } else {
-                ImageLoader.getInstance().displayImage(mContent.getPortraitUri(), viewHolder.mImageView, App.getOptions());
-            }
+            String portraitUri = SealUserInfoManager.getInstance().getPortraitUri(mContent);
+            ImageLoader.getInstance().displayImage(portraitUri, viewHolder.mImageView, App.getOptions());
             if (context.getSharedPreferences("config", MODE_PRIVATE).getBoolean("isDebug", false)) {
                 viewHolder.groupId.setVisibility(View.VISIBLE);
                 viewHolder.groupId.setText(mContent.getGroupsId());

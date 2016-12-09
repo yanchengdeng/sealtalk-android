@@ -40,4 +40,8 @@
     <string name="rc_voip_message_video">[视频聊天]</string>
     <string name="rc_voip_remote_switch_to_audio">对方已切换到语音聊天</string>
     <string name="rc_voip_switch_to_audio">已切换到语音聊天</string>
+    <string name="rc_voip_float_window_not_allowed">请打开悬浮窗权限</string>
+    <string name="rc_call_on_going">通话中...</string>
+    <string name="rc_audio_call_on_going">语音聊天中，轻击以继续</string>
+    <string name="rc_video_call_on_going">视频聊天中，轻击以继续</string>
 </resources>

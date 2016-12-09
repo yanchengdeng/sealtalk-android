@@ -449,7 +449,11 @@ public class MainActivity extends FragmentActivity implements
         if (mHomeKeyReceiver == null) {
             mHomeKeyReceiver = new HomeWatcherReceiver();
             final IntentFilter homeFilter = new IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
-            context.registerReceiver(mHomeKeyReceiver, homeFilter);
+            try {
+                context.registerReceiver(mHomeKeyReceiver, homeFilter);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 }

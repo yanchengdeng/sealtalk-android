@@ -6,22 +6,22 @@ import android.content.SharedPreferences;
 import android.support.multidex.MultiDexApplication;
 import android.text.TextUtils;
 
-import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
+import com.facebook.stetho.Stetho;
+import com.facebook.stetho.dumpapp.DumperPlugin;
+import com.facebook.stetho.inspector.database.DefaultDatabaseConnectionProvider;
+import com.facebook.stetho.inspector.protocol.ChromeDevtoolsDomain;
 
+import cn.rongcloud.im.message.TestMessage;
 import cn.rongcloud.im.message.provider.ContactNotificationMessageProvider;
+import cn.rongcloud.im.message.provider.TestMessageProvider;
 import cn.rongcloud.im.server.utils.NLog;
 import cn.rongcloud.im.utils.SharedPreferencesContext;
+import io.rong.imageloader.core.DisplayImageOptions;
+import io.rong.imageloader.core.display.FadeInBitmapDisplayer;
 import io.rong.imkit.RongIM;
-import io.rong.imkit.widget.provider.FileMessageItemProvider;
-import io.rong.imkit.widget.provider.GroupNotificationMessageItemProvider;
 import io.rong.imkit.widget.provider.RealTimeLocationMessageProvider;
+
 import io.rong.imlib.ipc.RongExceptionHandler;
-import io.rong.message.FileMessage;
-import io.rong.message.GroupNotificationMessage;
 import io.rong.push.RongPushClient;
 import io.rong.push.common.RongException;
 
@@ -34,10 +34,23 @@ public class App extends MultiDexApplication {
     public void onCreate() {
 
         super.onCreate();
+        Stetho.initialize(new Stetho.Initializer(this) {
+            @Override
+            protected Iterable<DumperPlugin> getDumperPlugins() {
+                return new Stetho.DefaultDumperPluginsBuilder(App.this).finish();
+            }
+
+            @Override
+            protected Iterable<ChromeDevtoolsDomain> getInspectorModules() {
+                Stetho.DefaultInspectorModulesBuilder defaultInspectorModulesBuilder = new Stetho.DefaultInspectorModulesBuilder(App.this);
+                defaultInspectorModulesBuilder.provideDatabaseDriver(new RongDatabaseDriver(App.this, new RongDatabaseFilesProvider(App.this), new DefaultDatabaseConnectionProvider()));
+                return defaultInspectorModulesBuilder.finish();
+            }
+        });
 
         if (getApplicationInfo().packageName.equals(getCurProcessName(getApplicationContext()))) {
 
-            //LeakCanary.install(this);//内存泄露检测
+//            LeakCanary.install(this);//内存泄露检测
             RongPushClient.registerHWPush(this);
             RongPushClient.registerMiPush(this, "2882303761517473625", "5451747338625");
             try {
@@ -65,6 +78,8 @@ public class App extends MultiDexApplication {
             try {
                 RongIM.registerMessageTemplate(new ContactNotificationMessageProvider());
                 RongIM.registerMessageTemplate(new RealTimeLocationMessageProvider());
+                RongIM.registerMessageType(TestMessage.class);
+                RongIM.registerMessageTemplate(new TestMessageProvider());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -72,26 +87,14 @@ public class App extends MultiDexApplication {
             openSealDBIfHasCachedToken();
 
             options = new DisplayImageOptions.Builder()
-            .showImageForEmptyUri(R.drawable.de_default_portrait)
-            .showImageOnFail(R.drawable.de_default_portrait)
-            .showImageOnLoading(R.drawable.de_default_portrait)
-            .displayer(new FadeInBitmapDisplayer(300))
-            .cacheInMemory(true)
-            .cacheOnDisk(true)
-            .build();
+                    .showImageForEmptyUri(R.drawable.de_default_portrait)
+                    .showImageOnFail(R.drawable.de_default_portrait)
+                    .showImageOnLoading(R.drawable.de_default_portrait)
+                    .displayer(new FadeInBitmapDisplayer(300))
+                    .cacheInMemory(true)
+                    .cacheOnDisk(true)
+                    .build();
 
-            //初始化图片下载组件
-            ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext())
-            .threadPriority(Thread.NORM_PRIORITY - 2)
-            .denyCacheImageMultipleSizesInMemory()
-            .diskCacheSize(50 * 1024 * 1024)
-            .diskCacheFileCount(200)
-            .diskCacheFileNameGenerator(new Md5FileNameGenerator())
-            .defaultDisplayImageOptions(options)
-            .build();
-
-            //Initialize ImageLoader with configuration.
-            ImageLoader.getInstance().init(config);
         }
     }
 

@@ -39,6 +39,8 @@
                 android:id="@+id/contact_top"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLength="16"
                 android:maxLines="1"
                 android:textColor="@color/group_list_black_textview"
                 android:textSize="16sp" />
@@ -58,6 +60,7 @@
                 android:id="@+id/contact_below"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
                 android:maxLength="16"
                 android:maxLines="1"
                 android:textColor="#999"
