@@ -33,6 +33,27 @@ Android 应用 SealTalk 由 融云 RongCloud 出品
 ## APK
 [下载 Apk](http://rongcloud.cn/sealtalk)<br/>
 
+## Jcenter & Maven
+
+![image](https://github.com/sealtalk/sealtalk-android/blob/master/screenshots/maven.png)<br/>
+
+```Java
+
+dependencies {
+
+    compile 'cn.rongcloud.android:IMLib:2.8.4'
+    compile 'cn.rongcloud.android:IMKit:2.8.4'
+    compile 'cn.rongcloud.android:CallLib:2.8.4'
+    compile 'cn.rongcloud.android:CallKit:2.8.4'
+    compile 'cn.rongcloud.android:RedPacket:2.8.4'
+}
+
+```
+
+[Sample and Uses](https://github.com/13120241790/RongCloudJcenter)<br/>
+
+
+
 ## UML
  登录类图
  ![image](https://github.com/sealtalk/sealtalk-android/blob/master/screenshots/SealTalk_UML.png)<br/>
