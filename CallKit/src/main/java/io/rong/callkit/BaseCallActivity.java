@@ -9,6 +9,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -16,6 +17,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
+import android.os.Vibrator;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
@@ -29,6 +31,7 @@ import io.rong.calllib.IRongCallListener;
 import io.rong.calllib.RongCallCommon;
 import io.rong.calllib.RongCallSession;
 import io.rong.common.RLog;
+import io.rong.imkit.RongContext;
 import io.rong.imkit.utilities.PermissionCheckUtil;
 import io.rong.imkit.utils.NotificationUtil;
 
@@ -44,6 +47,7 @@ public class BaseCallActivity extends Activity implements IRongCallListener {
     private static final String SYSTEM_DIALOG_REASON_HOME_KEY = "homekey";
 
     private MediaPlayer mMediaPlayer;
+    private Vibrator mVibrator;
     private int time = 0;
     private Runnable updateTimeRunnable;
     private boolean shouldShowFloat;
@@ -128,15 +132,23 @@ public class BaseCallActivity extends Activity implements IRongCallListener {
     }
 
     public void onIncomingCallRinging() {
-        Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
-        mMediaPlayer = new MediaPlayer();
-        try {
-            mMediaPlayer.setDataSource(this, uri);
-            mMediaPlayer.setLooping(true);
-            mMediaPlayer.prepare();
-            mMediaPlayer.start();
-        } catch (IOException e) {
-            e.printStackTrace();
+        int ringerMode = NotificationUtil.getRingerMode(this);
+        if(ringerMode != AudioManager.RINGER_MODE_SILENT){
+            if(ringerMode == AudioManager.RINGER_MODE_VIBRATE){
+                mVibrator = (Vibrator) RongContext.getInstance().getSystemService(Context.VIBRATOR_SERVICE);
+                mVibrator.vibrate(new long[] {500, 1000}, 0);
+            } else {
+                Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+                mMediaPlayer = new MediaPlayer();
+                try {
+                    mMediaPlayer.setDataSource(this, uri);
+                    mMediaPlayer.setLooping(true);
+                    mMediaPlayer.prepare();
+                    mMediaPlayer.start();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
@@ -156,6 +168,10 @@ public class BaseCallActivity extends Activity implements IRongCallListener {
         if (mMediaPlayer != null) {
             mMediaPlayer.stop();
             mMediaPlayer = null;
+        }
+        if(mVibrator != null){
+            mVibrator.cancel();
+            mVibrator = null;
         }
     }
 

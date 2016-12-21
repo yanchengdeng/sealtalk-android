@@ -74,6 +74,7 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
     private Friend mFriend;
     private String addMessage;
     private String mGroupName;
+    private String mPhoneString;
     private boolean mIsFriendsRelationship;
 
     private int mType;
@@ -104,6 +105,7 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
         mNoteNameLinearLayout = (LinearLayout) findViewById(R.id.ac_ll_note_name);
 
         mAddFriendButton.setOnClickListener(this);
+        mUserPhone.setOnClickListener(this);
     }
 
     private void initData() {
@@ -305,6 +307,14 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
                     }
                 });
                 break;
+            case R.id.contact_phone:
+                if (!TextUtils.isEmpty(mPhoneString)) {
+                    Uri telUri = Uri.parse("tel:"+mPhoneString);
+                    Intent intent = new Intent(Intent.ACTION_DIAL, telUri);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                }
+                break;
         }
 
     }
@@ -378,6 +388,7 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
                     GetFriendInfoByIDResponse friendInfoByIDResponse = (GetFriendInfoByIDResponse) result;
                     if (friendInfoByIDResponse.getCode() == 200) {
                         mUserPhone.setVisibility(View.VISIBLE);
+                        mPhoneString = friendInfoByIDResponse.getResult().getUser().getPhone();
                         mUserPhone.setText("手机号:" + friendInfoByIDResponse.getResult().getUser().getPhone());
                         GetFriendInfoByIDResponse.ResultEntity resultEntity = friendInfoByIDResponse.getResult();
                         GetFriendInfoByIDResponse.ResultEntity.UserEntity userEntity = resultEntity.getUser();
@@ -408,14 +419,14 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
                                 }
                                 //更新好友数据库
                                 SealUserInfoManager.getInstance().addFriend(
-                                    new Friend(mFriend.getUserId(),
-                                               nickName,
-                                               portraitUri,
-                                               mFriend.getDisplayName(),
-                                               null, null, null, null,
-                                               CharacterParser.getInstance().getSpelling(nickName),
-                                               TextUtils.isEmpty(mFriend.getDisplayName()) ?
-                                               null : CharacterParser.getInstance().getSpelling(mFriend.getDisplayName())));
+                                        new Friend(mFriend.getUserId(),
+                                                nickName,
+                                                portraitUri,
+                                                mFriend.getDisplayName(),
+                                                null, null, null, null,
+                                                CharacterParser.getInstance().getSpelling(nickName),
+                                                TextUtils.isEmpty(mFriend.getDisplayName()) ?
+                                                        null : CharacterParser.getInstance().getSpelling(mFriend.getDisplayName())));
                                 //更新好友列表
                                 BroadcastManager.getInstance(mContext).sendBroadcast(SealAppContext.UPDATE_FRIEND);
                                 //更新用户信息提供者
@@ -428,8 +439,8 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
                                         userInfoPortraitUri = RongGenerate.generateDefaultAvatar(nickName, mFriend.getUserId());
                                     }
                                     UserInfo newUserInfo = new UserInfo(mFriend.getUserId(),
-                                                                        nickName,
-                                                                        Uri.parse(userInfoPortraitUri));
+                                            nickName,
+                                            Uri.parse(userInfoPortraitUri));
                                     RongIM.getInstance().refreshUserInfoCache(newUserInfo);
                                 }
                             }
@@ -476,8 +487,8 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
         String portraitUri = userEntity.getPortraitUri();
         String displayName = resultEntity.getdisplayName();
         return hasNickNameChanged(nickName) ||
-               hasPortraitUriChanged(portraitUri) ||
-               hasDisplayNameChanged(displayName);
+                hasPortraitUriChanged(portraitUri) ||
+                hasDisplayNameChanged(displayName);
     }
 
     @Override

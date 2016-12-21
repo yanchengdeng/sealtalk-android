@@ -7,32 +7,22 @@ import io.rong.imkit.RongExtension;
 import io.rong.imkit.emoticon.IEmoticonTab;
 import io.rong.imkit.plugin.IPluginModule;
 import io.rong.imlib.model.Conversation;
-import io.rong.recognizer.RecognizePlugin;
 
 public class SealExtensionModule extends DefaultExtensionModule {
-    private RecognizePlugin recognize;
 
     @Override
     public void onAttachedToExtension(RongExtension extension) {
-        recognize = new RecognizePlugin();
-        recognize.init(extension.getContext());
         super.onAttachedToExtension(extension);
     }
 
     @Override
     public void onDetachedFromExtension() {
-        if (recognize != null) {
-            recognize.destroy();
-            recognize = null;
-        }
         super.onDetachedFromExtension();
     }
 
     @Override
     public List<IPluginModule> getPluginModules(Conversation.ConversationType conversationType) {
-        List<IPluginModule> pluginModules =  super.getPluginModules(conversationType);
-        pluginModules.add(recognize);
-        return pluginModules;
+        return super.getPluginModules(conversationType);
     }
 
     @Override

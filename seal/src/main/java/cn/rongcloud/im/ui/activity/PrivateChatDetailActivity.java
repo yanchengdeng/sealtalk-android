@@ -3,6 +3,7 @@ package cn.rongcloud.im.ui.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.MenuItem;
@@ -15,13 +16,16 @@ import java.util.ArrayList;
 
 import cn.rongcloud.im.App;
 import cn.rongcloud.im.R;
+import cn.rongcloud.im.SealAppContext;
 import cn.rongcloud.im.SealConst;
 import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.db.DBManager;
 import cn.rongcloud.im.db.Friend;
 import cn.rongcloud.im.db.FriendDao;
+import cn.rongcloud.im.server.pinyin.CharacterParser;
 import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.server.utils.OperationRong;
+import cn.rongcloud.im.server.utils.RongGenerate;
 import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
 import cn.rongcloud.im.ui.widget.switchbutton.SwitchButton;
 import io.rong.eventbus.EventBus;
@@ -68,6 +72,7 @@ public class PrivateChatDetailActivity extends BaseActivity implements View.OnCl
             updateUI();
         }
         EventBus.getDefault().register(this);
+        SealAppContext.getInstance().pushActivity(this);
     }
 
     private void updateUI() {
@@ -95,6 +100,17 @@ public class PrivateChatDetailActivity extends BaseActivity implements View.OnCl
     private void initView() {
         LinearLayout cleanMessage = (LinearLayout) findViewById(R.id.clean_friend);
         mImageView = (SelectableRoundedImageView) findViewById(R.id.friend_header);
+        mImageView.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(PrivateChatDetailActivity.this, UserDetailActivity.class);
+                Friend friend = CharacterParser.getInstance().generateFriendFromUserInfo(mUserInfo);
+                intent.putExtra("friend", friend);
+                intent.putExtra("conversationType", Conversation.ConversationType.PRIVATE.getValue());
+                intent.putExtra("type", 1);
+                PrivateChatDetailActivity.this.startActivity(intent);
+            }
+        });
         messageTop = (SwitchButton) findViewById(R.id.sw_freind_top);
         messageNotification = (SwitchButton) findViewById(R.id.sw_friend_notfaction);
         friendName = (TextView) findViewById(R.id.friend_name);
@@ -108,6 +124,7 @@ public class PrivateChatDetailActivity extends BaseActivity implements View.OnCl
     @Override
     protected void onDestroy() {
         EventBus.getDefault().unregister(this);
+        SealAppContext.getInstance().popActivity(this);
         super.onDestroy();
     }
 

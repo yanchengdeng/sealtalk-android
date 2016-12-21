@@ -47,10 +47,10 @@ import io.rong.message.ContactNotificationMessage;
 
 @SuppressWarnings("deprecation")
 public class MainActivity extends FragmentActivity implements
-    ViewPager.OnPageChangeListener,
-    View.OnClickListener,
-    DragPointView.OnDragListencer,
-    IUnReadMessageObserver {
+        ViewPager.OnPageChangeListener,
+        View.OnClickListener,
+        DragPointView.OnDragListencer,
+        IUnReadMessageObserver {
 
     public static ViewPager mViewPager;
     private List<Fragment> mFragment = new ArrayList<>();
@@ -149,37 +149,37 @@ public class MainActivity extends FragmentActivity implements
             Uri uri;
             if (isDebug) {
                 uri = Uri.parse("rong://" + getApplicationInfo().packageName).buildUpon()
-                      .appendPath("conversationlist")
-                      .appendQueryParameter(Conversation.ConversationType.PRIVATE.getName(), "true") //设置私聊会话是否聚合显示
-                      .appendQueryParameter(Conversation.ConversationType.GROUP.getName(), "true")//群组
-                      .appendQueryParameter(Conversation.ConversationType.PUBLIC_SERVICE.getName(), "false")//公共服务号
-                      .appendQueryParameter(Conversation.ConversationType.APP_PUBLIC_SERVICE.getName(), "false")//订阅号
-                      .appendQueryParameter(Conversation.ConversationType.SYSTEM.getName(), "true")//系统
-                      .appendQueryParameter(Conversation.ConversationType.DISCUSSION.getName(), "true")
-                      .build();
-                mConversationsTypes = new Conversation.ConversationType[] {Conversation.ConversationType.PRIVATE,
+                        .appendPath("conversationlist")
+                        .appendQueryParameter(Conversation.ConversationType.PRIVATE.getName(), "true") //设置私聊会话是否聚合显示
+                        .appendQueryParameter(Conversation.ConversationType.GROUP.getName(), "true")//群组
+                        .appendQueryParameter(Conversation.ConversationType.PUBLIC_SERVICE.getName(), "false")//公共服务号
+                        .appendQueryParameter(Conversation.ConversationType.APP_PUBLIC_SERVICE.getName(), "false")//订阅号
+                        .appendQueryParameter(Conversation.ConversationType.SYSTEM.getName(), "true")//系统
+                        .appendQueryParameter(Conversation.ConversationType.DISCUSSION.getName(), "true")
+                        .build();
+                mConversationsTypes = new Conversation.ConversationType[]{Conversation.ConversationType.PRIVATE,
                         Conversation.ConversationType.GROUP,
                         Conversation.ConversationType.PUBLIC_SERVICE,
                         Conversation.ConversationType.APP_PUBLIC_SERVICE,
                         Conversation.ConversationType.SYSTEM,
                         Conversation.ConversationType.DISCUSSION
-                                                                          };
+                };
 
             } else {
                 uri = Uri.parse("rong://" + getApplicationInfo().packageName).buildUpon()
-                      .appendPath("conversationlist")
-                      .appendQueryParameter(Conversation.ConversationType.PRIVATE.getName(), "false") //设置私聊会话是否聚合显示
-                      .appendQueryParameter(Conversation.ConversationType.GROUP.getName(), "false")//群组
-                      .appendQueryParameter(Conversation.ConversationType.PUBLIC_SERVICE.getName(), "false")//公共服务号
-                      .appendQueryParameter(Conversation.ConversationType.APP_PUBLIC_SERVICE.getName(), "false")//订阅号
-                      .appendQueryParameter(Conversation.ConversationType.SYSTEM.getName(), "true")//系统
-                      .build();
-                mConversationsTypes = new Conversation.ConversationType[] {Conversation.ConversationType.PRIVATE,
+                        .appendPath("conversationlist")
+                        .appendQueryParameter(Conversation.ConversationType.PRIVATE.getName(), "false") //设置私聊会话是否聚合显示
+                        .appendQueryParameter(Conversation.ConversationType.GROUP.getName(), "false")//群组
+                        .appendQueryParameter(Conversation.ConversationType.PUBLIC_SERVICE.getName(), "false")//公共服务号
+                        .appendQueryParameter(Conversation.ConversationType.APP_PUBLIC_SERVICE.getName(), "false")//订阅号
+                        .appendQueryParameter(Conversation.ConversationType.SYSTEM.getName(), "true")//系统
+                        .build();
+                mConversationsTypes = new Conversation.ConversationType[]{Conversation.ConversationType.PRIVATE,
                         Conversation.ConversationType.GROUP,
                         Conversation.ConversationType.PUBLIC_SERVICE,
                         Conversation.ConversationType.APP_PUBLIC_SERVICE,
                         Conversation.ConversationType.SYSTEM
-                                                                          };
+                };
             }
             listFragment.setUri(uri);
             mConversationListFragment = listFragment;
@@ -294,9 +294,9 @@ public class MainActivity extends FragmentActivity implements
     protected void initData() {
 
         final Conversation.ConversationType[] conversationTypes = {
-            Conversation.ConversationType.PRIVATE,
-            Conversation.ConversationType.GROUP, Conversation.ConversationType.SYSTEM,
-            Conversation.ConversationType.PUBLIC_SERVICE, Conversation.ConversationType.APP_PUBLIC_SERVICE
+                Conversation.ConversationType.PRIVATE,
+                Conversation.ConversationType.GROUP, Conversation.ConversationType.SYSTEM,
+                Conversation.ConversationType.PUBLIC_SERVICE, Conversation.ConversationType.APP_PUBLIC_SERVICE
         };
 
         RongIM.getInstance().addUnReadMessageCountChangedObserver(this, conversationTypes);
@@ -321,7 +321,7 @@ public class MainActivity extends FragmentActivity implements
                             startActivity(new Intent(MainActivity.this, NewFriendListActivity.class));
                         } else {
                             Uri uri = Uri.parse("rong://" + getApplicationInfo().packageName).buildUpon().appendPath("conversation")
-                                      .appendPath(conversationType).appendQueryParameter("targetId", targetId).build();
+                                    .appendPath(conversationType).appendQueryParameter("targetId", targetId).build();
                             Intent intent = new Intent(Intent.ACTION_VIEW);
                             intent.setData(uri);
                             startActivity(intent);
@@ -418,6 +418,8 @@ public class MainActivity extends FragmentActivity implements
     @Override
     protected void onDestroy() {
         RongIM.getInstance().removeUnReadMessageCountChangedObserver(this);
+        if (mHomeKeyReceiver != null)
+            this.unregisterReceiver(mHomeKeyReceiver);
         super.onDestroy();
     }
 

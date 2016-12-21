@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +31,6 @@ import org.json.JSONTokener;
 import java.util.Locale;
 import java.util.Random;
 
-import io.rong.common.RLog;
 
 
 /**
@@ -92,7 +92,7 @@ public class RecognizerView extends RelativeLayout implements RecognizerListener
 
         @Override
         public void onInit(int code) {
-            RLog.i(TAG, "onInit " + code);
+            Log.i(TAG, "onInit " + code);
         }
     };
 
@@ -106,7 +106,7 @@ public class RecognizerView extends RelativeLayout implements RecognizerListener
         setParam();
         int ret = mIat.startListening(this);
         if (ret != ErrorCode.SUCCESS) {
-            RLog.d(TAG, "startRecognize ret error " + ret);
+            Log.d(TAG, "startRecognize ret error " + ret);
         }
     }
 
@@ -308,7 +308,7 @@ public class RecognizerView extends RelativeLayout implements RecognizerListener
 
     @Override
     public void onEvent(int eventType, int i1, int i2, Bundle bundle) {
-        RLog.d(TAG, "RecognizerView onEvent eventType: " + eventType);
+        Log.d(TAG, "RecognizerView onEvent eventType: " + eventType);
     }
 
     @Override
@@ -318,13 +318,13 @@ public class RecognizerView extends RelativeLayout implements RecognizerListener
 
     @Override
     public void onBeginOfSpeech() {
-        RLog.d(TAG, "RecognizerView onBeginOfSpeech");
+        Log.d(TAG, "RecognizerView onBeginOfSpeech");
         beginOfSpeech();
     }
 
     @Override
     public void onEndOfSpeech() {
-        RLog.d(TAG, "RecognizerView onEndOfSpeech");
+        Log.d(TAG, "RecognizerView onEndOfSpeech");
 //        endOfSpeech();
     }
 

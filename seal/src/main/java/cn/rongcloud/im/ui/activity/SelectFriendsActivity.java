@@ -33,6 +33,7 @@ import cn.rongcloud.im.db.GroupMember;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.pinyin.CharacterParser;
+import cn.rongcloud.im.server.pinyin.FriendNameComparator;
 import cn.rongcloud.im.server.pinyin.PinyinComparator;
 import cn.rongcloud.im.server.pinyin.SideBar;
 import cn.rongcloud.im.server.response.AddGroupMemberResponse;
@@ -215,10 +216,10 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
                     continue;
                 }
                 data_list.add(new Friend(deleDisList.get(i).getUserId(),
-                                         deleDisList.get(i).getName(),
-                                         deleDisList.get(i).getPortraitUri().toString(),
-                                         null //TODO displayName 需要处理 暂为 null
-                                        ));
+                        deleDisList.get(i).getName(),
+                        deleDisList.get(i).getPortraitUri().toString(),
+                        null //TODO displayName 需要处理 暂为 null
+                ));
             }
             /**
              * 以下3步是标准流程
@@ -303,6 +304,15 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
                         for (Friend friend : friendList) {
                             data_list.add(new Friend(friend.getUserId(), friend.getName(), friend.getPortraitUri(), friend.getDisplayName(), null, null));
                         }
+                        if (isAddGroupMember) {
+                            for (GroupMember groupMember : addGroupMemberList) {
+                                for (int i = 0; i < data_list.size(); i++) {
+                                    if (groupMember.getUserId().equals(data_list.get(i).getUserId())) {
+                                        data_list.remove(i);
+                                    }
+                                }
+                            }
+                        }
                         fillSourceDataList();
                         filterSourceDataList();
                         updateAdapter();
@@ -324,9 +334,9 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
                     continue;
                 }
                 data_list.add(new Friend(deleteMember.getUserId(),
-                                         deleteMember.getName(), deleteMember.getPortraitUri(),
-                                         null //TODO displayName 需要处理 暂为 null
-                                        ));
+                        deleteMember.getName(), deleteMember.getPortraitUri(),
+                        null //TODO displayName 需要处理 暂为 null
+                ));
             }
             fillSourceDataList();
             updateAdapter();
@@ -763,7 +773,7 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
 
                         if (startDisList != null && startDisList.size() == 1) {
                             RongIM.getInstance().startPrivateChat(mContext, startDisList.get(0),
-                                                                  SealUserInfoManager.getInstance().getFriendByID(startDisList.get(0)).getName());
+                                    SealUserInfoManager.getInstance().getFriendByID(startDisList.get(0)).getName());
                         } else if (startDisList.size() > 1) {
 
                             String disName;

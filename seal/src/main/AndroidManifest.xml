@@ -498,6 +498,10 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/rc_file_path" />
         </provider>
+
+        <meta-data
+            android:name="RONG_CLOUD_APP_KEY"
+            android:value="n19jmcy59f1q9" />
     </application>
 
 

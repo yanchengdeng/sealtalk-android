@@ -9,7 +9,7 @@ android {
         minSdkVersion 11
         targetSdkVersion 23
         versionCode 2016120910
-        versionName "2.8.3 Stable"
+        versionName "2.8.4 Stable"
 
         multiDexEnabled true
     }
@@ -54,26 +54,19 @@ android {
     }
 }
 
-preBuild << {
-}
-//task astyle(type: Exec) {
-//    commandLine 'bash', './script/format_code.sh'
-//}
-//preBuild.dependsOn astyle
-
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile 'com.android.support:support-v4:21.0.3'
-    compile project(':IMKit')
-    compile project(':CallKit')  //音视频
-    compile project(':RedPacket') //红包
-    compile project(':Recognizer') //语音输入
-    compile project(':Sticker') //表情
-    // libs 中 happy dns.jar - okhttp.jar - okio.jar 为 qiniu存储所需依赖jar 融云 sdk 和你的 app 中都无需依赖
-    // org.apache.http.legacy.jar 为适配 Android tagetId 22 以上 jar
+    compile 'cn.rongcloud.android:RedPacket:2.8.4'
+    //红包
+    compile project(':Recognizer')
+    //语音输入
+    compile project(':Sticker')
+    //表情
     compile 'com.android.support:multidex:1.0.1'
-    compile project(':friendscircles') //暂无功能 module 可删除
     compile 'com.facebook.stetho:stetho:1.4.1'
+    compile project(':IMKit')
+    compile project(':CallKit')
 }
 apply plugin: 'com.google.gms.google-services'

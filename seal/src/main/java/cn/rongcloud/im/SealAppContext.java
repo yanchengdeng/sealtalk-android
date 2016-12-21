@@ -75,7 +75,7 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
 
     private static SealAppContext mRongCloudInstance;
 
-    private RongIM.LocationProvider.LocationCallback mLastLocationCallback;
+    private LocationCallback mLastLocationCallback;
 
     private static ArrayList<Activity> mActivities;
 
@@ -442,11 +442,11 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
     }
 
 
-    public RongIM.LocationProvider.LocationCallback getLastLocationCallback() {
+    public LocationCallback getLastLocationCallback() {
         return mLastLocationCallback;
     }
 
-    public void setLastLocationCallback(RongIM.LocationProvider.LocationCallback lastLocationCallback) {
+    public void setLastLocationCallback(LocationCallback lastLocationCallback) {
         this.mLastLocationCallback = lastLocationCallback;
     }
 

@@ -525,7 +525,12 @@ public class SealUserInfoManager implements OnDataListener {
                     fetchGroupCount++;
                     List<GetGroupMemberResponse.ResultEntity> list = groupMemberResponse.getResult();
                     if (list != null && list.size() > 0) {
-                        addGroupMembers(list, group.getGroupsId());
+                        if(mGroupMemberDao != null){
+                            addGroupMembers(list, group.getGroupsId());
+                        } else if(mDBManager == null){
+                            //如果这两个都为null,说明是被踢,已经关闭数据库,没要必要继续执行
+                            return false;
+                        }
                     }
                 } else {
                     if (fetchGroupCount > 0) {
@@ -873,19 +878,19 @@ public class SealUserInfoManager implements OnDataListener {
         if (list != null && list.size() > 0) {
             List<GroupMember> groupsMembersList = setCreatedToTop(list, groupID);
             if (groupsMembersList != null && groupsMembersList.size() > 0) {
-                if (mGroupMemberDao != null) {
-                    for (GroupMember groupMember : groupsMembersList) {
-                        if (groupMember != null && TextUtils.isEmpty(groupMember.getPortraitUri())) {
-                            String portrait = getPortrait(groupMember);
-                            groupMember.setPortraitUri(portrait);
-                        }
+                for (GroupMember groupMember : groupsMembersList) {
+                    if (groupMember != null && TextUtils.isEmpty(groupMember.getPortraitUri())) {
+                        String portrait = getPortrait(groupMember);
+                        groupMember.setPortraitUri(portrait);
                     }
+                }
+                if (mGroupMemberDao != null) {
                     mGroupMemberDao.insertOrReplaceInTx(groupsMembersList);
                 }
             }
-            return  groupsMembersList;
+            return groupsMembersList;
         } else {
-            return  null;
+            return null;
         }
     }
 

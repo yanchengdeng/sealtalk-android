@@ -1,12 +1,10 @@
 package cn.rongcloud.im.ui.activity;
 
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -15,8 +13,8 @@ import java.util.List;
 import cn.rongcloud.im.App;
 import cn.rongcloud.im.R;
 import cn.rongcloud.im.SealUserInfoManager;
-import cn.rongcloud.im.server.utils.RongGenerate;
 import cn.rongcloud.im.server.widget.LoadDialog;
+import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
 import io.rong.imageloader.core.ImageLoader;
 import io.rong.imlib.model.UserInfo;
 
@@ -93,7 +91,7 @@ public class BlackListActivity extends BaseActivity {
                 viewHolder = new ViewHolder();
                 convertView = LayoutInflater.from(mContext).inflate(R.layout.black_item_new, parent, false);
                 viewHolder.mName = (TextView) convertView.findViewById(R.id.blackname);
-                viewHolder.mHead = (ImageView) convertView.findViewById(R.id.blackuri);
+                viewHolder.mHead = (SelectableRoundedImageView) convertView.findViewById(R.id.blackuri);
                 convertView.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
@@ -106,7 +104,7 @@ public class BlackListActivity extends BaseActivity {
 
 
         class ViewHolder {
-            ImageView mHead;
+            SelectableRoundedImageView mHead;
             TextView mName;
         }
     }
