@@ -50,7 +50,7 @@ dependencies {
 
 ```
 
-[Sample and Uses](https://github.com/13120241790/RongCloudJcenter)<br/>
+[示例 和 使用](https://github.com/13120241790/RongCloudJcenter)<br/>
 
 
 
