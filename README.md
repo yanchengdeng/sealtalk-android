@@ -63,7 +63,7 @@ dependencies {
 #### Step 1:
 [Download RongCloud SDK](http://rongcloud.cn/downloads) Android IMKit SDK Package
 #### Step 2:
-Import IMKit SDK as module in Android Studio，then add dependency；(Temporary does not support Maven)
+Import IMKit SDK as module in Android Studio，then add dependency.
 #### Step 3:
 Read Android [Android Dev Doc](http://www.rongcloud.cn/docs/android.html), Learning knowledge
 #### Step 4:
