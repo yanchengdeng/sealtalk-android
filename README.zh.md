@@ -62,7 +62,7 @@ dependencies {
 #### Step 1:
 [下载融云 SDK](http://rongcloud.cn/downloads) Android IMKit SDK包
 #### Step 2:
-将 IMKit SDK 包当做 Model 导入 Android Studio , 再从 app 工程对其进行引用(暂不支持 Maven)
+将 IMKit SDK 包当做 Model 导入 Android Studio , 再从 app 工程对其进行引用.
 #### Step 3:
 阅读 Android [Android 开发文档](http://www.rongcloud.cn/docs/android.html),熟悉 IM 相关概念 和 接口以及初步集成
 #### Step 4:
