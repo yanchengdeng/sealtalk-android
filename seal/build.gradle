@@ -62,7 +62,7 @@ dependencies {
     //红包
     compile project(':Recognizer')
     //语音输入
-    compile project(':Sticker')
+    compile project(':sticker')
     //表情
     compile 'com.android.support:multidex:1.0.1'
     compile 'com.facebook.stetho:stetho:1.4.1'
