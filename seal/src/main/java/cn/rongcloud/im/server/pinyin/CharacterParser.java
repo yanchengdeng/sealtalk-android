@@ -371,22 +371,18 @@ public class CharacterParser {
 
 
     public Friend generateFriendFromUserInfo(UserInfo userInfo) {
-        Friend friend = new Friend();
+
         if (userInfo != null) {
-            friend.setUserId(userInfo.getUserId());
-            friend.setName(userInfo.getName());
-            Uri uri = userInfo.getPortraitUri();
-            friend.setPortraitUri(uri != null ?
-                                  uri.toString() : null);
+            return new Friend(userInfo.getUserId(), userInfo.getName(), userInfo.getPortraitUri());
         }
-        return friend;
+        return null;
     }
 
     public UserInfo generateUserInfoFromFriend(Friend friend) {
         if (friend != null) {
             UserInfo userInfo = new UserInfo(friend.getUserId(),
                                              friend.getName(),
-                                             Uri.parse(friend.getPortraitUri()));
+                                             friend.getPortraitUri());
             return userInfo;
         }
 

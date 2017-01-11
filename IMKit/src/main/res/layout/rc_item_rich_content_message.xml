@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@id/rc_layout"
     android:layout_width="244dp"
     android:layout_height="126dp"
@@ -16,7 +17,8 @@
         android:layout_marginTop="9dp"
         android:background="@android:color/transparent"
         android:gravity="center_vertical|left"
-        android:lines="2" />
+        android:lines="2"
+        tools:text="Title"/>
 
 
     <io.rong.imkit.widget.AsyncImageView
@@ -29,7 +31,7 @@
         android:layout_marginTop="3dp"
         android:layout_toRightOf="@id/rc_content"
         android:background="@android:color/transparent"
-        android:scaleType="fitXY"
+        android:scaleType="fitCenter"
         android:src="@drawable/rc_ic_def_rich_content"
         app:RCDefDrawable="@drawable/rc_ic_def_rich_content" />
 
@@ -43,7 +45,8 @@
         android:ellipsize="end"
         android:gravity="right"
         android:lines="4"
-        android:paddingBottom="9dp" />
+        android:paddingBottom="9dp"
+        tools:text="Content"/>
 
 
 </RelativeLayout>

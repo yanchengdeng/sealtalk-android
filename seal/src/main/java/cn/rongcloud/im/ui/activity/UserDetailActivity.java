@@ -376,7 +376,7 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
                             if (hasPortraitUriChanged(portraitUri)) {
                                 ImageLoader.getInstance().displayImage(portraitUri, mUserPortrait, App.getOptions());
                             } else {
-                                portraitUri = mFriend.getPortraitUri();
+                                portraitUri = mFriend.getPortraitUri().toString();
                             }
 
                             UserInfo userInfo = new UserInfo(userInfoByIdResponse.getResult().getId(), nickName, Uri.parse(portraitUri));
@@ -399,7 +399,7 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
                                 //当前app server返回的displayName为空,先不使用
                                 String displayName = resultEntity.getdisplayName();
                                 //如果没有设置头像,好友数据库的头像地址和用户信息提供者的头像处理不一致,这个不一致是seal app代码处理的问题,未来应该矫正回来
-                                String userInfoPortraitUri = mFriend.getPortraitUri();
+                                String userInfoPortraitUri = mFriend.getPortraitUri().toString();
                                 //更新UI
                                 //if (TextUtils.isEmpty(displayName) && hasDisplayNameChanged(displayName)) {
                                 if (!TextUtils.isEmpty(mFriend.getDisplayName())) {
@@ -421,7 +421,7 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
                                 SealUserInfoManager.getInstance().addFriend(
                                         new Friend(mFriend.getUserId(),
                                                 nickName,
-                                                portraitUri,
+                                                Uri.parse(portraitUri),
                                                 mFriend.getDisplayName(),
                                                 null, null, null, null,
                                                 CharacterParser.getInstance().getSpelling(nickName),

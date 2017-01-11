@@ -130,8 +130,8 @@ public class SealUserInfoManager implements OnDataListener {
     }
 
     /**
-     *修改数据库的存贮路径为.../appkey/userID/,
-     *必须确保userID存在后才能初始化DBManager
+     * 修改数据库的存贮路径为.../appkey/userID/,
+     * 必须确保userID存在后才能初始化DBManager
      */
     public void openDB() {
         RLog.d(TAG, "SealUserInfoManager openDB");
@@ -191,7 +191,7 @@ public class SealUserInfoManager implements OnDataListener {
             if (userInfo != null) {
                 RongIM.getInstance().refreshUserInfoCache(userInfo);
                 NLog.d(TAG, "SealUserInfoManager getUserInfo from cache " + userId + " "
-                       + userInfo.getName() + " " + userInfo.getPortraitUri());
+                        + userInfo.getName() + " " + userInfo.getPortraitUri());
                 return;
             }
         }
@@ -205,10 +205,9 @@ public class SealUserInfoManager implements OnDataListener {
                     if (friend.isExitsDisplayName()) {
                         name = friend.getDisplayName();
                     }
-                    userInfo = new UserInfo(friend.getUserId(), name,
-                                            Uri.parse(friend.getPortraitUri()));
+                    userInfo = new UserInfo(friend.getUserId(), name, friend.getPortraitUri());
                     NLog.d(TAG, "SealUserInfoManager getUserInfo from Friend db " + userId + " "
-                           + userInfo.getName() + " " + userInfo.getPortraitUri());
+                            + userInfo.getName() + " " + userInfo.getPortraitUri());
                     RongIM.getInstance().refreshUserInfoCache(userInfo);
                     return;
                 }
@@ -216,9 +215,9 @@ public class SealUserInfoManager implements OnDataListener {
                 if (groupMemberList != null && groupMemberList.size() > 0) {
                     GroupMember groupMember = groupMemberList.get(0);
                     userInfo = new UserInfo(groupMember.getUserId(), groupMember.getName(),
-                                            Uri.parse(groupMember.getPortraitUri()));
+                            groupMember.getPortraitUri());
                     NLog.d(TAG, "SealUserInfoManager getUserInfo from GroupMember db " + userId + " "
-                           + userInfo.getName() + " " + userInfo.getPortraitUri());
+                            + userInfo.getName() + " " + userInfo.getPortraitUri());
                     RongIM.getInstance().refreshUserInfoCache(userInfo);
                     return;
                 }
@@ -240,7 +239,7 @@ public class SealUserInfoManager implements OnDataListener {
                     groupInfo = new Group(groupsId, group.getName(), Uri.parse(group.getPortraitUri()));
                     RongIM.getInstance().refreshGroupInfoCache(groupInfo);
                     NLog.d(TAG, "SealUserInfoManager getGroupInfo from db " + groupsId + " "
-                           + groupInfo.getName() + " " + groupInfo.getPortraitUri());
+                            + groupInfo.getName() + " " + groupInfo.getPortraitUri());
                     return;
                 }
                 GroupInfoEngine.getInstance(mContext).startEngine(groupsId);
@@ -279,7 +278,7 @@ public class SealUserInfoManager implements OnDataListener {
     }
 
     /**
-     *第一次登录时同步好友,群组,群组成员,黑名单数据
+     * 第一次登录时同步好友,群组,群组成员,黑名单数据
      */
     public void getAllUserInfo() {
         if (!isNetworkConnected())
@@ -344,7 +343,10 @@ public class SealUserInfoManager implements OnDataListener {
                     }
                 } catch (HttpException e) {
                     e.printStackTrace();
-                    NLog.d(TAG, "fetchUserInfo occurs HttpException e=" + e.toString() + "mGetAllUserInfoState=" + mGetAllUserInfoState);
+                    RLog.d(TAG, "fetchUserInfo occurs HttpException e=" + e.toString() + "mGetAllUserInfoState=" + mGetAllUserInfoState);
+                } catch (Exception e){
+                    e.printStackTrace();
+                    RLog.d(TAG, "fetchUserInfo occurs Exception e=" + e.toString() + "mGetAllUserInfoState=" + mGetAllUserInfoState);
                 }
                 setGetAllUserInfoDone();
             }
@@ -358,7 +360,7 @@ public class SealUserInfoManager implements OnDataListener {
     }
 
     private boolean fetchFriends() throws HttpException {
-        UserRelationshipResponse userRelationshipResponse ;
+        UserRelationshipResponse userRelationshipResponse;
         try {
             userRelationshipResponse = action.getAllUserRelationship();
         } catch (JSONException e) {
@@ -418,8 +420,8 @@ public class SealUserInfoManager implements OnDataListener {
     }
 
     /**
-     *从server获取群组信息,群组create时使用
-     *注意这个接口同其它getGroups接口的区别,此方法只是写数据库不返回数据
+     * 从server获取群组信息,群组create时使用
+     * 注意这个接口同其它getGroups接口的区别,此方法只是写数据库不返回数据
      *
      * @param groupID 群组ID
      */
@@ -440,9 +442,9 @@ public class SealUserInfoManager implements OnDataListener {
                             if (groupInfo != null) {
                                 String role = groupInfo.getCreatorId().equals(RongIM.getInstance().getCurrentUserId()) ? "0" : "1";
                                 syncAddGroup(new Groups(groupID,
-                                                        groupInfo.getName(),
-                                                        groupInfo.getPortraitUri(),
-                                                        role));
+                                        groupInfo.getName(),
+                                        groupInfo.getPortraitUri(),
+                                        role));
                             }
                         } else {
                             mGetAllUserInfoState &= ~GROUPS;
@@ -525,9 +527,9 @@ public class SealUserInfoManager implements OnDataListener {
                     fetchGroupCount++;
                     List<GetGroupMemberResponse.ResultEntity> list = groupMemberResponse.getResult();
                     if (list != null && list.size() > 0) {
-                        if(mGroupMemberDao != null){
+                        if (mGroupMemberDao != null) {
                             addGroupMembers(list, group.getGroupsId());
-                        } else if(mDBManager == null){
+                        } else if (mDBManager == null) {
                             //如果这两个都为null,说明是被踢,已经关闭数据库,没要必要继续执行
                             return false;
                         }
@@ -551,8 +553,9 @@ public class SealUserInfoManager implements OnDataListener {
     }
 
     /**
-     *从server获取群组成员信息,群组create时使用
-     *注意这个接口同其它getGroupMember接口的区别,此方法只是写数据库不返回数据
+     * 从server获取群组成员信息,群组create时使用
+     * 注意这个接口同其它getGroupMember接口的区别,此方法只是写数据库不返回数据
+     *
      * @param groupID 群组ID
      */
     public void getGroupMember(final String groupID) {
@@ -734,9 +737,8 @@ public class SealUserInfoManager implements OnDataListener {
             public void run() {
                 if (mFriendDao != null) {
                     if (friend != null) {
-                        if (TextUtils.isEmpty(friend.getPortraitUri())) {
-                            String portrait = getPortrait(friend);
-                            friend.setPortraitUri(portrait);
+                        if (friend.getPortraitUri() != null && TextUtils.isEmpty(friend.getPortraitUri().toString())) {
+                            friend.setPortraitUri(Uri.parse(getPortrait(friend)));
                         }
                         mFriendDao.insertOrReplace(friend);
                     }
@@ -773,10 +775,10 @@ public class SealUserInfoManager implements OnDataListener {
             public void run() {
                 if (mGroupMemberDao != null) {
                     if (groupMember != null) {
-                        String portrait = groupMember.getPortraitUri();
+                        String portrait = groupMember.getPortraitUri().toString();
                         if (TextUtils.isEmpty(portrait)) {
                             portrait = getPortrait(groupMember);
-                            groupMember.setPortraitUri(portrait);
+                            groupMember.setPortraitUri(Uri.parse(portrait));
                         }
                         mGroupMemberDao.insertOrReplace(groupMember);
                     }
@@ -797,16 +799,15 @@ public class SealUserInfoManager implements OnDataListener {
             for (UserRelationshipResponse.ResultEntity resultEntity : list) {
                 if (resultEntity.getStatus() == 20) {
                     Friend friend = new Friend(
-                        resultEntity.getUser().getId(),
-                        resultEntity.getUser().getNickname(),
-                        resultEntity.getUser().getPortraitUri(),
-                        resultEntity.getDisplayName(),
-                        null, null, null, null,
-                        CharacterParser.getInstance().getSpelling(resultEntity.getUser().getNickname()),
-                        CharacterParser.getInstance().getSpelling(resultEntity.getDisplayName()));
-                    if (TextUtils.isEmpty(friend.getPortraitUri())) {
-                        String portrait = getPortrait(friend);
-                        friend.setPortraitUri(portrait);
+                            resultEntity.getUser().getId(),
+                            resultEntity.getUser().getNickname(),
+                            Uri.parse(resultEntity.getUser().getPortraitUri()),
+                            resultEntity.getDisplayName(),
+                            null, null, null, null,
+                            CharacterParser.getInstance().getSpelling(resultEntity.getUser().getNickname()),
+                            CharacterParser.getInstance().getSpelling(resultEntity.getDisplayName()));
+                    if (TextUtils.isEmpty(friend.getPortraitUri().toString())) {
+                        friend.setPortraitUri(Uri.parse(getPortrait(friend)));
                     }
                     friendsList.add(friend);
                 }
@@ -818,7 +819,7 @@ public class SealUserInfoManager implements OnDataListener {
             }
             return friendsList;
         } else {
-            return  null;
+            return null;
         }
     }
 
@@ -837,10 +838,10 @@ public class SealUserInfoManager implements OnDataListener {
                     portrait = RongGenerate.generateDefaultAvatar(groups.getGroup().getName(), groups.getGroup().getId());
                 }
                 mGroupsList.add(new Groups(groups.getGroup().getId(),
-                                           groups.getGroup().getName(),
-                                           portrait,
-                                           String.valueOf(groups.getRole())
-                                          ));
+                        groups.getGroup().getName(),
+                        portrait,
+                        String.valueOf(groups.getRole())
+                ));
             }
             if (mGroupsList.size() > 0) {
                 if (mGroupsDao != null) {
@@ -862,15 +863,15 @@ public class SealUserInfoManager implements OnDataListener {
     private void syncDeleteGroupMembers(String groupID) {
         if (mGroupMemberDao != null) {
             mGroupMemberDao.queryBuilder()
-            .where(GroupMemberDao.Properties.GroupId.eq(groupID))
-            .buildDelete().executeDeleteWithoutDetachingEntities();
+                    .where(GroupMemberDao.Properties.GroupId.eq(groupID))
+                    .buildDelete().executeDeleteWithoutDetachingEntities();
         }
     }
 
     /**
      * 同步接口,从server获取的群成员信息插入数据库,目前只有同步接口,如果需要可以加异步接口
      *
-     * @param list server获取的群组信息
+     * @param list    server获取的群组信息
      * @param groupID 群组ID
      * @return List<GroupMember> 群组成员列表
      */
@@ -879,9 +880,9 @@ public class SealUserInfoManager implements OnDataListener {
             List<GroupMember> groupsMembersList = setCreatedToTop(list, groupID);
             if (groupsMembersList != null && groupsMembersList.size() > 0) {
                 for (GroupMember groupMember : groupsMembersList) {
-                    if (groupMember != null && TextUtils.isEmpty(groupMember.getPortraitUri())) {
+                    if (groupMember != null && TextUtils.isEmpty(groupMember.getPortraitUri().toString())) {
                         String portrait = getPortrait(groupMember);
-                        groupMember.setPortraitUri(portrait);
+                        groupMember.setPortraitUri(Uri.parse(portrait));
                     }
                 }
                 if (mGroupMemberDao != null) {
@@ -916,9 +917,9 @@ public class SealUserInfoManager implements OnDataListener {
             List<BlackList> blackList = new ArrayList<>();
             for (GetBlackListResponse.ResultEntity black : responseList) {
                 blackList.add(new BlackList(black.getUser().getId(),
-                                            null,
-                                            null
-                                           ));
+                        null,
+                        null
+                ));
             }
             if (blackList.size() > 0) {
                 if (mBlackListDao != null) {
@@ -998,7 +999,7 @@ public class SealUserInfoManager implements OnDataListener {
     /**
      * 同步获取群组列表
      *
-     * @return  List<Groups> 群组列表
+     * @return List<Groups> 群组列表
      */
     public List<Groups> getGroups() {
         if (mGroupsDao != null) {
@@ -1043,7 +1044,7 @@ public class SealUserInfoManager implements OnDataListener {
     /**
      * 同步获取群组成员信息
      *
-     * @param  groupID 群组ID
+     * @param groupID 群组ID
      * @return List<GroupMember> 群组成员列表
      */
     public List<GroupMember> getGroupMembers(String groupID) {
@@ -1052,7 +1053,7 @@ public class SealUserInfoManager implements OnDataListener {
         } else {
             if (mGroupMemberDao != null) {
                 return mGroupMemberDao.queryBuilder().
-                       where(GroupMemberDao.Properties.GroupId.eq(groupID)).list();
+                        where(GroupMemberDao.Properties.GroupId.eq(groupID)).list();
             } else {
                 return null;
             }
@@ -1062,7 +1063,7 @@ public class SealUserInfoManager implements OnDataListener {
     /**
      * 同步获取群组成员信息
      *
-     * @param  userId 用户Id
+     * @param userId 用户Id
      * @return List<GroupMember> 群组成员列表
      */
     public List<GroupMember> getGroupMembersWithUserId(String userId) {
@@ -1071,7 +1072,7 @@ public class SealUserInfoManager implements OnDataListener {
         } else {
             if (mGroupMemberDao != null) {
                 return mGroupMemberDao.queryBuilder().
-                       where(GroupMemberDao.Properties.UserId.eq(userId)).list();
+                        where(GroupMemberDao.Properties.UserId.eq(userId)).list();
             } else {
                 return null;
             }
@@ -1081,8 +1082,8 @@ public class SealUserInfoManager implements OnDataListener {
     /**
      * 异步获取群组成员信息
      *
-     * @param  groupID 群组ID
-     * @param  callback 获取群组成员信息的回调
+     * @param groupID  群组ID
+     * @param callback 获取群组成员信息的回调
      */
     public void getGroupMembers(final String groupID, final ResultCallback<List<GroupMember>> callback) {
         if (TextUtils.isEmpty(groupID)) {
@@ -1127,14 +1128,14 @@ public class SealUserInfoManager implements OnDataListener {
         if (mBlackListDao != null) {
             return mBlackListDao.loadAll();
         } else {
-            return  null;
+            return null;
         }
     }
 
     /**
      * 异步获取黑名单信息
      *
-     * @param  callback 获取黑名单信息的回调
+     * @param callback 获取黑名单信息的回调
      */
     public void getBlackList(final ResultCallback<List<UserInfo>> callback) {
         mWorkHandler.post(new Runnable() {
@@ -1165,9 +1166,7 @@ public class SealUserInfoManager implements OnDataListener {
                     for (BlackList black : blackList) {
                         for (Friend friend : friendsList)
                             if (black.getUserId().equals(friend.getUserId())) {
-                                userInfoList.add(new UserInfo(friend.getUserId(),
-                                                              friend.getName(),
-                                                              Uri.parse(friend.getPortraitUri())));
+                                userInfoList.add(new UserInfo(friend.getUserId(), friend.getName(), friend.getPortraitUri()));
                             }
                     }
                 }
@@ -1181,10 +1180,10 @@ public class SealUserInfoManager implements OnDataListener {
     /**
      * 更新群组名称
      *
-     * @param groupID 群组ID
+     * @param groupID   群组ID
      * @param groupName 新的群组名称
      */
-    public void updateGroupsName(final  String groupID, final String groupName) {
+    public void updateGroupsName(final String groupID, final String groupName) {
         mWorkHandler.post(new Runnable() {
             @Override
             public void run() {
@@ -1282,9 +1281,8 @@ public class SealUserInfoManager implements OnDataListener {
     /**
      * 删除群组成员,群成员被踢时使用
      *
-     * @param groupID 群组ID
+     * @param groupID       群组ID
      * @param kickedUserIDs 被踢群成员userID
-     *
      * @return void
      */
     public void deleteGroupMembers(final String groupID, final List<String> kickedUserIDs) {
@@ -1295,9 +1293,9 @@ public class SealUserInfoManager implements OnDataListener {
                     for (String userIDs : kickedUserIDs) {
                         if (mGroupMemberDao != null) {
                             mGroupMemberDao.queryBuilder()
-                            .where(GroupMemberDao.Properties.GroupId.eq(groupID),
-                                   GroupMemberDao.Properties.UserId.eq(userIDs))
-                            .buildDelete().executeDeleteWithoutDetachingEntities();
+                                    .where(GroupMemberDao.Properties.GroupId.eq(groupID),
+                                            GroupMemberDao.Properties.UserId.eq(userIDs))
+                                    .buildDelete().executeDeleteWithoutDetachingEntities();
                         }
                     }
                 }
@@ -1309,7 +1307,6 @@ public class SealUserInfoManager implements OnDataListener {
      * 删除群组成员,退出群组,被踢,群组解散时会使用
      *
      * @param groupID 群组ID
-     *
      * @return void
      */
     public void deleteGroupMembers(final String groupID) {
@@ -1318,7 +1315,7 @@ public class SealUserInfoManager implements OnDataListener {
             public void run() {
                 if (mGroupMemberDao != null) {
                     mGroupMemberDao.queryBuilder().where(GroupMemberDao.Properties.GroupId.eq(groupID))
-                    .buildDelete().executeDeleteWithoutDetachingEntities();
+                            .buildDelete().executeDeleteWithoutDetachingEntities();
                 }
             }
         });
@@ -1387,7 +1384,7 @@ public class SealUserInfoManager implements OnDataListener {
     /**
      * 异步接口,获取1个好友信息
      *
-     * @param userID 好友ID
+     * @param userID   好友ID
      * @param callback 获取好友信息回调
      */
     public void getFriendByID(final String userID, final ResultCallback<Friend> callback) {
@@ -1412,7 +1409,7 @@ public class SealUserInfoManager implements OnDataListener {
     /**
      * 同步接口,获取1个群组信息
      *
-     * @param  groupID  群组ID
+     * @param groupID 群组ID
      * @return Groups 群组信息
      */
     public Groups getGroupsByID(String groupID) {
@@ -1611,15 +1608,15 @@ public class SealUserInfoManager implements OnDataListener {
                 groupPortraitUri = groups.getPortraitUri();
             }
             GroupMember newMember = new GroupMember(groupID,
-                                                    group.getUser().getId(),
-                                                    group.getUser().getNickname(),
-                                                    group.getUser().getPortraitUri(),
-                                                    group.getDisplayName(),
-                                                    CharacterParser.getInstance().getSpelling(group.getUser().getNickname()),
-                                                    CharacterParser.getInstance().getSpelling(group.getDisplayName()),
-                                                    groupName,
-                                                    CharacterParser.getInstance().getSpelling(groupName),
-                                                    groupPortraitUri);
+                    group.getUser().getId(),
+                    group.getUser().getNickname(),
+                    Uri.parse(group.getUser().getPortraitUri()),
+                    group.getDisplayName(),
+                    CharacterParser.getInstance().getSpelling(group.getUser().getNickname()),
+                    CharacterParser.getInstance().getSpelling(group.getDisplayName()),
+                    groupName,
+                    CharacterParser.getInstance().getSpelling(groupName),
+                    groupPortraitUri);
             if (group.getRole() == 0) {
                 created = newMember;
             } else {
@@ -1633,7 +1630,7 @@ public class SealUserInfoManager implements OnDataListener {
         return newList;
     }
 
-    private  boolean needGetAllUserInfo() {
+    private boolean needGetAllUserInfo() {
         return mGetAllUserInfoState == NONE;
     }
 
@@ -1651,24 +1648,24 @@ public class SealUserInfoManager implements OnDataListener {
 
     private boolean hasGetAllGroupMembers() {
         return ((mGetAllUserInfoState & GROUPMEMBERS) != 0)
-               && ((mGetAllUserInfoState & PARTGROUPMEMBERS) == 0);
+                && ((mGetAllUserInfoState & PARTGROUPMEMBERS) == 0);
     }
 
     private boolean hasGetPartGroupMembers() {
         return ((mGetAllUserInfoState & GROUPMEMBERS) == 0)
-               && ((mGetAllUserInfoState & PARTGROUPMEMBERS) != 0);
+                && ((mGetAllUserInfoState & PARTGROUPMEMBERS) != 0);
     }
 
     private boolean hasGetBlackList() {
         return (mGetAllUserInfoState & BLACKLIST) != 0;
     }
 
-    private void  setGetAllUserInfoWithPartGroupMembersState() {
+    private void setGetAllUserInfoWithPartGroupMembersState() {
         mGetAllUserInfoState &= ~GROUPMEMBERS;
         mGetAllUserInfoState |= PARTGROUPMEMBERS;
     }
 
-    private void  setGetAllUserInfoWtihAllGroupMembersState() {
+    private void setGetAllUserInfoWtihAllGroupMembersState() {
         mGetAllUserInfoState &= ~PARTGROUPMEMBERS;
         mGetAllUserInfoState |= GROUPMEMBERS;
     }
@@ -1740,8 +1737,8 @@ public class SealUserInfoManager implements OnDataListener {
     public String getPortraitUri(GetGroupInfoResponse groupInfoResponse) {
         if (groupInfoResponse.getResult() != null) {
             Groups groups = new Groups(groupInfoResponse.getResult().getId(),
-                                       groupInfoResponse.getResult().getName(),
-                                       groupInfoResponse.getResult().getPortraitUri());
+                    groupInfoResponse.getResult().getName(),
+                    groupInfoResponse.getResult().getPortraitUri());
             return getPortraitUri(groups);
         }
         return null;
@@ -1753,7 +1750,7 @@ public class SealUserInfoManager implements OnDataListener {
      */
     private String getPortrait(Friend friend) {
         if (friend != null) {
-            if (TextUtils.isEmpty(friend.getPortraitUri())) {
+            if (TextUtils.isEmpty(friend.getPortraitUri().toString())) {
                 if (TextUtils.isEmpty(friend.getUserId())) {
                     return null;
                 } else {
@@ -1768,8 +1765,8 @@ public class SealUserInfoManager implements OnDataListener {
                     List<GroupMember> groupMemberList = getGroupMembersWithUserId(friend.getUserId());
                     if (groupMemberList != null && groupMemberList.size() > 0) {
                         GroupMember groupMember = groupMemberList.get(0);
-                        if (!TextUtils.isEmpty(groupMember.getPortraitUri()))
-                            return groupMember.getPortraitUri();
+                        if (!TextUtils.isEmpty(groupMember.getPortraitUri().toString()))
+                            return groupMember.getPortraitUri().toString();
                     }
                     String portrait = RongGenerate.generateDefaultAvatar(friend.getName(), friend.getUserId());
                     //缓存信息kit会使用,备注名存在时需要缓存displayName
@@ -1782,7 +1779,7 @@ public class SealUserInfoManager implements OnDataListener {
                     return portrait;
                 }
             } else {
-                return friend.getPortraitUri();
+                return friend.getPortraitUri().toString();
             }
         }
         return null;
@@ -1790,7 +1787,7 @@ public class SealUserInfoManager implements OnDataListener {
 
     private String getPortrait(GroupMember groupMember) {
         if (groupMember != null) {
-            if (TextUtils.isEmpty(groupMember.getPortraitUri())) {
+            if (TextUtils.isEmpty(groupMember.getPortraitUri().toString())) {
                 if (TextUtils.isEmpty(groupMember.getUserId())) {
                     return null;
                 } else {
@@ -1804,15 +1801,15 @@ public class SealUserInfoManager implements OnDataListener {
                     }
                     Friend friend = getFriendByID(groupMember.getUserId());
                     if (friend != null) {
-                        if (!TextUtils.isEmpty(friend.getPortraitUri())) {
-                            return friend.getPortraitUri();
+                        if (!TextUtils.isEmpty(friend.getPortraitUri().toString())) {
+                            return friend.getPortraitUri().toString();
                         }
                     }
                     List<GroupMember> groupMemberList = getGroupMembersWithUserId(groupMember.getUserId());
                     if (groupMemberList != null && groupMemberList.size() > 0) {
                         GroupMember member = groupMemberList.get(0);
-                        if (!TextUtils.isEmpty(member.getPortraitUri())) {
-                            return member.getPortraitUri();
+                        if (!TextUtils.isEmpty(member.getPortraitUri().toString())) {
+                            return member.getPortraitUri().toString();
                         }
                     }
                     String portrait = RongGenerate.generateDefaultAvatar(groupMember.getName(), groupMember.getUserId());
@@ -1821,7 +1818,7 @@ public class SealUserInfoManager implements OnDataListener {
                     return portrait;
                 }
             } else {
-                return groupMember.getPortraitUri();
+                return groupMember.getPortraitUri().toString();
             }
         }
         return null;

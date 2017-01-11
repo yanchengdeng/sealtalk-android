@@ -3,6 +3,7 @@ package cn.rongcloud.im.db;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
+import android.net.Uri;
 
 import de.greenrobot.dao.AbstractDao;
 import de.greenrobot.dao.Property;
@@ -79,7 +80,10 @@ public class FriendDao extends AbstractDao<Friend, String> {
             stmt.bindString(2, name);
         }
 
-        String portraitUri = entity.getPortraitUri();
+        String portraitUri = null;
+        if (null != entity.getPortraitUri()){
+            portraitUri = entity.getPortraitUri().toString();
+        }
         if (portraitUri != null) {
             stmt.bindString(3, portraitUri);
         }
@@ -132,7 +136,7 @@ public class FriendDao extends AbstractDao<Friend, String> {
         Friend entity = new Friend( //
             cursor.getString(offset + 0), // userId
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // name
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // portraitUri
+            cursor.isNull(offset + 2) ? null : Uri.parse(cursor.getString(offset + 2)), // portraitUri
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // displayName
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // region
             cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // phoneNumber
@@ -149,7 +153,7 @@ public class FriendDao extends AbstractDao<Friend, String> {
     public void readEntity(Cursor cursor, Friend entity, int offset) {
         entity.setUserId(cursor.getString(offset + 0));
         entity.setName(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setPortraitUri(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setPortraitUri(cursor.isNull(offset + 2) ? null : Uri.parse(cursor.getString(offset + 2)));
         entity.setDisplayName(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setRegion(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
         entity.setPhoneNumber(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));

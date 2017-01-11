@@ -34,6 +34,7 @@ import cn.rongcloud.im.ui.activity.AccountSettingActivity;
 import cn.rongcloud.im.ui.activity.MyAccountActivity;
 import io.rong.imageloader.core.ImageLoader;
 import io.rong.imkit.RongIM;
+import io.rong.imlib.model.CSCustomServiceInfo;
 import io.rong.imlib.model.UserInfo;
 
 /**
@@ -49,11 +50,13 @@ public class MineFragment extends Fragment implements View.OnClickListener {
     private ImageView mNewVersionView;
     private boolean isHasNewVersion;
     private String url;
+    private boolean isDebug;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View mView = inflater.inflate(R.layout.seal_mine_fragment, container, false);
+        isDebug = getContext().getSharedPreferences("config", getContext().MODE_PRIVATE).getBoolean("isDebug", false);
         initViews(mView);
         initData();
         BroadcastManager.getInstance(getActivity()).addAction(SealConst.CHANGEINFO, new BroadcastReceiver() {
@@ -116,11 +119,18 @@ public class MineFragment extends Fragment implements View.OnClickListener {
         LinearLayout mUserProfile = (LinearLayout) mView.findViewById(R.id.start_user_profile);
         LinearLayout mMineSetting = (LinearLayout) mView.findViewById(R.id.mine_setting);
         LinearLayout mMineService = (LinearLayout) mView.findViewById(R.id.mine_service);
+        LinearLayout mMineXN = (LinearLayout) mView.findViewById(R.id.mine_xiaoneng);
         LinearLayout mMineAbout = (LinearLayout) mView.findViewById(R.id.mine_about);
+        if(isDebug){
+            mMineXN.setVisibility(View.VISIBLE);
+        }else{
+            mMineXN.setVisibility(View.GONE);
+        }
         mUserProfile.setOnClickListener(this);
         mMineSetting.setOnClickListener(this);
         mMineService.setOnClickListener(this);
         mMineAbout.setOnClickListener(this);
+        mMineXN.setOnClickListener(this);
         mView.findViewById(R.id.my_wallet).setOnClickListener(this);
     }
 
@@ -134,8 +144,17 @@ public class MineFragment extends Fragment implements View.OnClickListener {
                 startActivity(new Intent(getActivity(), AccountSettingActivity.class));
                 break;
             case R.id.mine_service:
-                // KEFU146001495753714 正式  KEFU145930951497220 测试
-                RongIM.getInstance().startCustomerServiceChat(getActivity(), "KEFU146001495753714", "在线客服", null);
+                CSCustomServiceInfo.Builder builder = new CSCustomServiceInfo.Builder();
+                builder.province("北京");
+                builder.city("北京");
+                RongIM.getInstance().startCustomerServiceChat(getActivity(), "KEFU146001495753714", "在线客服", builder.build());
+                // KEFU146001495753714 正式  KEFU145930951497220 测试  小能: zf_1000_1481459114694   zf_1000_1480591492399
+                break;
+            case R.id.mine_xiaoneng:
+                CSCustomServiceInfo.Builder builder1 = new CSCustomServiceInfo.Builder();
+                builder1.province("北京");
+                builder1.city("北京");
+                RongIM.getInstance().startCustomerServiceChat(getActivity(), "zf_1000_1481459114694", "在线客服", builder1.build());
                 break;
             case R.id.mine_about:
                 mNewVersionView.setVisibility(View.GONE);

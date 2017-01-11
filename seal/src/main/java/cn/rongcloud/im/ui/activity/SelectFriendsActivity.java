@@ -2,6 +2,7 @@ package cn.rongcloud.im.ui.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -33,14 +34,12 @@ import cn.rongcloud.im.db.GroupMember;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.pinyin.CharacterParser;
-import cn.rongcloud.im.server.pinyin.FriendNameComparator;
 import cn.rongcloud.im.server.pinyin.PinyinComparator;
 import cn.rongcloud.im.server.pinyin.SideBar;
 import cn.rongcloud.im.server.response.AddGroupMemberResponse;
 import cn.rongcloud.im.server.response.DeleteGroupMemberResponse;
 import cn.rongcloud.im.server.utils.NLog;
 import cn.rongcloud.im.server.utils.NToast;
-import cn.rongcloud.im.server.utils.RongGenerate;
 import cn.rongcloud.im.server.widget.DialogWithYesOrNoUtils;
 import cn.rongcloud.im.server.widget.LoadDialog;
 import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
@@ -217,7 +216,7 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
                 }
                 data_list.add(new Friend(deleDisList.get(i).getUserId(),
                         deleDisList.get(i).getName(),
-                        deleDisList.get(i).getPortraitUri().toString(),
+                        deleDisList.get(i).getPortraitUri(),
                         null //TODO displayName 需要处理 暂为 null
                 ));
             }
@@ -634,8 +633,7 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
         List<Friend> mFriendList = new ArrayList<>();
 
         for (int i = 0; i < list.size(); i++) {
-            Friend friendModel = new Friend();
-            friendModel.setName(list.get(i).getName());
+            Friend friendModel = new Friend(list.get(i).getUserId(), list.get(i).getName(), list.get(i).getPortraitUri());
             //汉字转换成拼音
             String pinyin = null;
             if (!TextUtils.isEmpty(list.get(i).getDisplayName())) {
@@ -762,12 +760,14 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
                         finish();
                     } else if (isCrateGroup) {
                         if (createGroupList.size() > 0) {
+                            mHeadRightText.setClickable(true);
                             Intent intent = new Intent(SelectFriendsActivity.this, CreateGroupActivity.class);
                             intent.putExtra("GroupMember", (Serializable) createGroupList);
                             startActivity(intent);
                             finish();
                         } else {
                             NToast.shortToast(mContext, "请至少邀请一位好友创建群组");
+                            mHeadRightText.setClickable(true);
                         }
                     } else {
 
@@ -802,6 +802,7 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
                                 }
                             });
                         } else {
+                            mHeadRightText.setClickable(true);
                             NToast.shortToast(mContext, getString(R.string.least_one_friend));
                         }
                     }

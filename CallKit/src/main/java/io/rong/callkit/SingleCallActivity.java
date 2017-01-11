@@ -405,6 +405,7 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
             showShortToast(getString(R.string.rc_voip_remote_switch_to_audio));
         initAudioCallView();
         handler.removeMessages(EVENT_FULL_SCREEN);
+        mButtonContainer.findViewById(R.id.rc_voip_call_mute).setSelected(muted);
     }
 
     private void initAudioCallView() {

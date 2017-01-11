@@ -382,8 +382,8 @@ public class SharedReceiverActivity extends BaseActivity {
                             String portraitUri = null;
                             if (friend == null)
                                 continue;
-                            if (friend != null && !TextUtils.isEmpty(friend.getPortraitUri())) {
-                                portraitUri = friend.getPortraitUri();
+                            if (friend != null && !TextUtils.isEmpty(friend.getPortraitUri().toString())) {
+                                portraitUri = friend.getPortraitUri().toString();
                             } else {
                                 if (friend != null) {
                                     portraitUri = RongGenerate.generateDefaultAvatar(friend.getName(), friend.getUserId());

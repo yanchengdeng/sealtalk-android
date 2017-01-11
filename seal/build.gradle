@@ -8,10 +8,13 @@ android {
         applicationId "cn.rongcloud.im"
         minSdkVersion 11
         targetSdkVersion 23
-        versionCode 2016120910
-        versionName "2.8.4 Stable"
+        versionCode 2017010910
+        versionName "2.8.5 dev"
 
         multiDexEnabled true
+        ndk {
+            abiFilters "armeabi-v7a", "x86"
+        }
     }
 
     signingConfigs {
@@ -59,14 +62,12 @@ dependencies {
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile 'com.android.support:support-v4:21.0.3'
     compile 'cn.rongcloud.android:RedPacket:2.8.4'
-    //红包
-    compile project(':Recognizer')
-    //语音输入
-    compile project(':sticker')
-    //表情
+    compile project(':Recognizer');
+    compile project(':contactcard');
+    compile project(':sticker');
+    compile project(':CallKit')
+    compile project(':IMKit');
     compile 'com.android.support:multidex:1.0.1'
     compile 'com.facebook.stetho:stetho:1.4.1'
-    compile project(':IMKit')
-    compile project(':CallKit')
 }
 apply plugin: 'com.google.gms.google-services'

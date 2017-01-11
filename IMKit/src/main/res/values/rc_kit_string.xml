@@ -224,4 +224,19 @@
     <string name="rc_dialog_button_clear">清空</string>
 
     <string name="rc_user_recalled_message">%s撤回了一条消息</string>
+
+    <string name="rc_cs_evaluate">评价</string>
+    <string name="rc_cs_evaluate_title">请对我们本次的服务进行评价</string>
+    <string name="rc_cs_very_satisfactory">非常满意</string>
+    <string name="rc_cs_satisfactory">满意</string>
+    <string name="rc_cs_average">一般</string>
+    <string name="rc_cs_unsatisfactory">不满意</string>
+    <string name="rc_cs_very_unsatisfactory">非常不满意</string>
+    <string name="rc_cs_resolved_or_not">是否解决了您的问题 ?</string>
+    <string name="rc_cs_submit_evaluate_content">提交评价</string>
+    <string name="rc_cs_please_comment">欢迎给我们的服务提建议~</string>
+    <string name="rc_cs_please_leave_message">请您留言, 我们会尽快回复您。</string>
+    <string name="rc_cs_leave_message">留言</string>
+    <string name="rc_cs_submit_message">提交留言</string>
+    <string name="rc_cs_message_submited">您的留言已提交</string>
 </resources>

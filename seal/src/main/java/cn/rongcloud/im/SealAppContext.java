@@ -234,12 +234,12 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
                         return false;
                     }
                     SealUserInfoManager.getInstance().addFriend(
-                        new Friend(contactNotificationMessage.getSourceUserId(),
-                                   c.getSourceUserNickname(),
-                                   null, null, null, null,
-                                   null, null,
-                                   CharacterParser.getInstance().getSpelling(c.getSourceUserNickname()),
-                                   null));
+                            new Friend(contactNotificationMessage.getSourceUserId(),
+                                    c.getSourceUserNickname(),
+                                    null, null, null, null,
+                                    null, null,
+                                    CharacterParser.getInstance().getSpelling(c.getSourceUserNickname()),
+                                    null));
                 }
                 BroadcastManager.getInstance(mContext).sendBroadcast(UPDATE_FRIEND);
                 BroadcastManager.getInstance(mContext).sendBroadcast(UPDATE_RED_DOT);
@@ -290,6 +290,7 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
                         BroadcastManager.getInstance(mContext).sendBroadcast(UPDATE_GROUP_MEMBER, groupID);
                     }
                 } else if (groupNotificationMessage.getOperation().equals("Add")) {
+                    SealUserInfoManager.getInstance().getGroups(groupID);
                     SealUserInfoManager.getInstance().getGroupMember(groupID);
                     BroadcastManager.getInstance(mContext).sendBroadcast(UPDATE_GROUP_MEMBER, groupID);
                 } else if (groupNotificationMessage.getOperation().equals("Quit")) {
@@ -307,9 +308,9 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
                         groupNameList.add(data.getTargetGroupName());
                         groupNameList.add(data.getOperatorNickname());
                         BroadcastManager.getInstance(mContext).sendBroadcast(UPDATE_GROUP_NAME, groupNameList);
-                        Groups oldGroup=SealUserInfoManager.getInstance().getGroupsByID(groupID);
-                        if(oldGroup!=null){
-                            Group group=new Group(groupID,data.getTargetGroupName(), Uri.parse(oldGroup.getPortraitUri()));
+                        Groups oldGroup = SealUserInfoManager.getInstance().getGroupsByID(groupID);
+                        if (oldGroup != null) {
+                            Group group = new Group(groupID, data.getTargetGroupName(), Uri.parse(oldGroup.getPortraitUri()));
                             RongIM.getInstance().refreshGroupInfoCache(group);
                         }
                     }
@@ -317,8 +318,7 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
-
+            return true;
         } else if (messageContent instanceof ImageMessage) {
             //ImageMessage imageMessage = (ImageMessage) messageContent;
         }

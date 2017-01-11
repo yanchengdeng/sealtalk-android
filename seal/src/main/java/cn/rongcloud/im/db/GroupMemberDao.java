@@ -3,6 +3,7 @@ package cn.rongcloud.im.db;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
+import android.net.Uri;
 
 import de.greenrobot.dao.AbstractDao;
 import de.greenrobot.dao.Property;
@@ -80,7 +81,7 @@ public class GroupMemberDao extends AbstractDao<GroupMember, Void> {
             stmt.bindString(3, name);
         }
 
-        String portraitUri = entity.getPortraitUri();
+        String portraitUri = entity.getPortraitUri().toString();
         if (portraitUri != null) {
             stmt.bindString(4, portraitUri);
         }
@@ -129,7 +130,7 @@ public class GroupMemberDao extends AbstractDao<GroupMember, Void> {
             cursor.getString(offset + 0), // groupId
             cursor.getString(offset + 1), // userId
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // name
-            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // portraitUri
+            cursor.isNull(offset + 3) ? null : Uri.parse(cursor.getString(offset + 3)), // portraitUri
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // displayName
             cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // nameSpelling
             cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // displayNameSpelling
@@ -146,7 +147,7 @@ public class GroupMemberDao extends AbstractDao<GroupMember, Void> {
         entity.setGroupId(cursor.getString(offset + 0));
         entity.setUserId(cursor.getString(offset + 1));
         entity.setName(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
-        entity.setPortraitUri(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setPortraitUri(cursor.isNull(offset + 3) ? null : Uri.parse(cursor.getString(offset + 3)));
         entity.setDisplayName(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
         entity.setNameSpelling(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
         entity.setDisplayNameSpelling(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));

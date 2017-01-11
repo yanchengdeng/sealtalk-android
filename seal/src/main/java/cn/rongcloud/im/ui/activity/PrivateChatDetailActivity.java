@@ -153,7 +153,7 @@ public class PrivateChatDetailActivity extends BaseActivity implements View.OnCl
                 String currentUserName = sp.getString(SealConst.SEALTALK_LOGIN_NAME, "");
                 String currentUserPortrait = sp.getString(SealConst.SEALTALK_LOGING_PORTRAIT, "");
                 if (friend != null) {
-                    String portraitUri = friend.getPortraitUri();
+                    String portraitUri = friend.getPortraitUri().toString();
                     mResult.setId(friend.getUserId());
                     if (!TextUtils.isEmpty(portraitUri)) {
                         mResult.setPortraitUri(portraitUri);

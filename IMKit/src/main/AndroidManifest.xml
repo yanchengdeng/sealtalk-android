@@ -27,18 +27,18 @@
 
     <application>
 
-        <activity android:name=".plugin.location.AMapLocationActivity" />
+        <activity android:name="io.rong.imkit.plugin.location.AMapLocationActivity" />
 
-        <activity android:name=".plugin.location.AMapPreviewActivity" />
+        <activity android:name="io.rong.imkit.plugin.location.AMapPreviewActivity" />
 
-        <activity android:name=".plugin.location.AMapRealTimeActivity" />
+        <activity android:name="io.rong.imkit.plugin.location.AMapRealTimeActivity" />
 
         <activity
-            android:name=".plugin.image.PictureSelectorActivity"
+            android:name="io.rong.imkit.plugin.image.PictureSelectorActivity"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".plugin.image.PicturePreviewActivity"
+            android:name="io.rong.imkit.plugin.image.PicturePreviewActivity"
             android:screenOrientation="portrait" />
 
         <!-- 开发者可以修改 RongBaseActivity 的 rc_base_activity_layout 布局文件调整 actionbar-->
@@ -69,9 +69,13 @@
             android:name="io.rong.imkit.mention.MemberMentionedActivity"
             android:configChanges="orientation|keyboardHidden"
             android:windowSoftInputMode="adjustPan|stateHidden" />
-        <activity android:name=".activity.FileManagerActivity" />
-        <activity android:name=".activity.FileListActivity" />
-        <activity android:name=".activity.FilePreviewActivity" />
+        <activity android:name="io.rong.imkit.activity.FileManagerActivity" />
+        <activity android:name="io.rong.imkit.activity.FileListActivity" />
+        <activity android:name="io.rong.imkit.activity.FilePreviewActivity" />
+        <activity
+            android:name=".activity.CSLeaveMessageActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:screenOrientation="portrait"/>
 
         <!-- 此部分代码需要移植到您的 app 下的 manifest，并且 authorities 指定您的包名。例如：com.android.FileProvider -->
         <!-- 否则使用拍照功能时，会崩溃 -->

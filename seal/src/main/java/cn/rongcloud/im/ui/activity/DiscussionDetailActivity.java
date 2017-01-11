@@ -356,7 +356,7 @@ public class DiscussionDetailActivity extends BaseActivity implements CompoundBu
                                         for (Friend friend : friendList) {
                                             for (String userId : addMember) {
                                                 if (userId.equals(friend.getUserId()))
-                                                    memberList.add(new UserInfo(userId, friend.getName(), Uri.parse(friend.getPortraitUri())));
+                                                    memberList.add(new UserInfo(userId, friend.getName(), friend.getPortraitUri()));
                                             }
                                         }
                                         adapter.updateListView(memberList);

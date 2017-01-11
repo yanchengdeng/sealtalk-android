@@ -120,9 +120,9 @@ public class NoteInformationActivity extends BaseActivity {
                                    CharacterParser.getInstance().getSpelling(mFriend.getName()),
                                    CharacterParser.getInstance().getSpelling(displayName)));
                     if (TextUtils.isEmpty(displayName)) {
-                        RongIM.getInstance().refreshUserInfoCache(new UserInfo(mFriend.getUserId(), mFriend.getName(), Uri.parse(mFriend.getPortraitUri())));
+                        RongIM.getInstance().refreshUserInfoCache(new UserInfo(mFriend.getUserId(), mFriend.getName(), mFriend.getPortraitUri()));
                     } else {
-                        RongIM.getInstance().refreshUserInfoCache(new UserInfo(mFriend.getUserId(), displayName, Uri.parse(mFriend.getPortraitUri())));
+                        RongIM.getInstance().refreshUserInfoCache(new UserInfo(mFriend.getUserId(), displayName, mFriend.getPortraitUri()));
                     }
                     BroadcastManager.getInstance(mContext).sendBroadcast(SealAppContext.UPDATE_FRIEND);
                     Intent intent = new Intent(mContext, UserDetailActivity.class);

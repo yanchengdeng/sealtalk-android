@@ -15,12 +15,14 @@ import cn.rongcloud.im.message.TestMessage;
 import cn.rongcloud.im.message.provider.ContactNotificationMessageProvider;
 import cn.rongcloud.im.message.provider.TestMessageProvider;
 import cn.rongcloud.im.server.utils.NLog;
+import cn.rongcloud.im.stetho.RongDatabaseDriver;
+import cn.rongcloud.im.stetho.RongDatabaseFilesProvider;
+import cn.rongcloud.im.stetho.RongDbFilesDumperPlugin;
 import cn.rongcloud.im.utils.SharedPreferencesContext;
 import io.rong.imageloader.core.DisplayImageOptions;
 import io.rong.imageloader.core.display.FadeInBitmapDisplayer;
 import io.rong.imkit.RongIM;
 import io.rong.imkit.widget.provider.RealTimeLocationMessageProvider;
-
 import io.rong.imlib.ipc.RongExceptionHandler;
 import io.rong.push.RongPushClient;
 import io.rong.push.common.RongException;
@@ -37,7 +39,9 @@ public class App extends MultiDexApplication {
         Stetho.initialize(new Stetho.Initializer(this) {
             @Override
             protected Iterable<DumperPlugin> getDumperPlugins() {
-                return new Stetho.DefaultDumperPluginsBuilder(App.this).finish();
+                return new Stetho.DefaultDumperPluginsBuilder(App.this)
+                        .provide(new RongDbFilesDumperPlugin(App.this, new RongDatabaseFilesProvider(App.this)))
+                        .finish();
             }
 
             @Override

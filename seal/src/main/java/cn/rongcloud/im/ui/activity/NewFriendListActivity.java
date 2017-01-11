@@ -1,6 +1,7 @@
 package cn.rongcloud.im.ui.activity;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -116,7 +117,7 @@ public class NewFriendListActivity extends BaseActivity implements NewFriendList
                         UserRelationshipResponse.ResultEntity bean = userRelationshipResponse.getResult().get(index);
                         SealUserInfoManager.getInstance().addFriend(new Friend(bean.getUser().getId(),
                                 bean.getUser().getNickname(),
-                                bean.getUser().getPortraitUri(),
+                                Uri.parse(bean.getUser().getPortraitUri()),
                                 bean.getDisplayName(),
                                 String.valueOf(bean.getStatus()),
                                 null,

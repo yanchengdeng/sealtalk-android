@@ -622,8 +622,7 @@ public class ConversationActivity extends BaseActivity implements View.OnClickLi
                 if (groupMembers != null) {
                     for (GroupMember groupMember : groupMembers) {
                         if (groupMember != null) {
-                            UserInfo userInfo = new UserInfo(groupMember.getUserId(), groupMember.getName(),
-                                                             Uri.parse(groupMember.getPortraitUri()));
+                            UserInfo userInfo = new UserInfo(groupMember.getUserId(), groupMember.getName(), groupMember.getPortraitUri());
                             userInfos.add(userInfo);
                         }
                     }

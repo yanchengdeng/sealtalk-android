@@ -26,6 +26,7 @@ import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.response.FriendInvitationResponse;
 import cn.rongcloud.im.server.response.GetUserInfoByPhoneResponse;
 import cn.rongcloud.im.server.utils.AMUtils;
+import cn.rongcloud.im.server.utils.CommonUtils;
 import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.server.widget.DialogWithYesOrNoUtils;
 import cn.rongcloud.im.server.widget.LoadDialog;
@@ -114,8 +115,8 @@ public class SearchFriendActivity extends BaseActivity {
                         if (userInfoByPhoneResponse.getResult() != null) {
                             GetUserInfoByPhoneResponse.ResultEntity userInfoByPhoneResponseResult = userInfoByPhoneResponse.getResult();
                             UserInfo userInfo = new UserInfo(userInfoByPhoneResponseResult.getId(),
-                                                             userInfoByPhoneResponseResult.getNickname(),
-                                                             Uri.parse(userInfoByPhoneResponseResult.getPortraitUri()));
+                                    userInfoByPhoneResponseResult.getNickname(),
+                                    Uri.parse(userInfoByPhoneResponseResult.getPortraitUri()));
                             portraitUri = SealUserInfoManager.getInstance().getPortraitUri(userInfo);
                         }
                         ImageLoader.getInstance().displayImage(portraitUri, searchImage, App.getOptions());
@@ -144,6 +145,10 @@ public class SearchFriendActivity extends BaseActivity {
 
                                     @Override
                                     public void executeEditEvent(String editText) {
+                                        if (!CommonUtils.isNetworkConnected(mContext)) {
+                                            NToast.shortToast(mContext, R.string.network_not_available);
+                                            return;
+                                        }
                                         addFriendMessage = editText;
                                         if (TextUtils.isEmpty(editText)) {
                                             addFriendMessage = "我是" + getSharedPreferences("config", MODE_PRIVATE).getString(SealConst.SEALTALK_LOGIN_NAME, "");
@@ -215,10 +220,9 @@ public class SearchFriendActivity extends BaseActivity {
         String selfPhoneNumber = sp.getString(SealConst.SEALTALK_LOGING_PHONE, "");
         if (inputPhoneNumber != null) {
             if (inputPhoneNumber.equals(selfPhoneNumber)) {
-                mFriend = new Friend();
-                mFriend.setUserId(sp.getString(SealConst.SEALTALK_LOGIN_ID, ""));
-                mFriend.setName(sp.getString(SealConst.SEALTALK_LOGIN_NAME, ""));
-                mFriend.setPortraitUri(sp.getString(SealConst.SEALTALK_LOGING_PORTRAIT, ""));
+                mFriend = new Friend(sp.getString(SealConst.SEALTALK_LOGIN_ID, ""),
+                        sp.getString(SealConst.SEALTALK_LOGIN_NAME, ""),
+                        Uri.parse(sp.getString(SealConst.SEALTALK_LOGING_PORTRAIT, "")));
                 return true;
             } else {
                 mFriend = SealUserInfoManager.getInstance().getFriendByID(id);

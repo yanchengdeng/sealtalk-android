@@ -696,7 +696,7 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
                 iv_avatar.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        UserInfo userInfo = new UserInfo(bean.getUserId(), bean.getName(), Uri.parse(TextUtils.isEmpty(bean.getPortraitUri()) ? RongGenerate.generateDefaultAvatar(bean.getName(), bean.getUserId()) : bean.getPortraitUri()));
+                        UserInfo userInfo = new UserInfo(bean.getUserId(), bean.getName(), TextUtils.isEmpty(bean.getPortraitUri().toString()) ? Uri.parse(RongGenerate.generateDefaultAvatar(bean.getName(), bean.getUserId())) : bean.getPortraitUri());
                         Intent intent = new Intent(context, UserDetailActivity.class);
                         Friend friend = CharacterParser.getInstance().generateFriendFromUserInfo(userInfo);
                         intent.putExtra("friend", friend);

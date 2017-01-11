@@ -221,6 +221,7 @@ public class BaseCallActivity extends Activity implements IRongCallListener {
         if (text != null) {
             showShortToast(text);
         }
+        stopRing();
         NotificationUtil.clearNotification(this, BaseCallActivity.CALL_NOTIFICATION_ID);
         RongCallProxy.getInstance().setCallListener(null);
     }

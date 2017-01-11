@@ -188,19 +188,14 @@ public class ReadReceiptDetailActivity extends BaseActivity {
                     while (iter.hasNext()) {
                         Map.Entry entry = (Map.Entry) iter.next();
                         Object key = entry.getKey();
-                        readMember = new GroupMember();
                         if (getMemberIndex(key.toString(), groupMember) == -1) { //不在群组中
                             UserInfo userInfo = RongUserInfoManager.getInstance().getUserInfo(key.toString());
                             if (userInfo != null) {
-                                readMember.setUserId(key.toString());
+                                readMember = new GroupMember(key.toString(), userInfo.getName(), userInfo.getPortraitUri());
                                 readMember.setDisplayName(userInfo.getName());
-                                readMember.setPortraitUri(userInfo.getPortraitUri().toString());
-                                readMember.setName(userInfo.getName());
                             } else {
-                                readMember.setUserId(key.toString());
+                                readMember = new GroupMember(key.toString(), key.toString(), null);
                                 readMember.setDisplayName(key.toString());
-                                readMember.setPortraitUri("");
-                                readMember.setName(key.toString());
                             }
                             if (mReadMember != null) {
                                 mReadMember.add(readMember);
@@ -340,7 +335,7 @@ public class ReadReceiptDetailActivity extends BaseActivity {
         tv_underline_page2 = (TextView) findViewById(R.id.underline_page2);
         tv_title_read = (TextView) findViewById(R.id.title_read);
 
-        formatString = getResources().getString(R.string.read_receipt_unread_persons);
+        formatString = getResources().getString(R.string.read_receipt_read_persons);
         content = String.format(formatString, 0);
         tv_title_read.setText(content);
         setTabSelectedBG(tv_underline_page1, tv_title_read);
@@ -352,7 +347,7 @@ public class ReadReceiptDetailActivity extends BaseActivity {
         });
 
         tv_title_unread = (TextView) findViewById(R.id.title_unread);
-        formatString = getResources().getString(R.string.read_receipt_read_persons);
+        formatString = getResources().getString(R.string.read_receipt_unread_persons);
         content = String.format(formatString, 0);
         tv_title_unread.setText(content);
         setTabUnSelectedBG(tv_underline_page2, tv_title_unread);
@@ -509,7 +504,7 @@ public class ReadReceiptDetailActivity extends BaseActivity {
             iv_avatar.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    UserInfo userInfo = new UserInfo(bean.getUserId(), bean.getName(), Uri.parse(TextUtils.isEmpty(bean.getPortraitUri()) ? RongGenerate.generateDefaultAvatar(bean.getName(), bean.getUserId()) : bean.getPortraitUri()));
+                    UserInfo userInfo = new UserInfo(bean.getUserId(), bean.getName(), TextUtils.isEmpty(bean.getPortraitUri().toString()) ? Uri.parse(RongGenerate.generateDefaultAvatar(bean.getName(), bean.getUserId())) : bean.getPortraitUri());
                     Intent intent = new Intent(context, UserDetailActivity.class);
                     Friend friend = CharacterParser.getInstance().generateFriendFromUserInfo(userInfo);
                     intent.putExtra("friend", friend);

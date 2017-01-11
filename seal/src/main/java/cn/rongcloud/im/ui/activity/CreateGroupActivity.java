@@ -39,6 +39,7 @@ import cn.rongcloud.im.server.widget.ClearWriteEditText;
 import cn.rongcloud.im.server.widget.LoadDialog;
 import io.rong.imageloader.core.ImageLoader;
 import io.rong.imkit.RongIM;
+import io.rong.imkit.emoticon.AndroidEmoji;
 import io.rong.imkit.widget.AsyncImageView;
 import io.rong.imlib.model.Conversation;
 
@@ -116,6 +117,16 @@ public class CreateGroupActivity extends BaseActivity implements View.OnClickLis
                 if (TextUtils.isEmpty(mGroupName)) {
                     NToast.shortToast(mContext, getString(R.string.group_name_not_is_null));
                     break;
+                }
+                if (mGroupName.length() == 1) {
+                    NToast.shortToast(mContext, getString(R.string.group_name_size_is_one));
+                    return;
+                }
+                if (AndroidEmoji.isEmoji(mGroupName)) {
+                    if (mGroupName.length() <= 2) {
+                        NToast.shortToast(mContext, getString(R.string.group_name_size_is_one));
+                        return;
+                    }
                 }
                 if (groupIds.size() > 1) {
                     LoadDialog.show(mContext);
