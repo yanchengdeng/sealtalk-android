@@ -381,6 +381,14 @@
             android:enabled="true" />
         <!--注：此service必须在2.2.5版本以后（包括2.2.5版本）加入-->
 
+
+        <service
+            android:name="com.xiaomi.push.service.XMJobService"
+            android:enabled="true"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+        <!--注：此service必须在3.0.1版本以后（包括3.0.1版本）加入-->
+
         <receiver
             android:name="com.xiaomi.push.service.receivers.NetworkStatusReceiver"
             android:exported="true">

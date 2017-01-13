@@ -62,12 +62,13 @@ dependencies {
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile 'com.android.support:support-v4:21.0.3'
     compile 'cn.rongcloud.android:RedPacket:2.8.4'
-    compile project(':Recognizer');
-    compile project(':contactcard');
-    compile project(':sticker');
+    compile project(':Recognizer')
+    compile project(':contactcard')
+    compile project(':sticker')
     compile project(':CallKit')
-    compile project(':IMKit');
+    compile project(':IMKit')
     compile 'com.android.support:multidex:1.0.1'
     compile 'com.facebook.stetho:stetho:1.4.1'
+    compile files('libs/MiPush_SDK_Client_3_1_2.jar')
 }
 apply plugin: 'com.google.gms.google-services'
