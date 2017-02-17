@@ -32,6 +32,8 @@ import io.rong.calllib.RongCallCommon;
 import io.rong.calllib.RongCallSession;
 import io.rong.common.RLog;
 import io.rong.imkit.RongContext;
+import io.rong.imkit.manager.AudioPlayManager;
+import io.rong.imkit.manager.AudioRecordManager;
 import io.rong.imkit.utilities.PermissionCheckUtil;
 import io.rong.imkit.utils.NotificationUtil;
 
@@ -111,6 +113,9 @@ public class BaseCallActivity extends Activity implements IRongCallListener {
         }
         isFinishing = false;
         RongCallProxy.getInstance().setCallListener(this);
+
+        AudioPlayManager.getInstance().stopPlay();
+        AudioRecordManager.getInstance().destroyRecord();
     }
 
     @Override

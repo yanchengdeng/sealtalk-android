@@ -26,4 +26,11 @@ public class ConversationFragmentEx extends ConversationFragment {
             getActivity().startActivity(intent);
         }
     }
+
+    public void onWarningDialog(String msg) {
+        String typeStr = getUri().getLastPathSegment();
+        if (!typeStr.equals("chatroom")) {
+            super.onWarningDialog(msg);
+        }
+    }
 }

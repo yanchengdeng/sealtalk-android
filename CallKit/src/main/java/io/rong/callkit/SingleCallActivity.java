@@ -221,7 +221,7 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
             } else {
                 mediaType = RongCallCommon.CallMediaType.VIDEO;
             }
-            Conversation.ConversationType conversationType = Conversation.ConversationType.valueOf(intent.getStringExtra("conversationType").toUpperCase(Locale.getDefault()));
+            Conversation.ConversationType conversationType = Conversation.ConversationType.valueOf(intent.getStringExtra("conversationType").toUpperCase(Locale.US));
             targetId = intent.getStringExtra("targetId");
 
             List<String> userIds = new ArrayList<>();
@@ -244,7 +244,7 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
             userName.setText(userInfo.getName());
             if (mediaType.equals(RongCallCommon.CallMediaType.AUDIO)) {
                 AsyncImageView userPortrait = (AsyncImageView) mUserInfoContainer.findViewById(R.id.rc_voip_user_portrait);
-                if (userPortrait != null) {
+                if (userPortrait != null && userInfo.getPortraitUri() != null) {
                     userPortrait.setResource(userInfo.getPortraitUri().toString(), R.drawable.rc_default_portrait);
                 }
             }

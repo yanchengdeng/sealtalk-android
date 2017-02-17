@@ -39,6 +39,7 @@ import cn.rongcloud.im.db.Friend;
 import cn.rongcloud.im.db.GroupMember;
 import cn.rongcloud.im.db.Groups;
 import cn.rongcloud.im.db.GroupsDao;
+import cn.rongcloud.im.model.SealSearchConversationResult;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.pinyin.CharacterParser;
@@ -69,7 +70,6 @@ import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.Group;
 import io.rong.imlib.model.Message;
-import io.rong.imlib.model.SearchConversationResult;
 import io.rong.imlib.model.UserInfo;
 
 /**
@@ -113,7 +113,7 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
     private LinearLayout mSearchMessagesLinearLayout;
     private Button mDismissBtn;
     private Button mQuitBtn;
-    private SearchConversationResult mResult;
+    private SealSearchConversationResult mResult;
 
 
     @Override
@@ -492,7 +492,7 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
                 searchIntent.putExtra("filterString", "");
                 ArrayList<Message> arrayList = new ArrayList<>();
                 searchIntent.putParcelableArrayListExtra("filterMessages", arrayList);
-                mResult = new SearchConversationResult();
+                mResult = new SealSearchConversationResult();
                 Conversation conversation = new Conversation();
                 conversation.setTargetId(fromConversationId);
                 conversation.setConversationType(mConversationType);

@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.view.MotionEvent;
@@ -32,8 +31,8 @@ import java.util.List;
 import cn.rongcloud.im.App;
 import cn.rongcloud.im.R;
 import cn.rongcloud.im.SealUserInfoManager;
+import cn.rongcloud.im.model.SealSearchConversationResult;
 import cn.rongcloud.im.server.pinyin.CharacterParser;
-import cn.rongcloud.im.server.utils.RongGenerate;
 import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
 import io.rong.imageloader.core.ImageLoader;
 import io.rong.imkit.RongIM;
@@ -58,7 +57,7 @@ public class SealSearchChattingDetailActivity extends Activity {
 
     private String mFilterString;
     private List<Message> mMessages;
-    private SearchConversationResult mResult;
+    private SealSearchConversationResult mResult;
     private int mFlag;
     private int mMatchCount;
     private int mMessageShowCount;
@@ -127,8 +126,6 @@ public class SealSearchChattingDetailActivity extends Activity {
                                     mChattingRecordsListView.setVisibility(View.VISIBLE);
                                     SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
                                     spannableStringBuilder.append(getString(R.string.ac_search_chat_detail, result.getMatchCount()));
-//                                    spannableStringBuilder.append("" + result.getMatchCount());
-//                                    spannableStringBuilder.append(getString(R.string.ac_search_chat_detail_two));
                                     SpannableStringBuilder colorFilterStr = new SpannableStringBuilder(mFilterString);
                                     colorFilterStr.setSpan(new ForegroundColorSpan(Color.parseColor("#0099ff")), 0, mFilterString.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
                                     spannableStringBuilder.append(colorFilterStr);

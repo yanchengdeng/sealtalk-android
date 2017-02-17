@@ -2,14 +2,14 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.1"
+    buildToolsVersion "23.0.3"
 
     defaultConfig {
         applicationId "cn.rongcloud.im"
         minSdkVersion 11
         targetSdkVersion 23
-        versionCode 2017010910
-        versionName "2.8.5 dev"
+        versionCode 2017021610
+        versionName "2.8.6 Stable"
 
         multiDexEnabled true
         ndk {
@@ -64,11 +64,11 @@ dependencies {
     compile project(':Recognizer')
     compile project(':contactcard')
     compile project(':sticker')
-    compile project(':CallKit')
-    compile project(':IMKit')
-    compile project(':RedPacket')
     compile 'com.android.support:multidex:1.0.1'
     compile 'com.facebook.stetho:stetho:1.4.1'
     compile files('libs/MiPush_SDK_Client_3_1_2.jar')
+    compile project(':IMKit')
+    compile project(':CallKit')
+    compile project(':RedPacket')
 }
 apply plugin: 'com.google.gms.google-services'

@@ -39,8 +39,8 @@ import java.util.concurrent.TimeUnit;
 
 import cn.rongcloud.im.App;
 import cn.rongcloud.im.R;
-import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.SealConst;
+import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.db.DBManager;
 import cn.rongcloud.im.db.Friend;
 import cn.rongcloud.im.db.FriendDao;
@@ -48,9 +48,11 @@ import cn.rongcloud.im.db.GroupMember;
 import cn.rongcloud.im.db.GroupMemberDao;
 import cn.rongcloud.im.db.Groups;
 import cn.rongcloud.im.db.GroupsDao;
+import cn.rongcloud.im.model.SealSearchConversationResult;
 import cn.rongcloud.im.model.SearchResult;
 import cn.rongcloud.im.server.pinyin.CharacterParser;
 import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
+import cn.rongcloud.im.utils.CommonUtils;
 import de.greenrobot.dao.query.QueryBuilder;
 import io.rong.imageloader.core.ImageLoader;
 import io.rong.imkit.RongIM;
@@ -147,8 +149,8 @@ public class SealSearchActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Object selectObj = parent.getItemAtPosition(position);
-                if (selectObj instanceof SearchConversationResult) {
-                    SearchConversationResult result = (SearchConversationResult) selectObj;
+                if (selectObj instanceof SealSearchConversationResult) {
+                    SealSearchConversationResult result = (SealSearchConversationResult) selectObj;
                     int count = result.getMatchCount();
                     Conversation conversation = result.getConversation();
                     if (count == 1) {
@@ -632,10 +634,10 @@ public class SealSearchActivity extends Activity {
 
     private class ChattingRecordsAdapter extends BaseAdapter {
 
-        private List<SearchConversationResult> searchConversationResults;
+        private List<SealSearchConversationResult> searchConversationResults;
 
         public ChattingRecordsAdapter(List<SearchConversationResult> searchConversationResults) {
-            this.searchConversationResults = searchConversationResults;
+            this.searchConversationResults= CommonUtils.convertSearchResult(searchConversationResults);
         }
 
         @Override
@@ -665,7 +667,7 @@ public class SealSearchActivity extends Activity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             final ChattingRecordsViewHolder viewHolder;
-            final SearchConversationResult searchResult = (SearchConversationResult) getItem(position);
+            final SealSearchConversationResult searchResult = (SealSearchConversationResult) getItem(position);
             final Conversation conversation = searchResult.getConversation();
             int searchResultCount = searchResult.getMatchCount();
             if (convertView == null) {

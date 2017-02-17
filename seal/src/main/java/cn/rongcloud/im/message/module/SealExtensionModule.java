@@ -30,11 +30,6 @@ public class SealExtensionModule extends DefaultExtensionModule {
     public void onInit(String appKey) {
         super.onInit(appKey);
         ContactCardPlugin.init();
-    }
-
-    @Override
-    public void onAttachedToExtension(RongExtension extension) {
-        super.onAttachedToExtension(extension);
         ContactCardPlugin.getInstance().setContactCardInfoProvider(new IContactCardInfoProvider() {
             @Override
             public void getContactCardInfoProvider(final IContactCardInfoCallback contactInfoCallback) {
@@ -65,13 +60,18 @@ public class SealExtensionModule extends DefaultExtensionModule {
                 view.getContext().startActivity(intent);
             }
         });
+    }
+
+    @Override
+    public void onAttachedToExtension(RongExtension extension) {
+        super.onAttachedToExtension(extension);
+
 
     }
 
     @Override
     public void onDetachedFromExtension() {
         super.onDetachedFromExtension();
-        ContactCardPlugin.getInstance().setContactCardInfoProvider(null);
     }
 
     @Override

@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.rongcloud.im.db.Friend;
+import cn.rongcloud.im.db.GroupMember;
 import cn.rongcloud.im.db.Groups;
 import cn.rongcloud.im.message.module.SealExtensionModule;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
@@ -53,13 +54,14 @@ import io.rong.message.ImageMessage;
  * Company RongCloud
  */
 public class SealAppContext implements RongIM.ConversationListBehaviorListener,
-    RongIMClient.OnReceiveMessageListener,
-    RongIM.UserInfoProvider,
-    RongIM.GroupInfoProvider,
-    RongIM.GroupUserInfoProvider,
-    RongIM.LocationProvider,
-    RongIMClient.ConnectionStatusListener,
-    RongIM.ConversationBehaviorListener {
+        RongIMClient.OnReceiveMessageListener,
+        RongIM.UserInfoProvider,
+        RongIM.GroupInfoProvider,
+        RongIM.GroupUserInfoProvider,
+        RongIM.LocationProvider,
+        RongIMClient.ConnectionStatusListener,
+        RongIM.ConversationBehaviorListener,
+        RongIM.IGroupMembersProvider {
 
     private static final int CLICK_CONVERSATION_USER_PORTRAIT = 1;
 
@@ -113,7 +115,7 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
         return mRongCloudInstance;
     }
 
-    public Context getContext(){
+    public Context getContext() {
         return mContext;
     }
 
@@ -132,6 +134,7 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
         setReadReceiptConversationType();
         RongIM.getInstance().enableNewComingMessageIcon(true);
         RongIM.getInstance().enableUnreadMessageIcon(true);
+        RongIM.getInstance().setGroupMembersProvider(this);
         //RongIM.setGroupUserInfoProvider(this, true);//seal app暂时未使用这种方式,目前使用UserInfoProvider
         BroadcastManager.getInstance(mContext).addAction(SealConst.EXIT, new BroadcastReceiver() {
             @Override
@@ -142,10 +145,10 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
     }
 
     private void setReadReceiptConversationType() {
-        Conversation.ConversationType[] types = new Conversation.ConversationType[] {
-            Conversation.ConversationType.PRIVATE,
-            Conversation.ConversationType.GROUP,
-            Conversation.ConversationType.DISCUSSION
+        Conversation.ConversationType[] types = new Conversation.ConversationType[]{
+                Conversation.ConversationType.PRIVATE,
+                Conversation.ConversationType.GROUP,
+                Conversation.ConversationType.DISCUSSION
         };
         RongIM.getInstance().setReadReceiptConversationTypeList(types);
     }
@@ -574,5 +577,29 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
             loginActivityIntent.putExtra("kickedByOtherClient", true);
         }
         mContext.startActivity(loginActivityIntent);
+    }
+
+    @Override
+    public void getGroupMembers(String groupId, final RongIM.IGroupMemberCallback callback) {
+        SealUserInfoManager.getInstance().getGroupMembers(groupId, new SealUserInfoManager.ResultCallback<List<GroupMember>>() {
+            @Override
+            public void onSuccess(List<GroupMember> groupMembers) {
+                List<UserInfo> userInfos = new ArrayList<>();
+                if (groupMembers != null) {
+                    for (GroupMember groupMember : groupMembers) {
+                        if (groupMember != null) {
+                            UserInfo userInfo = new UserInfo(groupMember.getUserId(), groupMember.getName(), groupMember.getPortraitUri());
+                            userInfos.add(userInfo);
+                        }
+                    }
+                }
+                callback.onGetGroupMembersResult(userInfos);
+            }
+
+            @Override
+            public void onError(String errString) {
+                callback.onGetGroupMembersResult(null);
+            }
+        });
     }
 }

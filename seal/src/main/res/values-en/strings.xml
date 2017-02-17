@@ -298,6 +298,7 @@
     <string name="fr_chat_room_two">ChatRoom II</string>
     <string name="fr_chat_room_three">ChatRoom III</string>
     <string name="fr_chat_room_four">ChatRoom IV</string>
+    <string name="fr_chat_room_join_failure">Join chatroom failure</string>
 
     <string name="ac_new_friend_list_no_data">No data</string>
     <string name="share_dialog_share">Share</string>

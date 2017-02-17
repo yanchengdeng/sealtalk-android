@@ -3,7 +3,6 @@ package cn.rongcloud.im.ui.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.MenuItem;
@@ -22,10 +21,10 @@ import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.db.DBManager;
 import cn.rongcloud.im.db.Friend;
 import cn.rongcloud.im.db.FriendDao;
+import cn.rongcloud.im.model.SealSearchConversationResult;
 import cn.rongcloud.im.server.pinyin.CharacterParser;
 import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.server.utils.OperationRong;
-import cn.rongcloud.im.server.utils.RongGenerate;
 import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
 import cn.rongcloud.im.ui.widget.switchbutton.SwitchButton;
 import io.rong.eventbus.EventBus;
@@ -36,7 +35,6 @@ import io.rong.imkit.utilities.PromptPopupDialog;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.Message;
-import io.rong.imlib.model.SearchConversationResult;
 import io.rong.imlib.model.UserInfo;
 
 /**
@@ -55,7 +53,7 @@ public class PrivateChatDetailActivity extends BaseActivity implements View.OnCl
 
     private Conversation.ConversationType mConversationType;
     private String fromConversationId;
-    private SearchConversationResult mResult;
+    private SealSearchConversationResult mResult;
 
 
     @Override
@@ -142,7 +140,7 @@ public class PrivateChatDetailActivity extends BaseActivity implements View.OnCl
                 searchIntent.putExtra("filterString", "");
                 ArrayList<Message> arrayList = new ArrayList<>();
                 searchIntent.putParcelableArrayListExtra("filterMessages", arrayList);
-                mResult = new SearchConversationResult();
+                mResult = new SealSearchConversationResult();
                 Conversation conversation = new Conversation();
                 conversation.setTargetId(fromConversationId);
                 conversation.setConversationType(mConversationType);

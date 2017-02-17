@@ -1,14 +1,10 @@
 package cn.rongcloud.im.ui.activity;
 
 import android.annotation.TargetApi;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -85,7 +81,6 @@ public class ConversationActivity extends BaseActivity implements View.OnClickLi
     private final String VoiceTypingTitle = "对方正在讲话...";
 
     private Handler mHandler;
-    private RongIM.IGroupMemberCallback mMentionMemberCallback;
 
     public static final int SET_TEXT_TYPING_TITLE = 1;
     public static final int SET_VOICE_TYPING_TITLE = 2;
@@ -116,7 +111,7 @@ public class ConversationActivity extends BaseActivity implements View.OnClickLi
             return;
         }
         mConversationType = Conversation.ConversationType.valueOf(intent.getData()
-                            .getLastPathSegment().toUpperCase(Locale.getDefault()));
+                .getLastPathSegment().toUpperCase(Locale.US));
 
         title = intent.getData().getQueryParameter("title");
 
@@ -134,36 +129,6 @@ public class ConversationActivity extends BaseActivity implements View.OnClickLi
         mRightButton.setOnClickListener(this);
 
         isPushMessage(intent);
-
-        // android 6.0 以上版本，监听SDK权限请求，弹出对应请求框。
-        if (Build.VERSION.SDK_INT >= 23) {
-            RongIM.getInstance().setRequestPermissionListener(new RongIM.RequestPermissionsListener() {
-                @Override
-                public void onPermissionRequest(String[] permissions, final int requestCode) {
-                    for (final String permission : permissions) {
-                        if (shouldShowRequestPermissionRationale(permission)) {
-                            requestPermissions(new String[] {permission}, requestCode);
-                        } else {
-                            int isPermissionGranted = checkSelfPermission(permission);
-                            if (isPermissionGranted != PackageManager.PERMISSION_GRANTED) {
-                                new AlertDialog.Builder(ConversationActivity.this)
-                                .setMessage("你需要在设置里打开以下权限:" + permission)
-                                .setPositiveButton("确认", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        requestPermissions(new String[] {permission}, requestCode);
-                                    }
-                                })
-                                .setNegativeButton("取消", null)
-                                .create().show();
-                            }
-                            return;
-                        }
-                    }
-                }
-            });
-        }
-
 
         mHandler = new Handler(new Handler.Callback() {
             @Override
@@ -213,14 +178,6 @@ public class ConversationActivity extends BaseActivity implements View.OnClickLi
         });
 
         SealAppContext.getInstance().pushActivity(this);
-
-        RongIM.getInstance().setGroupMembersProvider(new RongIM.IGroupMembersProvider() {
-            @Override
-            public void getGroupMembers(String groupId, RongIM.IGroupMemberCallback callback) {
-                getGroupMembersForMention();
-                mMentionMemberCallback = callback;
-            }
-        });
 
         //CallKit start 2
         RongCallKit.setGroupMemberProvider(new RongCallKit.GroupMembersProvider() {
@@ -363,8 +320,8 @@ public class ConversationActivity extends BaseActivity implements View.OnClickLi
         fragment = new ConversationFragmentEx();
 
         Uri uri = Uri.parse("rong://" + getApplicationInfo().packageName).buildUpon()
-                  .appendPath("conversation").appendPath(mConversationType.getName().toLowerCase())
-                  .appendQueryParameter("targetId", mTargetId).build();
+                .appendPath("conversation").appendPath(mConversationType.getName().toLowerCase())
+                .appendQueryParameter("targetId", mTargetId).build();
 
         fragment.setUri(uri);
 
@@ -429,17 +386,17 @@ public class ConversationActivity extends BaseActivity implements View.OnClickLi
             return;
 
         RongIM.getInstance().getPublicServiceProfile(Conversation.PublicServiceType.APP_PUBLIC_SERVICE
-        , targetId, new RongIMClient.ResultCallback<PublicServiceProfile>() {
-            @Override
-            public void onSuccess(PublicServiceProfile publicServiceProfile) {
-                setTitle(publicServiceProfile.getName());
-            }
+                , targetId, new RongIMClient.ResultCallback<PublicServiceProfile>() {
+                    @Override
+                    public void onSuccess(PublicServiceProfile publicServiceProfile) {
+                        setTitle(publicServiceProfile.getName());
+                    }
 
-            @Override
-            public void onError(RongIMClient.ErrorCode errorCode) {
+                    @Override
+                    public void onError(RongIMClient.ErrorCode errorCode) {
 
-            }
-        });
+                    }
+                });
     }
 
     /**
@@ -452,17 +409,17 @@ public class ConversationActivity extends BaseActivity implements View.OnClickLi
 
 
         RongIM.getInstance().getPublicServiceProfile(Conversation.PublicServiceType.PUBLIC_SERVICE
-        , targetId, new RongIMClient.ResultCallback<PublicServiceProfile>() {
-            @Override
-            public void onSuccess(PublicServiceProfile publicServiceProfile) {
-                setTitle(publicServiceProfile.getName());
-            }
+                , targetId, new RongIMClient.ResultCallback<PublicServiceProfile>() {
+                    @Override
+                    public void onSuccess(PublicServiceProfile publicServiceProfile) {
+                        setTitle(publicServiceProfile.getName());
+                    }
 
-            @Override
-            public void onError(RongIMClient.ErrorCode errorCode) {
+                    @Override
+                    public void onError(RongIMClient.ErrorCode errorCode) {
 
-            }
-        });
+                    }
+                });
     }
 
     /**
@@ -473,20 +430,20 @@ public class ConversationActivity extends BaseActivity implements View.OnClickLi
         if (targetId != null) {
 
             RongIM.getInstance().getDiscussion(targetId
-            , new RongIMClient.ResultCallback<Discussion>() {
-                @Override
-                public void onSuccess(Discussion discussion) {
-                    setTitle(discussion.getName());
-                }
+                    , new RongIMClient.ResultCallback<Discussion>() {
+                        @Override
+                        public void onSuccess(Discussion discussion) {
+                            setTitle(discussion.getName());
+                        }
 
-                @Override
-                public void onError(RongIMClient.ErrorCode e) {
-                    if (e.equals(RongIMClient.ErrorCode.NOT_IN_DISCUSSION)) {
-                        setTitle("不在讨论组中");
-                        supportInvalidateOptionsMenu();
-                    }
-                }
-            });
+                        @Override
+                        public void onError(RongIMClient.ErrorCode e) {
+                            if (e.equals(RongIMClient.ErrorCode.NOT_IN_DISCUSSION)) {
+                                setTitle("不在讨论组中");
+                                supportInvalidateOptionsMenu();
+                            }
+                        }
+                    });
         } else {
             setTitle("讨论组");
         }
@@ -555,8 +512,6 @@ public class ConversationActivity extends BaseActivity implements View.OnClickLi
     }
 
 
-
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -572,10 +527,7 @@ public class ConversationActivity extends BaseActivity implements View.OnClickLi
         RongCallKit.setGroupMemberProvider(null);
         //CallKit end 3
 
-        RongIM.getInstance().setGroupMembersProvider(null);
-        RongIM.getInstance().setRequestPermissionListener(null);
         RongIMClient.setTypingStatusListener(null);
-        RongIM.getInstance().setRequestPermissionListener(null);
         SealAppContext.getInstance().popActivity(this);
         super.onDestroy();
     }
@@ -597,7 +549,7 @@ public class ConversationActivity extends BaseActivity implements View.OnClickLi
                             || mConversationType.equals(Conversation.ConversationType.CUSTOMER_SERVICE)) {
                         SealAppContext.getInstance().popActivity(this);
                     } else {
-                        SealAppContext.getInstance().popAllActivity();
+                        SealAppContext.getInstance().popActivity(this);
                     }
                 }
             }
@@ -612,29 +564,6 @@ public class ConversationActivity extends BaseActivity implements View.OnClickLi
                 imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
             }
         }
-    }
-
-    private void getGroupMembersForMention() {
-        SealUserInfoManager.getInstance().getGroupMembers(mTargetId, new SealUserInfoManager.ResultCallback<List<GroupMember>>() {
-            @Override
-            public void onSuccess(List<GroupMember> groupMembers) {
-                List<UserInfo> userInfos = new ArrayList<>();
-                if (groupMembers != null) {
-                    for (GroupMember groupMember : groupMembers) {
-                        if (groupMember != null) {
-                            UserInfo userInfo = new UserInfo(groupMember.getUserId(), groupMember.getName(), groupMember.getPortraitUri());
-                            userInfos.add(userInfo);
-                        }
-                    }
-                }
-                mMentionMemberCallback.onGetGroupMembersResult(userInfos);
-            }
-
-            @Override
-            public void onError(String errString) {
-                mMentionMemberCallback.onGetGroupMembersResult(null);
-            }
-        });
     }
 
     //CallKit start 4
