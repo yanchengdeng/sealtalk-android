@@ -41,11 +41,11 @@ Android 应用 SealTalk 由 融云 RongCloud 出品
 
 dependencies {
 
-    compile 'cn.rongcloud.android:IMLib:2.8.4'
-    compile 'cn.rongcloud.android:IMKit:2.8.4'
-    compile 'cn.rongcloud.android:CallLib:2.8.4'
-    compile 'cn.rongcloud.android:CallKit:2.8.4'
-    compile 'cn.rongcloud.android:RedPacket:2.8.4'
+    compile 'cn.rongcloud.android:IMLib:2.8.6'
+    compile 'cn.rongcloud.android:IMKit:2.8.6'
+    compile 'cn.rongcloud.android:CallLib:2.8.6'
+    compile 'cn.rongcloud.android:CallKit:2.8.6'
+    compile 'cn.rongcloud.android:RedPacket:2.8.6'
 }
 
 ```
