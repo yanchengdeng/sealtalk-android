@@ -155,7 +155,7 @@ public class MultiAudioCallActivity extends BaseCallActivity {
             memberContainer.setChildPortraitSize(memberContainer.dip2pix(40));
             List<CallUserProfile> list = callSession.getParticipantProfileList();
             for (CallUserProfile profile : list) {
-                if (!profile.getUserId().equals(callSession.getCallerUserId()) && !profile.getUserId().equals(callSession.getSelfUserId())) {
+                if (!profile.getUserId().equals(callSession.getCallerUserId())) {
                     invitedList.add(profile.getUserId());
                     userInfo = RongContext.getInstance().getUserInfoFromCache(profile.getUserId());
                     memberContainer.addChild(profile.getUserId(), userInfo);

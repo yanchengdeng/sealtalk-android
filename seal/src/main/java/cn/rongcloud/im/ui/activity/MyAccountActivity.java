@@ -90,7 +90,7 @@ public class MyAccountActivity extends BaseActivity implements View.OnClickListe
             mName.setText(cacheName);
             String cacheId = sp.getString(SealConst.SEALTALK_LOGIN_ID, "a");
             String portraitUri = SealUserInfoManager.getInstance().getPortraitUri(new UserInfo(
-                                     cacheId, cacheName, Uri.parse(cachePortrait)));
+                    cacheId, cacheName, Uri.parse(cachePortrait)));
             ImageLoader.getInstance().displayImage(portraitUri, mImageView, App.getOptions());
         }
         setPortraitChangeListener();
@@ -182,6 +182,7 @@ public class MyAccountActivity extends BaseActivity implements View.OnClickListe
     @Override
     public void onFailure(int requestCode, int state, Object result) {
         switch (requestCode) {
+            case GET_QI_NIU_TOKEN:
             case UP_LOAD_PORTRAIT:
                 NToast.shortToast(mContext, "设置头像请求失败");
                 LoadDialog.dismiss(mContext);
@@ -211,18 +212,18 @@ public class MyAccountActivity extends BaseActivity implements View.OnClickListe
                     int checkPermission = checkSelfPermission(Manifest.permission.CAMERA);
                     if (checkPermission != PackageManager.PERMISSION_GRANTED) {
                         if (shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
-                            requestPermissions(new String[] {Manifest.permission.CAMERA}, REQUEST_CODE_ASK_PERMISSIONS);
+                            requestPermissions(new String[]{Manifest.permission.CAMERA}, REQUEST_CODE_ASK_PERMISSIONS);
                         } else {
                             new AlertDialog.Builder(mContext)
-                            .setMessage("您需要在设置里打开相机权限。")
-                            .setPositiveButton("确认", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    requestPermissions(new String[] {Manifest.permission.CAMERA}, REQUEST_CODE_ASK_PERMISSIONS);
-                                }
-                            })
-                            .setNegativeButton("取消", null)
-                            .create().show();
+                                    .setMessage("您需要在设置里打开相机权限。")
+                                    .setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            requestPermissions(new String[]{Manifest.permission.CAMERA}, REQUEST_CODE_ASK_PERMISSIONS);
+                                        }
+                                    })
+                                    .setNegativeButton("取消", null)
+                                    .create().show();
                         }
                         return;
                     }
@@ -279,6 +280,9 @@ public class MyAccountActivity extends BaseActivity implements View.OnClickListe
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+                } else {
+                    NToast.shortToast(mContext, getString(R.string.upload_portrait_failed));
+                    LoadDialog.dismiss(mContext);
                 }
             }
         }, null);

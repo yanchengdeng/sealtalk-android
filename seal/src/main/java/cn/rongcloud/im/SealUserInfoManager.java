@@ -255,7 +255,7 @@ public class SealUserInfoManager implements OnDataListener {
             @Override
             public void onResult(UserInfo info) {
                 if (info != null && RongIM.getInstance() != null) {
-                    if (TextUtils.isEmpty(String.valueOf(info.getPortraitUri()))) {
+                    if (TextUtils.isEmpty(info.getPortraitUri() == null ? null : info.getPortraitUri().toString())) {
                         info.setPortraitUri(Uri.parse(RongGenerate.generateDefaultAvatar(info.getName(), info.getUserId())));
                     }
                     NLog.d(TAG, "SealUserInfoManager getUserInfo from network " + info.getUserId() + " " + info.getName() + " " + info.getPortraitUri());
@@ -268,7 +268,7 @@ public class SealUserInfoManager implements OnDataListener {
             public void onResult(Group info) {
                 if (info != null && RongIM.getInstance() != null) {
                     NLog.d(TAG, "SealUserInfoManager getGroupInfo from network " + info.getId() + " " + info.getName() + " " + info.getPortraitUri());
-                    if (TextUtils.isEmpty(String.valueOf(info.getPortraitUri()))) {
+                    if (TextUtils.isEmpty(info.getPortraitUri() == null ? null : info.getPortraitUri().toString())) {
                         info.setPortraitUri(Uri.parse(RongGenerate.generateDefaultAvatar(info.getName(), info.getId())));
                     }
                     RongIM.getInstance().refreshGroupInfoCache(info);

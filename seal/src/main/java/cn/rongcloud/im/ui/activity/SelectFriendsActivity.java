@@ -678,7 +678,6 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.text_right:
-                mHeadRightText.setClickable(false);
                 if (mCBFlag != null && sourceDataList != null && sourceDataList.size() > 0) {
                     startDisList = new ArrayList<>();
                     List<String> disNameList = new ArrayList<>();

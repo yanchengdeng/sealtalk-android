@@ -66,6 +66,7 @@
             android:name=".ui.activity.MainActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
+        android:configChanges="orientation|keyboardHidden|screenSize"
             android:windowSoftInputMode="stateHidden|adjustPan">
 
             <intent-filter>
@@ -381,7 +382,6 @@
             android:enabled="true" />
         <!--注：此service必须在2.2.5版本以后（包括2.2.5版本）加入-->
 
-
         <service
             android:name="com.xiaomi.push.service.XMJobService"
             android:enabled="true"
@@ -506,10 +506,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/rc_file_path" />
         </provider>
-
-        <meta-data
-            android:name="RONG_CLOUD_APP_KEY"
-            android:value="n19jmcy59f1q9" />
     </application>
 
 

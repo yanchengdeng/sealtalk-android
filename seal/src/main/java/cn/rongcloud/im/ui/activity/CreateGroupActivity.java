@@ -200,6 +200,10 @@ public class CreateGroupActivity extends BaseActivity implements View.OnClickLis
                 LoadDialog.dismiss(mContext);
                 NToast.shortToast(mContext, getString(R.string.group_create_api_fail));
                 break;
+            case GET_QI_NIU_TOKEN:
+                LoadDialog.dismiss(mContext);
+                NToast.shortToast(mContext, getString(R.string.upload_portrait_failed));
+                break;
             case SET_GROUP_PORTRAIT_URI:
                 LoadDialog.dismiss(mContext);
                 NToast.shortToast(mContext, getString(R.string.group_header_api_fail));
@@ -283,6 +287,9 @@ public class CreateGroupActivity extends BaseActivity implements View.OnClickLis
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+                } else {
+                    NToast.shortToast(mContext, getString(R.string.upload_portrait_failed));
+                    LoadDialog.dismiss(mContext);
                 }
             }
         }, null);

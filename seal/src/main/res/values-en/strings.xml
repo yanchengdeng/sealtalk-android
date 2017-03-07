@@ -149,6 +149,7 @@
     <string name="create_group_success">create group success</string>
     <string name="group_header_api_fail">group header api fail</string>
     <string name="group_create_api_fail">group create api fail</string>
+    <string name="upload_portrait_failed">upload portrait fail</string>
     <string name="phone_unregister">This number has not been registered</string>
     <string name="group_name_not_is_null">Group nickname cannot be empty</string>
     <string name="group_name_size_is_one">Group nickname can not be less than two characters</string>

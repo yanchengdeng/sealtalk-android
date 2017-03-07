@@ -8,8 +8,8 @@ android {
         applicationId "cn.rongcloud.im"
         minSdkVersion 11
         targetSdkVersion 23
-        versionCode 2017021610
-        versionName "2.8.6 Stable"
+        versionCode 2017030510
+        versionName "2.8.7 Stable"
 
         multiDexEnabled true
         ndk {

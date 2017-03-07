@@ -193,6 +193,7 @@
     <string name="create_group_success">群组创建成功</string>
     <string name="group_header_api_fail">群组头像接口请求失败</string>
     <string name="group_create_api_fail">群组创建接口请求失败</string>
+    <string name="upload_portrait_failed">上传头像失败</string>
     <string name="phone_unregister">此号码未被注册</string>
     <string name="group_portrait">群头像</string>
     <string name="add_friend">加为好友</string>
