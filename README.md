@@ -58,6 +58,12 @@ dependencies {
 ## UML
   SealTalk UML
  ![image](https://github.com/sealtalk/sealtalk-android/blob/master/screenshots/SealTalk_UML.png)<br/>
+ 
+ Http UML
+ 
+ ![image](https://cloud.githubusercontent.com/assets/15966403/23929940/22a00a3c-0964-11e7-9300-0f86bcee3bda.png)<br/>
+ 
+ Thanks to [JerryMissTom](https://github.com/JerryMissTom) provide images
 
 ## Uses
 #### Step 1:
