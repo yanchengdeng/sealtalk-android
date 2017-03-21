@@ -1,21 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/color_bg"
+              android:orientation="vertical">
 
-    <include layout="@layout/w_layout_titlebar" />
+    <include layout="@layout/w_layout_titlebar"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:orientation="vertical">
 
         <LinearLayout
             android:id="@+id/id_switch_tab_ll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal" >
+            android:orientation="horizontal">
 
             <LinearLayout
                 android:id="@+id/ll_all"
@@ -25,7 +26,7 @@
                 android:background="@drawable/selector_item"
                 android:gravity="center"
                 android:orientation="horizontal"
-                android:padding="10dip" >
+                android:padding="10dip">
 
                 <TextView
                     android:id="@+id/tv_all"
@@ -34,7 +35,7 @@
                     android:gravity="center"
                     android:text="全部"
                     android:textColor="@color/title_bar_color"
-                    android:textSize="15dp" />
+                    android:textSize="15dp"/>
             </LinearLayout>
 
             <LinearLayout
@@ -45,16 +46,16 @@
                 android:background="@drawable/selector_item"
                 android:gravity="center"
                 android:orientation="horizontal"
-                android:padding="10dip" >
+                android:padding="10dip">
 
                 <TextView
                     android:id="@+id/tv_in"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:textColor="@color/color_959595"
                     android:text="收入"
-                    android:textSize="15dp" />
+                    android:textColor="@color/color_959595"
+                    android:textSize="15dp"/>
             </LinearLayout>
 
             <LinearLayout
@@ -65,7 +66,7 @@
                 android:background="@drawable/selector_item"
                 android:gravity="center"
                 android:orientation="horizontal"
-                android:padding="10dip" >
+                android:padding="10dip">
 
                 <TextView
                     android:id="@+id/tv_out"
@@ -74,7 +75,7 @@
                     android:gravity="center"
                     android:text="支出"
                     android:textColor="@color/color_959595"
-                    android:textSize="15dp" />
+                    android:textSize="15dp"/>
             </LinearLayout>
         </LinearLayout>
 
@@ -83,7 +84,7 @@
             android:layout_width="200dp"
             android:layout_height="1dp"
             android:background="@color/title_bar_color"
-            android:contentDescription="tab" >
+            android:contentDescription="tab">
         </ImageView>
     </LinearLayout>
 
@@ -91,7 +92,7 @@
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" >
+        android:layout_weight="1">
     </android.support.v4.view.ViewPager>
 
 </LinearLayout>
