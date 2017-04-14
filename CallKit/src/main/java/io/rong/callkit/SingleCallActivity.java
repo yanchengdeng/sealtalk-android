@@ -249,6 +249,25 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
                 }
             }
         }
+
+        createPowerManager();
+        createPickupDetector();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (pickupDetector != null && mediaType.equals(RongCallCommon.CallMediaType.AUDIO)) {
+            pickupDetector.register(this);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (pickupDetector != null) {
+            pickupDetector.unRegister();
+        }
     }
 
     private void initView(RongCallCommon.CallMediaType mediaType, RongCallAction callAction) {
@@ -344,6 +363,10 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
     protected void onDestroy() {
         RongContext.getInstance().getEventBus().unregister(this);
         stopRing();
+        if (wakeLock != null && wakeLock.isHeld()) {
+            wakeLock.setReferenceCounted(false);
+            wakeLock.release();
+        }
         RLog.d(TAG, "SingleCallActivity onDestroy");
         super.onDestroy();
     }
@@ -399,10 +422,13 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
 
     @Override
     public void onMediaTypeChanged(String userId, RongCallCommon.CallMediaType mediaType, SurfaceView video) {
-        if (callSession.getSelfUserId().equals(userId))
+        if (callSession.getSelfUserId().equals(userId)) {
             showShortToast(getString(R.string.rc_voip_switch_to_audio));
-        else
+        } else {
+            RongCallClient.getInstance().changeCallMediaType(RongCallCommon.CallMediaType.AUDIO);
+            callSession.setMediaType(RongCallCommon.CallMediaType.AUDIO);
             showShortToast(getString(R.string.rc_voip_remote_switch_to_audio));
+        }
         initAudioCallView();
         handler.removeMessages(EVENT_FULL_SCREEN);
         mButtonContainer.findViewById(R.id.rc_voip_call_mute).setSelected(muted);
@@ -443,6 +469,10 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
         mButtonContainer.setVisibility(View.VISIBLE);
         View handFreeV = mButtonContainer.findViewById(R.id.rc_voip_handfree);
         handFreeV.setSelected(handFree);
+
+        if (pickupDetector != null) {
+            pickupDetector.register(this);
+        }
     }
 
     public void onHangupBtnClick(View view) {

@@ -40,7 +40,7 @@ import io.rong.imkit.utils.NotificationUtil;
 /**
  * Created by weiqinxiao on 16/3/9.
  */
-public class BaseCallActivity extends Activity implements IRongCallListener {
+public class BaseCallActivity extends Activity implements IRongCallListener,PickupDetector.PickupDetectListener {
 
     private static final String TAG = "BaseCallActivity";
     private final static long DELAY_TIME = 1000;
@@ -57,6 +57,10 @@ public class BaseCallActivity extends Activity implements IRongCallListener {
     protected Handler handler;
     private BroadcastReceiver mHomeKeyReceiver;
     protected boolean isFinishing;
+
+    protected PickupDetector pickupDetector;
+    protected PowerManager powerManager;
+    protected PowerManager.WakeLock wakeLock;
 
     static final String[] VIDEO_CALL_PERMISSIONS = {Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA};
     static final String[] AUDIO_CALL_PERMISSIONS = {Manifest.permission.RECORD_AUDIO};
@@ -126,7 +130,6 @@ public class BaseCallActivity extends Activity implements IRongCallListener {
         if (shouldRestoreFloat && bundle != null){
             onRestoreFloatBox(bundle);
         }
-        shouldRestoreFloat = true;
     }
 
     public void onOutgoingCallRinging() {
@@ -220,6 +223,7 @@ public class BaseCallActivity extends Activity implements IRongCallListener {
             case REMOTE_HANGUP:
             case HANGUP:
             case NETWORK_ERROR:
+            case INIT_VIDEO_ERROR:
                 text = getString(R.string.rc_voip_call_terminalted);
                 break;
         }
@@ -281,7 +285,10 @@ public class BaseCallActivity extends Activity implements IRongCallListener {
         super.onResume();
         RLog.d(TAG, "BaseCallActivity onResume");
         RongCallProxy.getInstance().setCallListener(this);
-        time = CallFloatBoxView.hideFloatBox();
+        if (shouldRestoreFloat){
+            time = CallFloatBoxView.hideFloatBox();
+        }
+        shouldRestoreFloat = true;
     }
 
     @Override
@@ -376,6 +383,42 @@ public class BaseCallActivity extends Activity implements IRongCallListener {
             }
         } else {
             finish();
+        }
+    }
+
+    protected void createPowerManager() {
+        if (powerManager == null) {
+            powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+            wakeLock = powerManager.newWakeLock(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK, TAG);
+        }
+    }
+
+    protected void createPickupDetector() {
+        if (pickupDetector == null) {
+            pickupDetector = new PickupDetector(this);
+        }
+    }
+
+    @Override
+    public void onPickupDetected(boolean isPickingUp) {
+        if (wakeLock == null) {
+            RLog.d(TAG, "No PROXIMITY_SCREEN_OFF_WAKE_LOCK");
+            return;
+        }
+        if (isPickingUp && !wakeLock.isHeld()) {
+            setShouldShowFloat(false);
+            shouldRestoreFloat = false;
+            wakeLock.acquire();
+        }
+        if (!isPickingUp && wakeLock.isHeld()) {
+            try {
+                wakeLock.setReferenceCounted(false);
+                wakeLock.release();
+                setShouldShowFloat(true);
+                shouldRestoreFloat = true;
+            } catch (Exception e) {
+
+            }
         }
     }
 }

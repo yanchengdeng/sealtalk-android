@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -184,6 +185,27 @@ public class MultiAudioCallActivity extends BaseCallActivity {
             RongCallClient.getInstance().startCall(conversationType, targetId, invitedList, RongCallCommon.CallMediaType.AUDIO, "multi");
         }
         memberContainer.setOverScrollMode(View.OVER_SCROLL_NEVER);
+
+        createPowerManager();
+        createPickupDetector();
+    }
+
+    @Override
+    protected void onPause() {
+        if (pickupDetector != null){
+            pickupDetector.unRegister();
+        }
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        if (pickupDetector == null) createPickupDetector();
+        if (wakeLock == null) createPowerManager();
+        if (pickupDetector != null){
+            pickupDetector.register(this);
+        }
+        super.onResume();
     }
 
     public void onHangupBtnClick(View view) {
@@ -425,6 +447,10 @@ public class MultiAudioCallActivity extends BaseCallActivity {
     @Override
     protected void onDestroy() {
         RongContext.getInstance().getEventBus().unregister(this);
+        if (wakeLock != null && wakeLock.isHeld()){
+            wakeLock.setReferenceCounted(false);
+            wakeLock.release();
+        }
         super.onDestroy();
     }
 
