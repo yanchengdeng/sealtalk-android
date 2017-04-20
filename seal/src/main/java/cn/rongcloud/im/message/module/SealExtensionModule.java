@@ -1,72 +1,40 @@
 package cn.rongcloud.im.message.module;
 
-import android.content.Intent;
-import android.net.Uri;
-import android.text.TextUtils;
-import android.view.View;
-
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.List;
 
-import cn.rongcloud.contactcard.ContactCardPlugin;
-import cn.rongcloud.contactcard.IContactCardClickCallback;
-import cn.rongcloud.contactcard.IContactCardInfoProvider;
-import cn.rongcloud.contactcard.message.ContactMessage;
-import cn.rongcloud.im.SealUserInfoManager;
-import cn.rongcloud.im.db.Friend;
-import cn.rongcloud.im.server.pinyin.CharacterParser;
-import cn.rongcloud.im.server.utils.RongGenerate;
-import cn.rongcloud.im.ui.activity.UserDetailActivity;
 import io.rong.imkit.DefaultExtensionModule;
 import io.rong.imkit.RongExtension;
 import io.rong.imkit.emoticon.IEmoticonTab;
-import io.rong.imkit.model.UIMessage;
+import io.rong.imkit.plugin.DefaultLocationPlugin;
 import io.rong.imkit.plugin.IPluginModule;
+import io.rong.imkit.plugin.ImagePlugin;
+import io.rong.imkit.widget.provider.FilePlugin;
 import io.rong.imlib.model.Conversation;
-import io.rong.imlib.model.UserInfo;
+import io.rong.imlib.model.Message;
 
 
 public class SealExtensionModule extends DefaultExtensionModule {
+
     @Override
     public void onInit(String appKey) {
         super.onInit(appKey);
-        ContactCardPlugin.init();
-        ContactCardPlugin.getInstance().setContactCardInfoProvider(new IContactCardInfoProvider() {
-            @Override
-            public void getContactCardInfoProvider(final IContactCardInfoCallback contactInfoCallback) {
-                SealUserInfoManager.getInstance().getFriends(new SealUserInfoManager.ResultCallback<List<Friend>>() {
-                    @Override
-                    public void onSuccess(List<Friend> friendList) {
-                        contactInfoCallback.getContactCardInfoCallback(friendList);
-                    }
+    }
 
-                    @Override
-                    public void onError(String errString) {
-                        contactInfoCallback.getContactCardInfoCallback(null);
-                    }
-                });
-            }
-        });
+    @Override
+    public void onDisconnect() {
+        super.onDisconnect();
+    }
 
-        ContactCardPlugin.getInstance().setContactCardClickCallback(new IContactCardClickCallback() {
-            @Override
-            public void onContactCardMessageClick(View view, int position, ContactMessage content, UIMessage message) {
-                Intent intent = new Intent(view.getContext(), UserDetailActivity.class);
-                Friend friend = SealUserInfoManager.getInstance().getFriendByID(content.getId());
-                if (friend == null) {
-                    UserInfo userInfo = new UserInfo(content.getId(), content.getName(), Uri.parse(TextUtils.isEmpty(content.getImgUrl()) ? RongGenerate.generateDefaultAvatar(content.getName(), content.getId()) : content.getImgUrl()));
-                    friend = CharacterParser.getInstance().generateFriendFromUserInfo(userInfo);
-                }
-                intent.putExtra("friend", friend);
-                view.getContext().startActivity(intent);
-            }
-        });
+    @Override
+    public void onConnect(String token) {
+        super.onConnect(token);
     }
 
     @Override
     public void onAttachedToExtension(RongExtension extension) {
         super.onAttachedToExtension(extension);
-
-
     }
 
     @Override
@@ -75,13 +43,47 @@ public class SealExtensionModule extends DefaultExtensionModule {
     }
 
     @Override
+    public void onReceivedMessage(Message message) {
+        super.onReceivedMessage(message);
+    }
+
+    @Override
     public List<IPluginModule> getPluginModules(Conversation.ConversationType conversationType) {
-        List<IPluginModule> pluginModules = super.getPluginModules(conversationType);
-        if (conversationType.equals(Conversation.ConversationType.PRIVATE)
-                || conversationType.equals(Conversation.ConversationType.GROUP)) {
-            pluginModules.add(ContactCardPlugin.getInstance());
+        if (conversationType.equals(Conversation.ConversationType.PUBLIC_SERVICE)) {
+            List<IPluginModule> pluginModuleList = new ArrayList<>();
+            IPluginModule image = new ImagePlugin();
+            IPluginModule locationPlugin = new DefaultLocationPlugin();
+            pluginModuleList.add(image);
+            pluginModuleList.add(locationPlugin);
+            try {
+                String clsName = "com.iflytek.cloud.SpeechUtility";
+                Class<?> cls = Class.forName(clsName);
+                if (cls != null) {
+                    cls = Class.forName("io.rong.recognizer.RecognizePlugin");
+                    Constructor<?> constructor = cls.getConstructor();
+                    IPluginModule recognizer = (IPluginModule) constructor.newInstance();
+                    pluginModuleList.add(recognizer);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return pluginModuleList;
+        } else if (conversationType == Conversation.ConversationType.CUSTOMER_SERVICE) {
+            List<IPluginModule> pluginModules = super.getPluginModules(conversationType);
+            if (conversationType == Conversation.ConversationType.CUSTOMER_SERVICE) {
+                if (pluginModules != null) {
+                    for (IPluginModule module : pluginModules) {
+                        if (module instanceof FilePlugin) {
+                            pluginModules.remove(module);
+                            break;
+                        }
+                    }
+                }
+            }
+            return pluginModules;
+        } else {
+            return super.getPluginModules(conversationType);
         }
-        return pluginModules;
     }
 
     @Override

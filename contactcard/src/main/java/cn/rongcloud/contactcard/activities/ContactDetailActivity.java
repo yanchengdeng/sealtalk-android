@@ -23,6 +23,8 @@ import android.widget.ViewAnimator;
 import java.util.List;
 
 import cn.rongcloud.contactcard.R;
+import cn.rongcloud.contactcard.message.ContactMessage;
+import io.rong.imkit.RongContext;
 import io.rong.imkit.RongIM;
 import io.rong.imkit.emoticon.AndroidEmoji;
 import io.rong.imkit.mention.RongMentionManager;
@@ -34,7 +36,6 @@ import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.Group;
 import io.rong.imlib.model.Message;
-import cn.rongcloud.contactcard.message.ContactMessage;
 import io.rong.imlib.model.UserInfo;
 import io.rong.message.TextMessage;
 
@@ -190,42 +191,46 @@ public class ContactDetailActivity extends Activity {
             public void onClick(View v) {
                 ContactMessage contactMessage = ContactMessage.obtain(mContactFriend.getUserId(), mContactFriend.getName(), mContactFriend.getPortraitUri().toString());
                 contactMessage.setUserInfo(RongUserInfoManager.getInstance().getUserInfo(RongIMClient.getInstance().getCurrentUserId()));
-                RongIM.getInstance().sendMessage(Message.obtain(mTargetId, mConversationType, contactMessage), null, null, new IRongCallback.ISendMessageCallback() {
-                    @Override
-                    public void onAttached(Message message) {
+                String pushContent = String.format(RongContext.getInstance().getResources().getString(R.string.rc_recommend_clause_to_me),
+                        contactMessage.getUserInfo().getName(), contactMessage.getName());
+                RongIM.getInstance().sendMessage(Message.obtain(mTargetId, mConversationType, contactMessage), pushContent, null,
+                        new IRongCallback.ISendMessageCallback() {
+                            @Override
+                            public void onAttached(Message message) {
 
-                    }
+                            }
 
-                    @Override
-                    public void onSuccess(Message message) {
+                            @Override
+                            public void onSuccess(Message message) {
 
-                    }
+                            }
 
-                    @Override
-                    public void onError(Message message, RongIMClient.ErrorCode errorCode) {
+                            @Override
+                            public void onError(Message message, RongIMClient.ErrorCode errorCode) {
 
-                    }
-                });
+                            }
+                        });
 
                 String message = mMessage.getText().toString().trim();
                 if (!("".equals(message))) {
                     TextMessage mTextMessage = TextMessage.obtain(message);
-                    RongIM.getInstance().sendMessage(Message.obtain(mTargetId, mConversationType, mTextMessage), null, null, new IRongCallback.ISendMessageCallback() {
-                        @Override
-                        public void onAttached(Message message) {
+                    RongIM.getInstance().sendMessage(Message.obtain(mTargetId, mConversationType, mTextMessage), null, null,
+                            new IRongCallback.ISendMessageCallback() {
+                                @Override
+                                public void onAttached(Message message) {
 
-                        }
+                                }
 
-                        @Override
-                        public void onSuccess(Message message) {
+                                @Override
+                                public void onSuccess(Message message) {
 
-                        }
+                                }
 
-                        @Override
-                        public void onError(Message message, RongIMClient.ErrorCode errorCode) {
+                                @Override
+                                public void onError(Message message, RongIMClient.ErrorCode errorCode) {
 
-                        }
-                    });
+                                }
+                            });
                 } else {
                     hideInputKeyBoard();
                 }
@@ -242,27 +247,35 @@ public class ContactDetailActivity extends Activity {
         });
     }
 
-    private class GridAdapter extends BaseAdapter {
+    private static class GridAdapter extends BaseAdapter {
 
         private List<UserInfo> list;
         Context context;
 
-        public GridAdapter(Context context, List<UserInfo> list) {
+        GridAdapter(Context context, List<UserInfo> list) {
             this.list = list;
             this.context = context;
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
+            ViewHolder viewHolder;
             if (convertView == null) {
                 convertView = LayoutInflater.from(context).inflate(R.layout.rc_gridview_item_contact_group_members, parent, false);
+                viewHolder = new ViewHolder();
+                viewHolder.portrait = (AsyncImageView) convertView.findViewById(R.id.iv_avatar);
+                viewHolder.name = (TextView) convertView.findViewById(R.id.tv_username);
+                convertView.setTag(viewHolder);
+            } else {
+                viewHolder = (ViewHolder) convertView.getTag();
             }
-            AsyncImageView iv_avatar = (AsyncImageView) convertView.findViewById(R.id.iv_avatar);
-            TextView tv_username = (TextView) convertView.findViewById(R.id.tv_username);
 
-            final UserInfo member = list.get(position);
-            tv_username.setText(member.getName());
-            iv_avatar.setAvatar(member.getPortraitUri());
+            UserInfo member = list.get(position);
+            if (member != null) {
+                viewHolder.portrait.setAvatar(member.getPortraitUri());
+                viewHolder.name.setText(member.getName());
+            }
+
             return convertView;
         }
 
@@ -280,6 +293,11 @@ public class ContactDetailActivity extends Activity {
         public long getItemId(int position) {
             return position;
         }
+    }
+
+    private static class ViewHolder {
+        AsyncImageView portrait;
+        TextView name;
     }
 
     private void hideInputKeyBoard() {

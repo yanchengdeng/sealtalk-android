@@ -20,7 +20,7 @@ import io.rong.imlib.model.UserInfo;
  * Created by Beyond on 2016/12/5.
  */
 
-@MessageTag(value = "RCD:CardMsg", flag = MessageTag.ISCOUNTED | MessageTag.ISPERSISTED)
+@MessageTag(value = "RC:CardMsg", flag = MessageTag.ISCOUNTED | MessageTag.ISPERSISTED)
 public class ContactMessage extends MessageContent {
     private static final String TAG = "ContactMessage";
 

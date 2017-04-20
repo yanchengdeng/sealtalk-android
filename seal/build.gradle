@@ -6,10 +6,10 @@ android {
 
     defaultConfig {
         applicationId "cn.rongcloud.im"
-        minSdkVersion 11
+        minSdkVersion 14
         targetSdkVersion 23
-        versionCode 2017041017
-        versionName "2.8.9 Stable"
+        versionCode 2017041917
+        versionName "2.8.10 Dev"
 
         multiDexEnabled true
         ndk {
@@ -70,5 +70,8 @@ dependencies {
     compile project(':IMKit')
     compile project(':CallKit')
     compile project(':RedPacket')
+    compile(name: 'HMS-SDK-2.4.0.300', ext: 'aar')
 }
 apply plugin: 'com.google.gms.google-services'
+
+repositories { flatDir { dirs 'aars' } }

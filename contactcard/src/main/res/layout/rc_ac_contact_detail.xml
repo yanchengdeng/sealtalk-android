@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="280dp"
     android:layout_height="wrap_content"
-    android:background="@drawable/rc_contact_detail_activity_corner_style"
+    android:background="@drawable/rc_contact_detail_activity_corner_bg"
     android:orientation="vertical">
 
     <TextView
@@ -118,7 +118,8 @@
                 android:paddingRight="9dp"
                 android:paddingStart="9dp"
                 android:textColorHint="#dadada"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                android:maxLines="2"/>
         </LinearLayout>
 
         <LinearLayout

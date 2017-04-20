@@ -25,9 +25,9 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
-import cn.rongcloud.contactcard.ContactCardPlugin;
-import cn.rongcloud.contactcard.R;
+import cn.rongcloud.contactcard.ContactCardContext;
 import cn.rongcloud.contactcard.IContactCardInfoProvider;
+import cn.rongcloud.contactcard.R;
 import io.rong.imkit.mention.SideBar;
 import io.rong.imkit.tools.CharacterParser;
 import io.rong.imkit.widget.AsyncImageView;
@@ -59,6 +59,12 @@ public class ContactListActivity extends Activity {
         SideBar mSideBar = (SideBar) findViewById(R.id.rc_sidebar);
         TextView letterPopup = (TextView) findViewById(R.id.rc_popup_bg);
         mSideBar.setTextView(letterPopup);
+        findViewById(R.id.rc_btn_cancel).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         mAdapter = new MembersAdapter();
         mListView.setAdapter(mAdapter);
@@ -67,7 +73,9 @@ public class ContactListActivity extends Activity {
         mTargetId = getIntent().getStringExtra("targetId");
         mConversationType = (Conversation.ConversationType) getIntent().getSerializableExtra("conversationType");
 
-        IContactCardInfoProvider iContactInfoProvider = ContactCardPlugin.getInstance().getContactCardInfoProvider();
+        IContactCardInfoProvider iContactInfoProvider = ContactCardContext.getInstance().getContactCardInfoProvider();
+        if (iContactInfoProvider == null)
+            return;
         iContactInfoProvider.getContactCardInfoProvider(new IContactCardInfoProvider.IContactCardInfoCallback() {
             @Override
             public void getContactCardInfoCallback(final List<? extends UserInfo> members) {
@@ -177,21 +185,9 @@ public class ContactListActivity extends Activity {
 
             }
         });
-
-        findViewById(R.id.rc_btn_cancel).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
     }
 
-//    private void startContactDetailActivity(List<Friend> friendList, int position) {
-//
-//        finish();
-//    }
-
-    class MembersAdapter extends BaseAdapter implements SectionIndexer {
+    static class MembersAdapter extends BaseAdapter implements SectionIndexer {
         private List<MemberInfo> mList = new ArrayList<>();
 
         public void setData(List<MemberInfo> list) {
@@ -269,13 +265,13 @@ public class ContactListActivity extends Activity {
         }
     }
 
-    class ViewHolder {
+    private static class ViewHolder {
         AsyncImageView portrait;
         TextView name;
         TextView letter;
     }
 
-    private class MemberInfo {
+    private static class MemberInfo {
         UserInfo userInfo;
         String letter;
 

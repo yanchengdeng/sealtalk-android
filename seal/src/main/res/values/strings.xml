@@ -344,5 +344,8 @@
     <string name="seal_mine_fragment_user_portrait">用户头像</string>
     <string name="item_filter_group_list_include">包含：</string>
     <string name="rs_ada_user_ship_add">已添加</string>
+    <string name="seal_set_push_language">设置 Push 中文</string>
+    <string name="seal_set_push_detail">显示 Push 内容</string>
+    <string name="seal_set_push_receive">接收 Push 消息</string>
 
 </resources>

@@ -2,28 +2,43 @@ package cn.rongcloud.im;
 
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.support.multidex.MultiDexApplication;
 import android.text.TextUtils;
+import android.view.View;
 
 import com.facebook.stetho.Stetho;
 import com.facebook.stetho.dumpapp.DumperPlugin;
 import com.facebook.stetho.inspector.database.DefaultDatabaseConnectionProvider;
 import com.facebook.stetho.inspector.protocol.ChromeDevtoolsDomain;
 
+import java.util.List;
+
+import cn.rongcloud.contactcard.ContactCardExtensionModule;
+import cn.rongcloud.contactcard.IContactCardClickListener;
+import cn.rongcloud.contactcard.IContactCardInfoProvider;
+import cn.rongcloud.contactcard.message.ContactMessage;
+import cn.rongcloud.im.db.Friend;
 import cn.rongcloud.im.message.TestMessage;
 import cn.rongcloud.im.message.provider.ContactNotificationMessageProvider;
 import cn.rongcloud.im.message.provider.TestMessageProvider;
+import cn.rongcloud.im.server.pinyin.CharacterParser;
 import cn.rongcloud.im.server.utils.NLog;
+import cn.rongcloud.im.server.utils.RongGenerate;
 import cn.rongcloud.im.stetho.RongDatabaseDriver;
 import cn.rongcloud.im.stetho.RongDatabaseFilesProvider;
 import cn.rongcloud.im.stetho.RongDbFilesDumperPlugin;
+import cn.rongcloud.im.ui.activity.UserDetailActivity;
 import cn.rongcloud.im.utils.SharedPreferencesContext;
 import io.rong.imageloader.core.DisplayImageOptions;
 import io.rong.imageloader.core.display.FadeInBitmapDisplayer;
+import io.rong.imkit.RongExtensionManager;
 import io.rong.imkit.RongIM;
 import io.rong.imkit.widget.provider.RealTimeLocationMessageProvider;
 import io.rong.imlib.ipc.RongExceptionHandler;
+import io.rong.imlib.model.UserInfo;
 import io.rong.push.RongPushClient;
 import io.rong.push.common.RongException;
 
@@ -101,7 +116,36 @@ public class App extends MultiDexApplication {
                     .cacheOnDisk(true)
                     .build();
 
-            //RongExtensionManager.getInstance().registerExtensionModule(new PTTExtensionModule(this, true, 1000 * 60));
+//            RongExtensionManager.getInstance().registerExtensionModule(new PTTExtensionModule(this, true, 1000 * 60));
+            RongExtensionManager.getInstance().registerExtensionModule(new ContactCardExtensionModule(new IContactCardInfoProvider() {
+                @Override
+                public void getContactCardInfoProvider(final IContactCardInfoCallback contactInfoCallback) {
+                    SealUserInfoManager.getInstance().getFriends(new SealUserInfoManager.ResultCallback<List<Friend>>() {
+                        @Override
+                        public void onSuccess(List<Friend> friendList) {
+                            contactInfoCallback.getContactCardInfoCallback(friendList);
+                        }
+
+                        @Override
+                        public void onError(String errString) {
+                            contactInfoCallback.getContactCardInfoCallback(null);
+                        }
+                    });
+                }
+            }, new IContactCardClickListener() {
+                @Override
+                public void onContactCardClick(View view, ContactMessage content) {
+                    Intent intent = new Intent(view.getContext(), UserDetailActivity.class);
+                    Friend friend = SealUserInfoManager.getInstance().getFriendByID(content.getId());
+                    if (friend == null) {
+                        UserInfo userInfo = new UserInfo(content.getId(), content.getName(),
+                                Uri.parse(TextUtils.isEmpty(content.getImgUrl()) ? RongGenerate.generateDefaultAvatar(content.getName(), content.getId()) : content.getImgUrl()));
+                        friend = CharacterParser.getInstance().generateFriendFromUserInfo(userInfo);
+                    }
+                    intent.putExtra("friend", friend);
+                    view.getContext().startActivity(intent);
+                }
+            }));
         }
     }
 

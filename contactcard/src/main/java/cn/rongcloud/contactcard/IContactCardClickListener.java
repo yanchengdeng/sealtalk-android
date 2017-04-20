@@ -9,6 +9,6 @@ import io.rong.imkit.model.UIMessage;
  * Created by Beyond on 05/01/2017.
  */
 
-public interface IContactCardClickCallback {
-    void onContactCardMessageClick(View view, int position, ContactMessage content, UIMessage message);
+public interface IContactCardClickListener {
+    void onContactCardClick(View view, ContactMessage content);
 }

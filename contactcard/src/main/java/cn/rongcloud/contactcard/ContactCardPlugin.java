@@ -7,10 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 
 import cn.rongcloud.contactcard.activities.ContactListActivity;
-import cn.rongcloud.contactcard.message.ContactMessage;
-import cn.rongcloud.contactcard.message.ContactMessageItemProvider;
 import io.rong.imkit.RongExtension;
-import io.rong.imkit.RongIM;
 import io.rong.imkit.plugin.IPluginModule;
 import io.rong.imlib.model.Conversation;
 
@@ -21,46 +18,8 @@ import io.rong.imlib.model.Conversation;
 public class ContactCardPlugin implements IPluginModule {
 
     private static final int REQUEST_CONTACT = 55;
-    private static volatile ContactCardPlugin contactPlugin = null;
-    private IContactCardInfoProvider iContactCardInfoProvider;
 
-    private IContactCardClickCallback iContactCardClickCallback;
-
-    private ContactCardPlugin(){
-
-    }
-
-    public static void init() {
-        RongIM.registerMessageType(ContactMessage.class); //注册名片消息
-        RongIM.registerMessageTemplate(new ContactMessageItemProvider());
-
-    }
-
-    public static ContactCardPlugin getInstance(){
-        if(contactPlugin == null){
-            synchronized (ContactCardPlugin.class){
-                if(contactPlugin == null){
-                    contactPlugin = new ContactCardPlugin();
-                }
-            }
-        }
-        return contactPlugin;
-    }
-
-    public void setContactCardInfoProvider(IContactCardInfoProvider iContactCardInfoProvider) {
-        this.iContactCardInfoProvider = iContactCardInfoProvider;
-    }
-
-    public IContactCardInfoProvider getContactCardInfoProvider() {
-        return iContactCardInfoProvider;
-    }
-
-    public IContactCardClickCallback getContactCardClickCallback() {
-        return iContactCardClickCallback;
-    }
-
-    public void setContactCardClickCallback(IContactCardClickCallback iContactCardClickCallback) {
-        this.iContactCardClickCallback = iContactCardClickCallback;
+    public ContactCardPlugin() {
     }
 
     @Override

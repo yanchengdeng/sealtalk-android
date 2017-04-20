@@ -5,7 +5,7 @@ android {
     buildToolsVersion "23.0.1"
 
     defaultConfig {
-        minSdkVersion 9
+        minSdkVersion 14
         targetSdkVersion 19
         versionCode 1
         versionName "1.0"
@@ -27,3 +27,4 @@ dependencies {
     compile project(':IMKit')
     compile project(':CallLib')
 }
+repositories { flatDir { dirs '../push/aars' } }

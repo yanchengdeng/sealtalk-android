@@ -5,14 +5,14 @@ import android.content.res.Resources;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import cn.rongcloud.contactcard.ContactCardPlugin;
-import cn.rongcloud.contactcard.IContactCardClickCallback;
+import cn.rongcloud.contactcard.IContactCardClickListener;
 import cn.rongcloud.contactcard.R;
 import io.rong.common.RLog;
 import io.rong.imkit.RongContext;
@@ -20,6 +20,7 @@ import io.rong.imkit.RongIM;
 import io.rong.imkit.emoticon.AndroidEmoji;
 import io.rong.imkit.model.ProviderTag;
 import io.rong.imkit.model.UIMessage;
+import io.rong.imkit.userInfoCache.RongUserInfoManager;
 import io.rong.imkit.utilities.OptionsPopupDialog;
 import io.rong.imkit.widget.AsyncImageView;
 import io.rong.imkit.widget.provider.IContainerItemProvider;
@@ -33,6 +34,11 @@ import io.rong.imlib.model.Message;
 @ProviderTag(messageContent = ContactMessage.class, showProgress = false, showReadState = true, showSummaryWithName = false)
 public class ContactMessageItemProvider extends IContainerItemProvider.MessageProvider<ContactMessage> {
     private final static String TAG = "ContactMessageItemProvider";
+    private IContactCardClickListener iContactCardClickListener;
+
+    public ContactMessageItemProvider(IContactCardClickListener iContactCardClickListener) {
+        this.iContactCardClickListener = iContactCardClickListener;
+    }
 
     private static class ViewHolder {
         AsyncImageView mImage;
@@ -54,8 +60,11 @@ public class ContactMessageItemProvider extends IContainerItemProvider.MessagePr
     @Override
     public void bindView(View v, int position, ContactMessage content, UIMessage message) {
         ViewHolder viewHolder = (ViewHolder) v.getTag();
-        if (content.getImgUrl() != null) {
-            viewHolder.mImage.setResource(content.getImgUrl(), 0);
+        if (!TextUtils.isEmpty(content.getImgUrl())) {
+            viewHolder.mImage.setAvatar(content.getImgUrl(), R.drawable.rc_default_portrait);
+        } else {
+            if (RongUserInfoManager.getInstance().getUserInfo(content.getId()) != null)
+                viewHolder.mImage.setAvatar(RongUserInfoManager.getInstance().getUserInfo(content.getId()).getPortraitUri());
         }
 
         SpannableStringBuilder spannable = new SpannableStringBuilder(content.getName());
@@ -69,25 +78,25 @@ public class ContactMessageItemProvider extends IContainerItemProvider.MessagePr
     }
 
     @Override
-    public Spannable getContentSummary(ContactMessage data) {
-        if (data != null && data.getUserInfo() != null && data.getUserInfo().getUserId() != null && data.getName() != null) {
-            if (data.getUserInfo().getUserId().equals(RongIM.getInstance().getCurrentUserId())) {
+    public Spannable getContentSummary(ContactMessage contactMessage) {
+        if (contactMessage != null && contactMessage.getUserInfo() != null && contactMessage.getUserInfo().getUserId() != null && contactMessage.getName() != null) {
+            if (contactMessage.getUserInfo().getUserId().equals(RongIM.getInstance().getCurrentUserId())) {
                 String str_RecommendClause = RongContext.getInstance().getResources().getString(R.string.rc_recommend_clause_to_others);
-                return new SpannableString(String.format(str_RecommendClause, data.getName()));
-            }
-
-            else {
+                return new SpannableString(String.format(str_RecommendClause, contactMessage.getName()));
+            } else {
                 String str_RecommendClause = RongContext.getInstance().getResources().getString(R.string.rc_recommend_clause_to_me);
-                return new SpannableString(String.format(str_RecommendClause, data.getUserInfo().getName(), data.getName()));
+                return new SpannableString(String.format(str_RecommendClause, contactMessage.getUserInfo().getName(), contactMessage.getName()));
             }
-        } else
+        } else {
             return new SpannableString("[" + R.string.rc_plugins_contact + "]");
+        }
     }
 
     @Override
     public void onItemClick(View view, int position, ContactMessage content, UIMessage message) {
-        IContactCardClickCallback iContactCardClickCallback = ContactCardPlugin.getInstance().getContactCardClickCallback();
-        iContactCardClickCallback.onContactCardMessageClick(view, position, content, message);
+        if (iContactCardClickListener != null) {
+            iContactCardClickListener.onContactCardClick(view, content);
+        }
     }
 
     @Override

@@ -1,1 +1,1 @@
-include ':seal', ':Recognizer', ':contactcard', ':sticker', ':IMLib', ':IMKit', ':CallLib', ':CallKit', ':RedPacket'
+include ':seal', ':Recognizer', ':sticker', ':IMLib', ':IMKit', ':CallLib', ':CallKit', ':RedPacket', ':contactcard'
