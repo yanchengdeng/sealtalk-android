@@ -41,6 +41,7 @@ import io.rong.imlib.ipc.RongExceptionHandler;
 import io.rong.imlib.model.UserInfo;
 import io.rong.push.RongPushClient;
 import io.rong.push.common.RongException;
+import io.rong.recognizer.RecognizeExtensionModule;
 
 
 public class App extends MultiDexApplication {
@@ -116,7 +117,7 @@ public class App extends MultiDexApplication {
                     .cacheOnDisk(true)
                     .build();
 
-//            RongExtensionManager.getInstance().registerExtensionModule(new PTTExtensionModule(this, true, 1000 * 60));
+            //RongExtensionManager.getInstance().registerExtensionModule(new PTTExtensionModule(this, true, 1000 * 60));
             RongExtensionManager.getInstance().registerExtensionModule(new ContactCardExtensionModule(new IContactCardInfoProvider() {
                 @Override
                 public void getContactCardInfoProvider(final IContactCardInfoCallback contactInfoCallback) {
@@ -146,6 +147,7 @@ public class App extends MultiDexApplication {
                     view.getContext().startActivity(intent);
                 }
             }));
+            RongExtensionManager.getInstance().registerExtensionModule(new RecognizeExtensionModule());
         }
     }
 

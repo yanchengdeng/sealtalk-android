@@ -18,6 +18,7 @@
             android:background="@drawable/rc_bg_speech_tv_bottom"
             android:gravity="center"
             android:text="@string/rc_plugin_recognize_clear"
+            android:textSize="16sp"
             android:textColor="@color/rc_speech_tv" />
 
         <View
@@ -34,12 +35,23 @@
         android:layout_alignParentTop="true"
         android:background="@color/rc_divider_color" />
 
-    <ImageView
-        android:id="@+id/img_mic"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-        android:layout_centerInParent="true"
-        android:background="@drawable/rc_bg_img_mic"
-        android:src="@drawable/volume_0" />
+    <RelativeLayout
+        android:id="@+id/rl_mic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/rc_recognize_bg_mic"
+        android:layout_marginTop="77dp">
+
+        <ImageView
+            android:id="@+id/img_mic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:src="@drawable/rc_recognize_volume_grey" />
+
+    </RelativeLayout>
+
+
 
 </RelativeLayout>

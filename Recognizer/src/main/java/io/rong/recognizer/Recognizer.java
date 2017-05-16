@@ -6,10 +6,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -22,6 +20,7 @@ import com.iflytek.cloud.RecognizerResult;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.SpeechRecognizer;
+import com.iflytek.cloud.SpeechUtility;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,46 +30,64 @@ import org.json.JSONTokener;
 import java.util.Locale;
 import java.util.Random;
 
+import io.rong.common.RLog;
 
-
-/**
- * Created by zwfang on 16/11/8.
- */
-public class RecognizerView extends RelativeLayout implements RecognizerListener {
-
-    private final static String TAG = "RecognizerView";
+public class Recognizer extends RelativeLayout implements RecognizerListener {
+    private final static String TAG = "Recognizer";
 
     private ImageView imgMic;
     private RelativeLayout rlBottom;
 
-
     private Random random;
     private IRecognizedResult resultCallBack;
     private SpeechRecognizer mIat = null;
-    AnimationDrawable animStart;
-    AnimationDrawable animEnd;
+    private AnimationDrawable animStart;
+    private AnimationDrawable animEnd;
+    private static String mAppId;
 
-    public RecognizerView(Context context) {
+    /**
+     * 开发者可以通过此接口设置自己从科大讯飞官网申请的 appId。
+     * 此方法可以在 SDK init 之后调用。
+     *
+     * @param appId 自定义的 appId
+     */
+    public static void setAppId(String appId) {
+        mAppId = appId;
+    }
+
+    public Recognizer(Context context) {
         super(context);
+        /**
+         * 语音输入模块集成的是讯分SDK,开发者要集成需要去讯飞开放平台获取自身的APPID替换下面的id.
+         */
+        if (SpeechUtility.getUtility() == null) {
+            SpeechUtility.createUtility(context.getApplicationContext(), SpeechConstant.APPID + "=" + (mAppId == null ? "581f2927" : mAppId));
+        }
         initViews();
     }
 
-    public RecognizerView(Context context, AttributeSet attrs) {
+    public Recognizer(Context context, AttributeSet attrs) {
         super(context, attrs);
         initViews();
     }
 
     private void initViews() {
         setClickable(true);
-        setBackgroundColor(getResources().getColor(R.color.rc_normal));
+        setBackgroundColor(getResources().getColor(R.color.rc_recognizerview_bg_normal));
         RelativeLayout recognizerContainer = (RelativeLayout) LayoutInflater.from(getContext()).inflate(R.layout.rc_view_recognizer, null);
-        imgMic = (ImageView) recognizerContainer.findViewById(R.id.img_mic);
-        imgMic.setOnClickListener(new OnClickListener() {
+        View rlMic = recognizerContainer.findViewById(R.id.rl_mic);
+        rlMic.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                startRecognize();
+                if (mIat == null || !mIat.isListening()) {
+                    startRecognize();
+                } else {
+                    reset();
+                }
             }
         });
+        imgMic = (ImageView) recognizerContainer.findViewById(R.id.img_mic);
+
         TextView tvClear = (TextView) recognizerContainer.findViewById(R.id.btn_clear);
         tvClear.setOnClickListener(new OnClickListener() {
             @Override
@@ -92,11 +109,11 @@ public class RecognizerView extends RelativeLayout implements RecognizerListener
 
         @Override
         public void onInit(int code) {
-            Log.i(TAG, "onInit " + code);
+            RLog.i(TAG, "onInit " + code);
         }
     };
 
-    private void startRecognize() {
+    public void startRecognize() {
         if (null == mIat) {
             mIat = SpeechRecognizer.createRecognizer(getContext(), mInitListener);
         }
@@ -106,7 +123,7 @@ public class RecognizerView extends RelativeLayout implements RecognizerListener
         setParam();
         int ret = mIat.startListening(this);
         if (ret != ErrorCode.SUCCESS) {
-            Log.d(TAG, "startRecognize ret error " + ret);
+            RLog.d(TAG, "startRecognize ret error " + ret);
         }
     }
 
@@ -116,7 +133,7 @@ public class RecognizerView extends RelativeLayout implements RecognizerListener
      * @param
      * @return
      */
-    public void setParam() {
+    private void setParam() {
         // 清空参数
         mIat.setParameter(SpeechConstant.PARAMS, null);
 
@@ -150,79 +167,82 @@ public class RecognizerView extends RelativeLayout implements RecognizerListener
         int num = random.nextInt(3) + 1;
         switch (num) {
             case 1:
-                imgMic.setImageResource(R.drawable.volume_1);
+                imgMic.setImageResource(R.drawable.rc_recognize_volume_01);
                 break;
             case 2:
-                imgMic.setImageResource(R.drawable.volume_2);
+                imgMic.setImageResource(R.drawable.rc_recognize_volume_02);
                 break;
             default:
-                imgMic.setImageResource(R.drawable.volume_3);
+                imgMic.setImageResource(R.drawable.rc_recognize_volume_03);
                 break;
         }
     }
 
-    public void changeVolume(int volume) {
-
+    private void changeVolume(int volume) {
         if (null != imgMic) {
             switch (volume / 2) {
                 case 0:
                     setRandomImageResource();
                     break;
                 case 1:
-                    imgMic.setImageResource(R.drawable.volume_2);
+                    imgMic.setImageResource(R.drawable.rc_recognize_volume_02);
                     break;
                 case 2:
-                    imgMic.setImageResource(R.drawable.volume_3);
+                    imgMic.setImageResource(R.drawable.rc_recognize_volume_03);
                     break;
                 case 3:
-                    imgMic.setImageResource(R.drawable.volume_4);
+                    imgMic.setImageResource(R.drawable.rc_recognize_volume_04);
                     break;
                 case 4:
-                    imgMic.setImageResource(R.drawable.volume_5);
+                    imgMic.setImageResource(R.drawable.rc_recognize_volume_05);
                     break;
                 case 5:
-                    imgMic.setImageResource(R.drawable.volume_6);
+                    imgMic.setImageResource(R.drawable.rc_recognize_volume_06);
                     break;
                 case 6:
-                    imgMic.setImageResource(R.drawable.volume_7);
+                    imgMic.setImageResource(R.drawable.rc_recognize_volume_07);
                     break;
                 case 7:
-                    imgMic.setImageResource(R.drawable.volume_8);
+                    imgMic.setImageResource(R.drawable.rc_recognize_volume_08);
                     break;
                 case 8:
-                    imgMic.setImageResource(R.drawable.volume_9);
+                    imgMic.setImageResource(R.drawable.rc_recognize_volume_09);
                     break;
                 case 9:
-                    imgMic.setImageResource(R.drawable.volume_10);
+                    imgMic.setImageResource(R.drawable.rc_recognize_volume_10);
                     break;
                 case 10:
-                    imgMic.setImageResource(R.drawable.volume_11);
+                    imgMic.setImageResource(R.drawable.rc_recognize_volume_11);
+                    break;
+                case 11:
+                    imgMic.setImageResource(R.drawable.rc_recognize_volume_12);
+                    break;
+                case 12:
+                    imgMic.setImageResource(R.drawable.rc_recognize_volume_13);
                     break;
                 default:
-                    imgMic.setImageResource(R.drawable.volume_12);
+                    imgMic.setImageResource(R.drawable.rc_recognize_volume_14);
                     break;
             }
         }
     }
 
 
-    public void endOfSpeech() {
+    private void endOfSpeech() {
         if (null == imgMic) return;
         imgMic.setImageResource(R.drawable.rc_anim_speech_end);
         animEnd = (AnimationDrawable) imgMic.getDrawable();
-        if (!animEnd.isRunning()) {
-            animEnd.start();
-        }
+        imgMic.clearAnimation();
+        animEnd.start();
     }
 
 
-    public void beginOfSpeech() {
+    private void beginOfSpeech() {
         if (null == imgMic) return;
         imgMic.setImageResource(R.drawable.rc_anim_speech_start);
         animStart = (AnimationDrawable) imgMic.getDrawable();
-        if (!animStart.isRunning()) {
-            animStart.start();
-        }
+        imgMic.clearAnimation();
+        animStart.start();
     }
 
     @Override
@@ -244,6 +264,10 @@ public class RecognizerView extends RelativeLayout implements RecognizerListener
             animStart.stop();
             animEnd = null;
         }
+        if (SpeechUtility.getUtility() != null) {
+            SpeechUtility.getUtility().destroy();
+        }
+        mInitListener = null;
     }
 
     private String parseIatResult(String json) {
@@ -296,19 +320,24 @@ public class RecognizerView extends RelativeLayout implements RecognizerListener
     @Override
     public void onResult(RecognizerResult recognizerResult, boolean b) {
         printResult(recognizerResult);
-
+        if (imgMic != null) {
+            imgMic.setImageResource(R.drawable.rc_recognize_disable);
+        }
     }
 
     @Override
     public void onError(SpeechError speechError) {
         if (speechError.getErrorCode() == ErrorCode.ERROR_NO_NETWORK) {
-            Toast.makeText(getContext(), getContext().getString(R.string.check_network), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getContext().getString(R.string.rc_plugin_recognize_check_network), Toast.LENGTH_SHORT).show();
+        }
+        if (imgMic != null) {
+            imgMic.setImageResource(R.drawable.rc_recognize_disable);
         }
     }
 
     @Override
     public void onEvent(int eventType, int i1, int i2, Bundle bundle) {
-        Log.d(TAG, "RecognizerView onEvent eventType: " + eventType);
+        RLog.d(TAG, "RecognizerView onEvent eventType: " + eventType);
     }
 
     @Override
@@ -318,25 +347,21 @@ public class RecognizerView extends RelativeLayout implements RecognizerListener
 
     @Override
     public void onBeginOfSpeech() {
-        Log.d(TAG, "RecognizerView onBeginOfSpeech");
+        RLog.d(TAG, "RecognizerView onBeginOfSpeech");
         beginOfSpeech();
     }
 
     @Override
     public void onEndOfSpeech() {
-        Log.d(TAG, "RecognizerView onEndOfSpeech");
-//        endOfSpeech();
+        RLog.d(TAG, "RecognizerView onEndOfSpeech");
+        endOfSpeech();
     }
 
     public void setResultCallBack(IRecognizedResult resultCallBack) {
         this.resultCallBack = resultCallBack;
     }
 
-    public void startRecord() {
-        startRecognize();
-    }
-
-    public void stopRecord() {
+    private void reset() {
         if (null != mIat) {
             mIat.cancel();
             mIat.destroy();
@@ -346,10 +371,12 @@ public class RecognizerView extends RelativeLayout implements RecognizerListener
             animEnd.stop();
             animEnd = null;
         }
-        ViewGroup parent = (ViewGroup) getParent();
-        if (null != parent) {
-            parent.removeView(this);
+        if (animStart != null) {
+            animStart.stop();
+            animStart = null;
         }
-        mInitListener = null;
+        if (imgMic != null) {
+            imgMic.setImageResource(R.drawable.rc_recognize_disable);
+        }
     }
 }

@@ -7,28 +7,11 @@ import android.graphics.drawable.Drawable;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 
-import com.iflytek.cloud.SpeechConstant;
-import com.iflytek.cloud.SpeechUtility;
-
 import io.rong.imkit.RongExtension;
 import io.rong.imkit.plugin.IPluginModule;
 import io.rong.imkit.utilities.PermissionCheckUtil;
 
-/**
- * Created by zwfang on 16/11/8.
- */
-
 public class RecognizePlugin implements IPluginModule {
-    private RecognizerView recognizerView;
-
-    /**
-     * 初始化语音识别实例
-     *
-     * @param context 上下文
-     */
-    public void init(Context context) {
-        SpeechUtility.createUtility(context.getApplicationContext(), SpeechConstant.APPID + "=581f2927"); //初始化
-    }
 
     @Override
     public Drawable obtainDrawable(Context context) {
@@ -46,10 +29,7 @@ public class RecognizePlugin implements IPluginModule {
         if (!PermissionCheckUtil.requestPermissions(currentFragment, permissions)) {
             return;
         }
-        if (SpeechUtility.getUtility() == null) {
-            SpeechUtility.createUtility(extension.getContext().getApplicationContext(), SpeechConstant.APPID + "=581f2927"); //初始化
-        }
-        recognizerView = new RecognizerView(extension.getContext());
+        Recognizer recognizerView = new Recognizer(extension.getContext());
         recognizerView.setResultCallBack(new IRecognizedResult() {
             @Override
             public void onResult(String data) {
@@ -65,24 +45,12 @@ public class RecognizePlugin implements IPluginModule {
             }
         });
         extension.addPluginPager(recognizerView);
+        recognizerView.startRecognize();
     }
 
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-    }
-
-    /**
-     * 释放语音识别实例。
-     */
-    public void destroy() {
-        if (recognizerView != null) {
-            recognizerView.stopRecord();
-            recognizerView = null;
-        }
-        if (SpeechUtility.getUtility() != null) {
-            SpeechUtility.getUtility().destroy();
-        }
     }
 }
