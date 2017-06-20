@@ -23,7 +23,7 @@ import io.rong.imkit.utilities.OptionsPopupDialog;
 import io.rong.imkit.widget.provider.IContainerItemProvider;
 import io.rong.imlib.model.Message;
 
-@ProviderTag(messageContent = CallSTerminateMessage.class, showSummaryWithName = false, showProgress = false, showWarning = false, showReadState = true)
+@ProviderTag(messageContent = CallSTerminateMessage.class, showSummaryWithName = false, showProgress = false, showWarning = false, showReadState = false)
 public class CallEndMessageItemProvider extends IContainerItemProvider.MessageProvider<CallSTerminateMessage> {
     private static class ViewHolder {
         AutoLinkTextView message;
@@ -89,6 +89,9 @@ public class CallEndMessageItemProvider extends IContainerItemProvider.MessagePr
             case NETWORK_ERROR:
             case REMOTE_NETWORK_ERROR:
                 msgContent = v.getResources().getString(R.string.rc_voip_call_interrupt);
+                break;
+            case OTHER_DEVICE_HAD_ACCEPTED:
+                msgContent = v.getResources().getString(R.string.rc_voip_call_other);
                 break;
         }
 

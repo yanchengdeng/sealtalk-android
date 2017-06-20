@@ -40,7 +40,7 @@ import io.rong.imkit.utils.NotificationUtil;
 /**
  * Created by weiqinxiao on 16/3/9.
  */
-public class BaseCallActivity extends Activity implements IRongCallListener,PickupDetector.PickupDetectListener {
+public class BaseCallActivity extends Activity implements IRongCallListener, PickupDetector.PickupDetectListener {
 
     private static final String TAG = "BaseCallActivity";
     private final static long DELAY_TIME = 1000;
@@ -127,7 +127,7 @@ public class BaseCallActivity extends Activity implements IRongCallListener,Pick
         super.onStart();
         Intent intent = getIntent();
         Bundle bundle = intent.getBundleExtra("floatbox");
-        if (shouldRestoreFloat && bundle != null){
+        if (shouldRestoreFloat && bundle != null) {
             onRestoreFloatBox(bundle);
         }
     }
@@ -141,10 +141,10 @@ public class BaseCallActivity extends Activity implements IRongCallListener,Pick
 
     public void onIncomingCallRinging() {
         int ringerMode = NotificationUtil.getRingerMode(this);
-        if(ringerMode != AudioManager.RINGER_MODE_SILENT){
-            if(ringerMode == AudioManager.RINGER_MODE_VIBRATE){
+        if (ringerMode != AudioManager.RINGER_MODE_SILENT) {
+            if (ringerMode == AudioManager.RINGER_MODE_VIBRATE) {
                 mVibrator = (Vibrator) RongContext.getInstance().getSystemService(Context.VIBRATOR_SERVICE);
-                mVibrator.vibrate(new long[] {500, 1000}, 0);
+                mVibrator.vibrate(new long[]{500, 1000}, 0);
             } else {
                 Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
                 mMediaPlayer = new MediaPlayer();
@@ -161,7 +161,7 @@ public class BaseCallActivity extends Activity implements IRongCallListener,Pick
     }
 
     public void setupTime(final TextView timeView) {
-        if(updateTimeRunnable != null) {
+        if (updateTimeRunnable != null) {
             handler.removeCallbacks(updateTimeRunnable);
         }
         updateTimeRunnable = new UpdateTimeRunnable(timeView);
@@ -177,7 +177,7 @@ public class BaseCallActivity extends Activity implements IRongCallListener,Pick
             mMediaPlayer.stop();
             mMediaPlayer = null;
         }
-        if(mVibrator != null){
+        if (mVibrator != null) {
             mVibrator.cancel();
             mVibrator = null;
         }
@@ -264,8 +264,19 @@ public class BaseCallActivity extends Activity implements IRongCallListener,Pick
         shouldShowFloat = true;
     }
 
+
     @Override
     protected void onPause() {
+        isFinishing = isFinishing();
+        if (isFinishing) {
+            try {
+                if (mHomeKeyReceiver != null) {
+                    unregisterReceiver(mHomeKeyReceiver);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         super.onPause();
         if (shouldShowFloat) {
             Bundle bundle = new Bundle();
@@ -285,7 +296,7 @@ public class BaseCallActivity extends Activity implements IRongCallListener,Pick
         super.onResume();
         RLog.d(TAG, "BaseCallActivity onResume");
         RongCallProxy.getInstance().setCallListener(this);
-        if (shouldRestoreFloat){
+        if (shouldRestoreFloat) {
             time = CallFloatBoxView.hideFloatBox();
         }
         shouldRestoreFloat = true;
@@ -299,13 +310,6 @@ public class BaseCallActivity extends Activity implements IRongCallListener,Pick
 
     @Override
     protected void onDestroy() {
-        try {
-            if (mHomeKeyReceiver != null) {
-                unregisterReceiver(mHomeKeyReceiver);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         isFinishing = false;
         handler.removeCallbacks(updateTimeRunnable);
         super.onDestroy();

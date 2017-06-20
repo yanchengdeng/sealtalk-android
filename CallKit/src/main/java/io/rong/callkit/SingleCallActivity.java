@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
 import android.view.View;
@@ -425,9 +426,11 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
         if (callSession.getSelfUserId().equals(userId)) {
             showShortToast(getString(R.string.rc_voip_switch_to_audio));
         } else {
-            RongCallClient.getInstance().changeCallMediaType(RongCallCommon.CallMediaType.AUDIO);
-            callSession.setMediaType(RongCallCommon.CallMediaType.AUDIO);
-            showShortToast(getString(R.string.rc_voip_remote_switch_to_audio));
+            if (callSession.getMediaType() != RongCallCommon.CallMediaType.AUDIO) {
+                RongCallClient.getInstance().changeCallMediaType(RongCallCommon.CallMediaType.AUDIO);
+                callSession.setMediaType(RongCallCommon.CallMediaType.AUDIO);
+                showShortToast(getString(R.string.rc_voip_remote_switch_to_audio));
+            }
         }
         initAudioCallView();
         handler.removeMessages(EVENT_FULL_SCREEN);

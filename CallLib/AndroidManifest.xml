@@ -2,7 +2,7 @@
     package="io.rong.calllib">
 
     <uses-sdk
-        android:minSdkVersion="9"
+        android:minSdkVersion="15"
         android:targetSdkVersion="20" />
 
     <application>

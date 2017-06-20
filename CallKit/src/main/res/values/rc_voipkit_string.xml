@@ -13,6 +13,7 @@
     <string name="rc_voip_call_started">开始通话</string>
     <string name="rc_voip_select_member">选择成员</string>
     <string name="rc_voip_call_start_fail">正在通话中</string>
+    <string name="rc_voip_call_other">其它设备已处理</string>
 
     <string name="rc_voip_audio_call_inviting">邀请你进行语音聊天...</string>
     <string name="rc_voip_video_call_inviting">邀请你进行视频聊天...</string>

@@ -1,6 +1,5 @@
 package io.rong.callkit;
 
-import android.util.Log;
 import android.view.SurfaceView;
 
 import java.util.Queue;
