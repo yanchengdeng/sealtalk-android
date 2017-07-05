@@ -14,6 +14,7 @@ import com.facebook.stetho.dumpapp.DumperPlugin;
 import com.facebook.stetho.inspector.database.DefaultDatabaseConnectionProvider;
 import com.facebook.stetho.inspector.protocol.ChromeDevtoolsDomain;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import cn.rongcloud.contactcard.ContactCardExtensionModule;
@@ -120,7 +121,7 @@ public class App extends MultiDexApplication {
             //RongExtensionManager.getInstance().registerExtensionModule(new PTTExtensionModule(this, true, 1000 * 60));
             RongExtensionManager.getInstance().registerExtensionModule(new ContactCardExtensionModule(new IContactCardInfoProvider() {
                 @Override
-                public void getContactCardInfoProvider(final IContactCardInfoCallback contactInfoCallback) {
+                public void getContactAllInfoProvider(final IContactCardInfoCallback contactInfoCallback) {
                     SealUserInfoManager.getInstance().getFriends(new SealUserInfoManager.ResultCallback<List<Friend>>() {
                         @Override
                         public void onSuccess(List<Friend> friendList) {
@@ -133,6 +134,24 @@ public class App extends MultiDexApplication {
                         }
                     });
                 }
+
+                @Override
+                public void getContactAppointedInfoProvider(String userId, final IContactCardInfoCallback contactInfoCallback) {
+                    SealUserInfoManager.getInstance().getFriendByID(userId, new SealUserInfoManager.ResultCallback<Friend>() {
+                        @Override
+                        public void onSuccess(Friend friend) {
+                            List<UserInfo> list = new ArrayList<>();
+                            list.add(friend);
+                            contactInfoCallback.getContactCardInfoCallback(list);
+                        }
+
+                        @Override
+                        public void onError(String errString) {
+                            contactInfoCallback.getContactCardInfoCallback(null);
+                        }
+                    });
+                }
+
             }, new IContactCardClickListener() {
                 @Override
                 public void onContactCardClick(View view, ContactMessage content) {

@@ -126,9 +126,9 @@ public class ContactDetailActivity extends Activity {
                             }
                         }
                     });
+                    mArrow.setVisibility(View.VISIBLE);
                 }
 
-                mArrow.setVisibility(View.VISIBLE);
                 mArrow.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -160,7 +160,7 @@ public class ContactDetailActivity extends Activity {
         }
 
         if (mContactFriend != null)
-            mContactName.setText("[" + getString(R.string.rc_plugins_contact) + "]" + mContactFriend.getName());
+            mContactName.setText(getString(R.string.rc_plugins_contact) + ": " + mContactFriend.getName());
 
         mMessage.addTextChangedListener(new TextWatcher() {
             @Override
@@ -189,12 +189,15 @@ public class ContactDetailActivity extends Activity {
         mSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ContactMessage contactMessage = ContactMessage.obtain(mContactFriend.getUserId(), mContactFriend.getName(), mContactFriend.getPortraitUri().toString());
-                contactMessage.setUserInfo(RongUserInfoManager.getInstance().getUserInfo(RongIMClient.getInstance().getCurrentUserId()));
-                String pushContent = String.format(RongContext.getInstance().getResources().getString(R.string.rc_recommend_clause_to_me),
-                        contactMessage.getUserInfo().getName(), contactMessage.getName());
-                RongIM.getInstance().sendMessage(Message.obtain(mTargetId, mConversationType, contactMessage), pushContent, null,
-                        new IRongCallback.ISendMessageCallback() {
+                UserInfo sendUserInfo = RongUserInfoManager.getInstance().
+                        getUserInfo(RongIMClient.getInstance().getCurrentUserId());
+                String sendUserName = sendUserInfo == null ? "" : sendUserInfo.getName();
+                ContactMessage contactMessage = ContactMessage.obtain(mContactFriend.getUserId(),
+                        mContactFriend.getName(), mContactFriend.getPortraitUri().toString(),
+                        RongIMClient.getInstance().getCurrentUserId(), sendUserName, "");
+                String pushContent = String.format(RongContext.getInstance().getResources().getString(R.string.rc_recommend_clause_to_me), sendUserName, contactMessage.getName());
+                RongIM.getInstance().sendMessage(Message.obtain(mTargetId, mConversationType, contactMessage),
+                        pushContent, null, new IRongCallback.ISendMessageCallback() {
                             @Override
                             public void onAttached(Message message) {
 

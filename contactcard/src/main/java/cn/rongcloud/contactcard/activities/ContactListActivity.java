@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -43,7 +44,7 @@ public class ContactListActivity extends Activity {
     private ListView mListView;
     private List<MemberInfo> mAllMemberList;
     private MembersAdapter mAdapter;
-    private Handler handler = new Handler();
+    private Handler handler = new Handler(Looper.getMainLooper());
 
     private Conversation.ConversationType mConversationType;
     private String mTargetId;
@@ -76,7 +77,7 @@ public class ContactListActivity extends Activity {
         IContactCardInfoProvider iContactInfoProvider = ContactCardContext.getInstance().getContactCardInfoProvider();
         if (iContactInfoProvider == null)
             return;
-        iContactInfoProvider.getContactCardInfoProvider(new IContactCardInfoProvider.IContactCardInfoCallback() {
+        iContactInfoProvider.getContactAllInfoProvider(new IContactCardInfoProvider.IContactCardInfoCallback() {
             @Override
             public void getContactCardInfoCallback(final List<? extends UserInfo> members) {
                 if (members != null && members.size() > 0) {
@@ -129,12 +130,10 @@ public class ContactListActivity extends Activity {
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                finish();
-                Intent intent = new Intent(ContactListActivity.this, ContactDetailActivity.class);
-                intent.putExtra("conversationType", mConversationType);
-                intent.putExtra("targetId", mTargetId);
+                Intent intent = new Intent();
                 intent.putExtra("contact", mAdapter.getItem(position).userInfo);
-                startActivity(intent);
+                setResult(Activity.RESULT_OK, intent);
+                finish();
             }
         });
 
@@ -187,7 +186,7 @@ public class ContactListActivity extends Activity {
         });
     }
 
-    static class MembersAdapter extends BaseAdapter implements SectionIndexer {
+    private static class MembersAdapter extends BaseAdapter implements SectionIndexer {
         private List<MemberInfo> mList = new ArrayList<>();
 
         public void setData(List<MemberInfo> list) {
