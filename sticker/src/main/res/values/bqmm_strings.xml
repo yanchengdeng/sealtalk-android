@@ -32,7 +32,6 @@
     <!-- 删除表情时提示语 -->
     <string name="bqmm_delete_package_text_en">deleting...</string>
 
-    <string name="rc_dialog_item_message_delete">删除消息</string>
-    <string name="rc_dialog_item_message_copy">复制消息</string>
-    <string name="rc_dialog_item_message_recall">撤回消息</string>
+    <string name="bqmm_rc_dialog_item_message_delete">删除消息</string>
+    <string name="bqmm_rc_dialog_item_message_recall">撤回消息</string>
 </resources>
