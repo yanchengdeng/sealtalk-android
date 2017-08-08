@@ -346,13 +346,6 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
             muteV.setSelected(muted);
         }
 
-        AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
-        if (audioManager.isWiredHeadsetOn()) {
-            RongCallClient.getInstance().setEnableSpeakerphone(false);
-        } else {
-            RongCallClient.getInstance().setEnableSpeakerphone(handFree);
-        }
-
         View handFreeV = mButtonContainer.findViewById(R.id.rc_voip_handfree);
         if (handFreeV != null) {
             handFreeV.setSelected(handFree);
@@ -484,7 +477,7 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
             finish();
             return;
         }
-        RongCallClient.getInstance().hangUpCall(callSession.getCallId());
+        RongCallClient.getInstance().hangUpCall(session.getCallId());
         stopRing();
     }
 
@@ -494,7 +487,7 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
             finish();
             return;
         }
-        RongCallClient.getInstance().acceptCall(callSession.getCallId());
+        RongCallClient.getInstance().acceptCall(session.getCallId());
     }
 
     public void hideVideoCallInformation() {
@@ -569,6 +562,9 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
                     extra = String.format("%02d:%02d", (time % 3600) / 60, (time % 60));
                 }
                 break;
+            case OTHER_DEVICE_HAD_ACCEPTED:
+                showShortToast(getString(R.string.rc_voip_call_other));
+                break;
         }
 
         if (!TextUtils.isEmpty(senderId)) {
@@ -578,11 +574,12 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
             message.setExtra(extra);
             if (senderId.equals(callSession.getSelfUserId())) {
                 message.setDirection("MO");
+                RongIM.getInstance().insertOutgoingMessage(Conversation.ConversationType.PRIVATE, callSession.getTargetId(), io.rong.imlib.model.Message.SentStatus.SENT, message, null);
             } else {
                 message.setDirection("MT");
+                io.rong.imlib.model.Message.ReceivedStatus receivedStatus = new io.rong.imlib.model.Message.ReceivedStatus(0);
+                RongIM.getInstance().insertIncomingMessage(Conversation.ConversationType.PRIVATE, callSession.getTargetId(), senderId, receivedStatus, message, null);
             }
-
-            RongIM.getInstance().insertMessage(Conversation.ConversationType.PRIVATE, callSession.getTargetId(), senderId, message, null);
         }
         postRunnableDelay(new Runnable() {
             @Override

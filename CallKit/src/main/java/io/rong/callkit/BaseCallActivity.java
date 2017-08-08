@@ -276,19 +276,19 @@ public class BaseCallActivity extends Activity implements IRongCallListener, Pic
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
-        super.onPause();
-        if (shouldShowFloat) {
-            Bundle bundle = new Bundle();
-            String action = onSaveFloatBoxState(bundle);
-            if (action != null) {
-                bundle.putString("action", action);
-                CallFloatBoxView.showFloatBox(getApplicationContext(), bundle, time);
-                int mediaType = bundle.getInt("mediaType");
-                showOnGoingNotification(getString(R.string.rc_call_on_going),
-                        mediaType == RongCallCommon.CallMediaType.AUDIO.getValue() ? getString(R.string.rc_audio_call_on_going) : getString(R.string.rc_video_call_on_going));
+            if (shouldShowFloat) {
+                Bundle bundle = new Bundle();
+                String action = onSaveFloatBoxState(bundle);
+                if (action != null) {
+                    bundle.putString("action", action);
+                    CallFloatBoxView.showFloatBox(getApplicationContext(), bundle, time);
+                    int mediaType = bundle.getInt("mediaType");
+                    showOnGoingNotification(getString(R.string.rc_call_on_going),
+                            mediaType == RongCallCommon.CallMediaType.AUDIO.getValue() ? getString(R.string.rc_audio_call_on_going) : getString(R.string.rc_video_call_on_going));
+                }
             }
         }
+        super.onPause();
     }
 
     @Override

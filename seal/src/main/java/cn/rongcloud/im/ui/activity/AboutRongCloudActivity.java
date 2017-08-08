@@ -21,6 +21,7 @@ import cn.rongcloud.im.server.UpdateService;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.server.widget.DialogWithYesOrNoUtils;
+import io.rong.imlib.common.BuildVar;
 
 public class AboutRongCloudActivity extends BaseActivity {
 
@@ -44,7 +45,7 @@ public class AboutRongCloudActivity extends BaseActivity {
         TextView version = (TextView) findViewById(R.id.sealtalk_version);
         RelativeLayout mCloseDebug = (RelativeLayout) findViewById(R.id.close_debug);
         RelativeLayout mStartDebug = (RelativeLayout) findViewById(R.id.start_debug);
-        version.setText(SealConst.SEALTALKVERSION);
+        version.setText(getVersionInfo()[1]);
         mUpdateLog.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -171,8 +172,7 @@ public class AboutRongCloudActivity extends BaseActivity {
         }
 
 
-        String[] versionInfo = getVersionInfo();
-        mSDKVersion.setText(versionInfo[1]);
+        mSDKVersion.setText(BuildVar.SDK_VERSION);
     }
 
     private String[] getVersionInfo() {

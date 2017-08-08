@@ -31,7 +31,7 @@ import io.rong.message.InformationNotificationMessage;
 
 public class MultiAudioCallActivity extends BaseCallActivity {
     private static final String TAG = "VoIPMultiAudioCallActivity";
-    LinearLayout maudioContainer;
+    LinearLayout audioContainer;
     CallUserGridView memberContainer;
 
     RelativeLayout incomingLayout;
@@ -50,7 +50,7 @@ public class MultiAudioCallActivity extends BaseCallActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.rc_voip_ac_muti_audio);
-        maudioContainer = (LinearLayout) findViewById(R.id.rc_voip_container);
+        audioContainer = (LinearLayout) findViewById(R.id.rc_voip_container);
         incomingLayout = (RelativeLayout) LayoutInflater.from(this).inflate(R.layout.rc_voip_item_incoming_maudio, null);
         outgoingLayout = (RelativeLayout) LayoutInflater.from(this).inflate(R.layout.rc_voip_item_outgoing_maudio, null);
         outgoingController = (FrameLayout) LayoutInflater.from(this).inflate(R.layout.rc_voip_call_bottom_connected_button_layout, null);
@@ -106,12 +106,12 @@ public class MultiAudioCallActivity extends BaseCallActivity {
     public void onRestoreFloatBox(Bundle bundle) {
         super.onRestoreFloatBox(bundle);
         if (bundle != null) {
-            maudioContainer.addView(outgoingLayout);
-            memberContainer = (CallUserGridView) maudioContainer.findViewById(R.id.rc_voip_members_container);
-            FrameLayout controller = (FrameLayout) maudioContainer.findViewById(R.id.rc_voip_control_layout);
+            audioContainer.addView(outgoingLayout);
+            memberContainer = (CallUserGridView) audioContainer.findViewById(R.id.rc_voip_members_container);
+            FrameLayout controller = (FrameLayout) audioContainer.findViewById(R.id.rc_voip_control_layout);
             controller.addView(outgoingController);
             callSession = RongCallClient.getInstance().getCallSession();
-            if (callSession == null){
+            if (callSession == null) {
                 setShouldShowFloat(false);
                 finish();
             }
@@ -119,7 +119,7 @@ public class MultiAudioCallActivity extends BaseCallActivity {
 
             List<CallUserProfile> participantProfiles = callSession.getParticipantProfileList();
             for (CallUserProfile item : participantProfiles) {
-                if (!item.getUserId().equals(callSession.getSelfUserId()) && !item.getUserId().equals(callSession.getCallerUserId())) {
+                if (!item.getUserId().equals(callSession.getSelfUserId())) {
                     if (item.getCallStatus().equals(RongCallCommon.CallStatus.CONNECTED))
                         memberContainer.addChild(item.getUserId(), RongContext.getInstance().getUserInfoFromCache(item.getUserId()));
                     else {
@@ -150,8 +150,8 @@ public class MultiAudioCallActivity extends BaseCallActivity {
             else
                 name.setText(callSession.getCallerUserId());
             name.setTag(callSession.getCallerUserId() + "callerName");
-            maudioContainer.addView(incomingLayout);
-            memberContainer = (CallUserGridView) maudioContainer.findViewById(R.id.rc_voip_members_container);
+            audioContainer.addView(incomingLayout);
+            memberContainer = (CallUserGridView) audioContainer.findViewById(R.id.rc_voip_members_container);
             memberContainer.setChildPortraitSize(memberContainer.dip2pix(40));
             List<CallUserProfile> list = callSession.getParticipantProfileList();
             for (CallUserProfile profile : list) {
@@ -161,7 +161,7 @@ public class MultiAudioCallActivity extends BaseCallActivity {
                     memberContainer.addChild(profile.getUserId(), userInfo);
                 }
             }
-            FrameLayout controller = (FrameLayout) maudioContainer.findViewById(R.id.rc_voip_control_layout);
+            FrameLayout controller = (FrameLayout) audioContainer.findViewById(R.id.rc_voip_control_layout);
             controller.addView(incomingController);
             onIncomingCallRinging();
         } else if (callAction.equals(RongCallAction.ACTION_OUTGOING_CALL)) {
@@ -169,10 +169,10 @@ public class MultiAudioCallActivity extends BaseCallActivity {
             String targetId = intent.getStringExtra("targetId");
             ArrayList<String> userIds = intent.getStringArrayListExtra("invitedUsers");
 
-            maudioContainer.addView(outgoingLayout);
-            memberContainer = (CallUserGridView) maudioContainer.findViewById(R.id.rc_voip_members_container);
+            audioContainer.addView(outgoingLayout);
+            memberContainer = (CallUserGridView) audioContainer.findViewById(R.id.rc_voip_members_container);
             memberContainer.enableShowState(true);
-            FrameLayout controller = (FrameLayout) maudioContainer.findViewById(R.id.rc_voip_control_layout);
+            FrameLayout controller = (FrameLayout) audioContainer.findViewById(R.id.rc_voip_control_layout);
             controller.addView(outgoingController);
             for (int i = 0; i < userIds.size(); i++) {
                 if (!userIds.get(i).equals(RongIMClient.getInstance().getCurrentUserId())) {
@@ -191,7 +191,7 @@ public class MultiAudioCallActivity extends BaseCallActivity {
 
     @Override
     protected void onPause() {
-        if (pickupDetector != null){
+        if (pickupDetector != null) {
             pickupDetector.unRegister();
         }
         super.onPause();
@@ -201,7 +201,7 @@ public class MultiAudioCallActivity extends BaseCallActivity {
     protected void onResume() {
         if (pickupDetector == null) createPickupDetector();
         if (wakeLock == null) createPowerManager();
-        if (pickupDetector != null){
+        if (pickupDetector != null) {
             pickupDetector.register(this);
         }
         super.onResume();
@@ -285,10 +285,10 @@ public class MultiAudioCallActivity extends BaseCallActivity {
         stopRing();
 
         if (callAction.equals(RongCallAction.ACTION_INCOMING_CALL)) {
-            maudioContainer.removeAllViews();
+            audioContainer.removeAllViews();
             FrameLayout controller = (FrameLayout) outgoingLayout.findViewById(R.id.rc_voip_control_layout);
             controller.addView(outgoingController);
-            maudioContainer.addView(outgoingLayout);
+            audioContainer.addView(outgoingLayout);
             memberContainer = (CallUserGridView) outgoingLayout.findViewById(R.id.rc_voip_members_container);
             memberContainer.enableShowState(true);
             for (CallUserProfile profile : callSession.getParticipantProfileList()) {
@@ -446,7 +446,7 @@ public class MultiAudioCallActivity extends BaseCallActivity {
     @Override
     protected void onDestroy() {
         RongContext.getInstance().getEventBus().unregister(this);
-        if (wakeLock != null && wakeLock.isHeld()){
+        if (wakeLock != null && wakeLock.isHeld()) {
             wakeLock.setReferenceCounted(false);
             wakeLock.release();
         }
@@ -476,6 +476,13 @@ public class MultiAudioCallActivity extends BaseCallActivity {
 
     @Override
     public void onBackPressed() {
+        if (callSession == null) {
+            callSession = RongCallClient.getInstance().getCallSession();
+            if (callSession == null) {
+                super.onBackPressed();
+                return;
+            }
+        }
         List<CallUserProfile> participantProfiles = callSession.getParticipantProfileList();
         RongCallCommon.CallStatus callStatus = null;
         for (CallUserProfile item : participantProfiles) {
@@ -492,7 +499,7 @@ public class MultiAudioCallActivity extends BaseCallActivity {
     }
 
     public void onEventMainThread(UserInfo userInfo) {
-        TextView callerName = (TextView) maudioContainer.findViewWithTag(userInfo.getUserId() + "callerName");
+        TextView callerName = (TextView) audioContainer.findViewWithTag(userInfo.getUserId() + "callerName");
         if (callerName != null && userInfo.getName() != null)
             callerName.setText(userInfo.getName());
         if (memberContainer != null && memberContainer.findChildById(userInfo.getUserId()) != null) {

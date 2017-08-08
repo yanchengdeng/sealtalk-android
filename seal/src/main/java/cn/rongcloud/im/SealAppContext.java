@@ -77,7 +77,7 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
 
     private static SealAppContext mRongCloudInstance;
 
-    private LocationCallback mLastLocationCallback;
+    private RongIM.LocationProvider.LocationCallback mLastLocationCallback;
 
     private static ArrayList<Activity> mActivities;
 
@@ -222,9 +222,9 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
                 BroadcastManager.getInstance(mContext).sendBroadcast(UPDATE_RED_DOT);
             } else if (contactNotificationMessage.getOperation().equals("AcceptResponse")) {
                 //对方同意我的好友请求
-                ContactNotificationMessageData c = null;
+                ContactNotificationMessageData contactNotificationMessageData;
                 try {
-                    c = JsonMananger.jsonToBean(contactNotificationMessage.getExtra(), ContactNotificationMessageData.class);
+                    contactNotificationMessageData = JsonMananger.jsonToBean(contactNotificationMessage.getExtra(), ContactNotificationMessageData.class);
                 } catch (HttpException e) {
                     e.printStackTrace();
                     return false;
@@ -232,16 +232,16 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
                     e.printStackTrace();
                     return false;
                 }
-                if (c != null) {
+                if (contactNotificationMessageData != null) {
                     if (SealUserInfoManager.getInstance().isFriendsRelationship(contactNotificationMessage.getSourceUserId())) {
                         return false;
                     }
                     SealUserInfoManager.getInstance().addFriend(
                             new Friend(contactNotificationMessage.getSourceUserId(),
-                                    c.getSourceUserNickname(),
+                                    contactNotificationMessageData.getSourceUserNickname(),
                                     null, null, null, null,
                                     null, null,
-                                    CharacterParser.getInstance().getSpelling(c.getSourceUserNickname()),
+                                    CharacterParser.getInstance().getSpelling(contactNotificationMessageData.getSourceUserNickname()),
                                     null));
                 }
                 BroadcastManager.getInstance(mContext).sendBroadcast(UPDATE_FRIEND);
@@ -445,11 +445,11 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
     }
 
 
-    public LocationCallback getLastLocationCallback() {
+    public RongIM.LocationProvider.LocationCallback getLastLocationCallback() {
         return mLastLocationCallback;
     }
 
-    public void setLastLocationCallback(LocationCallback lastLocationCallback) {
+    public void setLastLocationCallback(RongIM.LocationProvider.LocationCallback lastLocationCallback) {
         this.mLastLocationCallback = lastLocationCallback;
     }
 

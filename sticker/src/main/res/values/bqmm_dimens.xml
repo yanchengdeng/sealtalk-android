@@ -20,8 +20,4 @@
 
     <!-- 默认大表情包标题内容字体大小 -->
     <dimen name="bqmm_preload_package_name_text_size">18sp</dimen>
-    <!-- 设置是否支持消息撤回-->
-    <bool name="rc_enable_message_recall">true</bool>
-    <!-- 消息撤回有效时间（单位：秒）-->
-    <integer name="rc_message_recall_interval">120</integer>
 </resources>

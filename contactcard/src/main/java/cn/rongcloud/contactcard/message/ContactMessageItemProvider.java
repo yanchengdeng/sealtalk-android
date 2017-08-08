@@ -72,7 +72,8 @@ public class ContactMessageItemProvider extends IContainerItemProvider.MessagePr
                 = ContactCardContext.getInstance().getContactCardInfoProvider();
         if (iContactCardInfoProvider != null) {
             iContactCardInfoProvider.getContactAppointedInfoProvider(
-                    content.getId(), new IContactCardInfoProvider.IContactCardInfoCallback() {
+                    content.getId(), content.getName(), content.getImgUrl(),
+                    new IContactCardInfoProvider.IContactCardInfoCallback() {
                         @Override
                         public void getContactCardInfoCallback(List<? extends UserInfo> list) {
                             if (list != null && list.size() > 0) {

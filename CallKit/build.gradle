@@ -7,8 +7,8 @@ android {
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 1
-        versionName "1.0"
+        versionCode 2017080817
+        versionName "2.8.14 Dev"
     }
     buildTypes {
         release {
@@ -27,4 +27,3 @@ dependencies {
     compile project(':IMKit')
     compile project(':CallLib')
 }
-repositories { flatDir { dirs '../push/aars' } }

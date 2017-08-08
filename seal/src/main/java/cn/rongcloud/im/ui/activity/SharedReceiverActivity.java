@@ -67,7 +67,7 @@ public class SharedReceiverActivity extends BaseActivity {
         if (intent != null) {
             /** 截获 Intent 部分 **/
             try {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
                     String linkInfo = getIntent().getClipData().toString();
                     if (linkInfo != null) {
                         if (linkInfo.contains("file://")) {
