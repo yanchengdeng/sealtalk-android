@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
 import android.view.View;
@@ -346,6 +345,12 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
             muteV.setSelected(muted);
         }
 
+        AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+        if (audioManager.isWiredHeadsetOn()) {
+            RongCallClient.getInstance().setEnableSpeakerphone(false);
+        } else {
+            RongCallClient.getInstance().setEnableSpeakerphone(handFree);
+        }
         View handFreeV = mButtonContainer.findViewById(R.id.rc_voip_handfree);
         if (handFreeV != null) {
             handFreeV.setSelected(handFree);
@@ -555,7 +560,7 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
         switch (reason) {
             case HANGUP:
             case REMOTE_HANGUP:
-                int time = getTime();
+                long time = getTime();
                 if (time >= 3600) {
                     extra = String.format("%d:%02d:%02d", time / 3600, (time % 3600) / 60, (time % 60));
                 } else {

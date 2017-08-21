@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="rc_voip_video">Video call</string>
-    <string name="rc_voip_audio">Voice call</string>
+    <string name="rc_voip_video">Video Call</string>
+    <string name="rc_voip_audio">Voice Call</string>
     <string name="rc_voip_call_waiting">Waiting for accept calling invitation...</string>
     <string name="rc_voip_call_connecting">Connecting</string>
     <string name="rc_voip_call_busy">Busy line</string>
@@ -37,8 +37,8 @@
     <string name="rc_voip_mt_no_response">No answer</string>
     <string name="rc_voip_call_time_length">Duration&#160;</string>
     <string name="rc_voip_mt_busy">Remote user my be busy. Try again later.</string>
-    <string name="rc_voip_message_audio">[Voice call]</string>
-    <string name="rc_voip_message_video">[Video call]</string>
+    <string name="rc_voip_message_audio">[Voice Call]</string>
+    <string name="rc_voip_message_video">[Video Call]</string>
     <string name="rc_voip_remote_switch_to_audio">Other user switched to voice call.</string>
     <string name="rc_voip_switch_to_audio">Switch to voice call.</string>
     <string name="rc_voip_float_window_not_allowed">Please enable floating windows</string>

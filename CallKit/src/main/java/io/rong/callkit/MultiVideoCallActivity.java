@@ -185,7 +185,7 @@ public class MultiVideoCallActivity extends BaseCallActivity {
             if (!callAction.equals(RongCallAction.ACTION_RESUME_CALL))
                 return;
             localViewUserId = bundle.getString("localViewUserId");
-            if (callSession == null){
+            if (callSession == null) {
                 setShouldShowFloat(false);
                 finish();
             }
@@ -309,6 +309,12 @@ public class MultiVideoCallActivity extends BaseCallActivity {
     public void onCallConnected(RongCallSession callSession, SurfaceView localVideo) {
         super.onCallConnected(callSession, localVideo);
         this.callSession = callSession;
+        AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+        if (audioManager.isWiredHeadsetOn()) {
+            RongCallClient.getInstance().setEnableSpeakerphone(false);
+        } else {
+            RongCallClient.getInstance().setEnableSpeakerphone(true);
+        }
         if (localView == null) {
             localView = localVideo;
             localViewContainer.addView(localView, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
