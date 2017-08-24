@@ -28,7 +28,6 @@ import android.widget.Toast;
 import java.io.IOException;
 
 import io.rong.calllib.IRongCallListener;
-import io.rong.calllib.RongCallClient;
 import io.rong.calllib.RongCallCommon;
 import io.rong.calllib.RongCallSession;
 import io.rong.common.RLog;
@@ -51,7 +50,7 @@ public class BaseCallActivity extends Activity implements IRongCallListener, Pic
 
     private MediaPlayer mMediaPlayer;
     private Vibrator mVibrator;
-    private long time = 0;
+    private int time = 0;
     private Runnable updateTimeRunnable;
     private boolean shouldShowFloat;
     private boolean shouldRestoreFloat;
@@ -169,7 +168,7 @@ public class BaseCallActivity extends Activity implements IRongCallListener, Pic
         handler.post(updateTimeRunnable);
     }
 
-    public long getTime() {
+    public int getTime() {
         return time;
     }
 
@@ -282,7 +281,7 @@ public class BaseCallActivity extends Activity implements IRongCallListener, Pic
                 String action = onSaveFloatBoxState(bundle);
                 if (action != null) {
                     bundle.putString("action", action);
-                    CallFloatBoxView.showFloatBox(getApplicationContext(), bundle);
+                    CallFloatBoxView.showFloatBox(getApplicationContext(), bundle, time);
                     int mediaType = bundle.getInt("mediaType");
                     showOnGoingNotification(getString(R.string.rc_call_on_going),
                             mediaType == RongCallCommon.CallMediaType.AUDIO.getValue() ? getString(R.string.rc_audio_call_on_going) : getString(R.string.rc_video_call_on_going));
@@ -298,11 +297,8 @@ public class BaseCallActivity extends Activity implements IRongCallListener, Pic
         RLog.d(TAG, "BaseCallActivity onResume");
         RongCallProxy.getInstance().setCallListener(this);
         if (shouldRestoreFloat) {
-            CallFloatBoxView.hideFloatBox();
+            time = CallFloatBoxView.hideFloatBox();
         }
-        RongCallSession session = RongCallClient.getInstance().getCallSession();
-        long activeTime = session != null ? session.getActiveTime() : 0;
-        time = activeTime == 0 ? 0 : (System.currentTimeMillis() - activeTime) / 1000;
         shouldRestoreFloat = true;
     }
 

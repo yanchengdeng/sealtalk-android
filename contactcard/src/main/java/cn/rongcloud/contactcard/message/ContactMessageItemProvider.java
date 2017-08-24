@@ -64,11 +64,9 @@ public class ContactMessageItemProvider extends IContainerItemProvider.MessagePr
         if (!TextUtils.isEmpty(content.getImgUrl())) {
             viewHolder.mImage.setAvatar(content.getImgUrl(), R.drawable.rc_default_portrait);
         }
-        if (!TextUtils.isEmpty(content.getName())) {
-            SpannableStringBuilder spannable = new SpannableStringBuilder(content.getName());
-            AndroidEmoji.ensure(spannable);
-            viewHolder.mName.setText(spannable);
-        }
+        SpannableStringBuilder spannable = new SpannableStringBuilder(content.getName());
+        AndroidEmoji.ensure(spannable);
+        viewHolder.mName.setText(spannable);
 
         IContactCardInfoProvider iContactCardInfoProvider
                 = ContactCardContext.getInstance().getContactCardInfoProvider();
@@ -90,7 +88,7 @@ public class ContactMessageItemProvider extends IContainerItemProvider.MessagePr
                                                 .setImgUrl(userInfo.getPortraitUri().toString());
                                     }
                                     // 如果本端设置了该用户信息的别名(备注、昵称)，优先显示这个别名
-                                    if (!TextUtils.isEmpty(content.getName()) && !content.getName().equals(userInfo.getName())) {
+                                    if (!content.getName().equals(userInfo.getName())) {
                                         viewHolder.mName.setText(userInfo.getName());
                                     }
                                 }
