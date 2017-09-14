@@ -74,6 +74,7 @@
     <string name="rc_voice_short">录音时间太短</string>
     <string name="rc_voice_failure">录音失败！</string>
     <string name="rc_voice_too_long">录制时间超长</string>
+    <string name="rc_voip_occupying">声音通道正被占用，请稍后再试</string>
 
 
     <string name="rc_pub_service_info_description">功能介绍</string>

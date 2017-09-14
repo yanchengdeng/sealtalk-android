@@ -13,10 +13,6 @@ import io.rong.imlib.model.Conversation;
  *  Created by Yuejunhong on 2016/10/10.
  */
 public class ConversationFragmentEx extends ConversationFragment {
-    @Override
-    public boolean onResendItemClick(io.rong.imlib.model.Message message) {
-        return false;
-    }
 
     @Override
     public void onReadReceiptStateClick(io.rong.imlib.model.Message message) {

@@ -546,6 +546,11 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
                 intent.putExtra("targetId", fromConversationId);
                 startActivity(intent);
                 break;
+            case R.id.group_member_online_status:
+                intent = new Intent(mContext, MembersOnlineStatusActivity.class);
+                intent.putExtra("targetId", fromConversationId);
+                startActivity(intent);
+                break;
             case R.id.ll_group_port:
                 if (isCreated) {
                     showPhotoDialog();
@@ -941,6 +946,7 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
         mQuitBtn = (Button) findViewById(R.id.group_quit);
         mDismissBtn = (Button) findViewById(R.id.group_dismiss);
         RelativeLayout totalGroupMember = (RelativeLayout) findViewById(R.id.group_member_size_item);
+        RelativeLayout memberOnlineStatus = (RelativeLayout) findViewById(R.id.group_member_online_status);
         LinearLayout mGroupPortL = (LinearLayout) findViewById(R.id.ll_group_port);
         LinearLayout mGroupNameL = (LinearLayout) findViewById(R.id.ll_group_name);
         mGroupAnnouncementDividerLinearLayout = (LinearLayout) findViewById(R.id.ac_ll_group_announcement_divider);
@@ -950,6 +956,10 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
         mGroupNameL.setOnClickListener(this);
         totalGroupMember.setOnClickListener(this);
         mGroupDisplayName.setOnClickListener(this);
+        memberOnlineStatus.setOnClickListener(this);
+        if (getSharedPreferences("config", Context.MODE_PRIVATE).getBoolean("isDebug", false)) {
+            memberOnlineStatus.setVisibility(View.VISIBLE);
+        }
         mQuitBtn.setOnClickListener(this);
         mDismissBtn.setOnClickListener(this);
         groupClean.setOnClickListener(this);

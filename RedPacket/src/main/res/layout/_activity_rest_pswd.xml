@@ -12,7 +12,7 @@
         android:id="@+id/actionbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:content="重置密码" />
+        app:content="@string/jrmf_reset_pwd_title" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -33,7 +33,7 @@
                 android:gravity="center_vertical"
                 android:paddingLeft="@dimen/base_padding"
                 android:visibility="gone"
-                android:text="请填写证件号码完成身份验证"
+                android:text="@string/jrmf_auth_tip"
                 android:textSize="12dip" />
 
             <LinearLayout
@@ -47,18 +47,18 @@
                     android:layout_width="90dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:text="姓名" />
+                    android:text="@string/jrmf_username" />
 
                 <com.jrmf360.rylib.rp.widget.ClearEditText
                     android:id="@+id/et_username"
-                    style="@style/text_black_16"
+                    style="@style/text_black_14"
                     android:layout_width="0dip"
                     android:layout_height="match_parent"
                     android:layout_weight="5"
                     android:background="@null"
                     android:textColorHint="@color/color_b7b7b7"
                     android:gravity="center_vertical"
-                    android:hint="请填写完整姓名"
+                    android:hint="@string/jrmf_input_username_hint"
                     android:textColor="@color/black"
                     android:paddingRight="@dimen/base_padding" />
             </LinearLayout>
@@ -79,18 +79,18 @@
                     android:layout_width="90dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:text="身份证" />
+                    android:text="@string/jrmf_IDCard" />
 
                 <com.jrmf360.rylib.rp.widget.ClearEditText
                     android:id="@+id/et_identity"
-                    style="@style/text_black_16"
+                    style="@style/text_black_14"
                     android:layout_width="0dip"
                     android:layout_height="match_parent"
                     android:layout_weight="5"
                     android:background="@null"
                     android:digits="0123456789xyzXYZ"
                     android:gravity="center_vertical"
-                    android:hint="请输入身份证号"
+                    android:hint="@string/jrmf_input_IDCard_num2"
                     android:inputType="number"
                     android:textColor="@color/black"
                     android:textColorHint="@color/color_b7b7b7"
@@ -113,17 +113,17 @@
                     android:layout_width="90dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:text="手机号" />
+                    android:text="@string/jrmf_phone_num" />
 
                 <com.jrmf360.rylib.rp.widget.ClearEditText
                     android:id="@+id/et_userphone"
-                    style="@style/text_black_16"
+                    style="@style/text_black_14"
                     android:layout_width="0dip"
                     android:layout_height="match_parent"
                     android:layout_weight="5"
                     android:background="@null"
                     android:gravity="center_vertical"
-                    android:hint="请输入手机号"
+                    android:hint="@string/jrmf_inupt_phone_num"
                     android:inputType="phone"
                     android:textColor="@color/black"
                     android:textColorHint="@color/color_b7b7b7"
@@ -142,17 +142,17 @@
                     android:layout_width="90dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:text="验证码" />
+                    android:text="@string/jrmf_verify_code" />
 
                 <com.jrmf360.rylib.rp.widget.ClearEditText
                     android:id="@+id/et_vcode"
-                    style="@style/text_black_16"
+                    style="@style/text_black_14"
                     android:layout_width="0dip"
                     android:layout_height="match_parent"
                     android:layout_weight="3.5"
                     android:background="@null"
                     android:gravity="center_vertical"
-                    android:hint="请填写验证码"
+                    android:hint="@string/verify_code_empty2"
                     android:maxLength="6"
                     android:textColor="@color/black"
                     android:textColorHint="@color/color_b7b7b7"
@@ -169,7 +169,7 @@
                     android:gravity="center"
                     android:textSize="12sp"
                     android:textColor="@color/white"
-                    android:text="发送验证码" />
+                    android:text="@string/send_code" />
 
             </LinearLayout>
 
@@ -189,11 +189,11 @@
                     android:layout_width="90dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:text="新密码" />
+                    android:text="@string/jrmf_new_pwd" />
 
                 <com.jrmf360.rylib.rp.widget.ClearEditText
                     android:id="@+id/et_password"
-                    style="@style/text_black_16"
+                    style="@style/text_black_14"
                     android:layout_width="0dip"
                     android:layout_height="match_parent"
                     android:layout_weight="5"
@@ -202,8 +202,7 @@
                     android:textColor="@color/black"
                     android:textColorHint="@color/color_b7b7b7"
                     android:inputType="numberPassword"
-                    android:gravity="center_vertical"
-                    android:hint="请输入6位新支付密码"
+                    android:hint="@string/jrmf_input_new_pwd"
                     android:paddingRight="@dimen/base_padding" />
             </LinearLayout>
 
@@ -218,10 +217,10 @@
                     android:layout_width="90dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:text="确认新密码" />
+                    android:text="@string/jrmf_confirm_new_pwd" />
                 <com.jrmf360.rylib.rp.widget.ClearEditText
                     android:id="@+id/et_confirm_pwd"
-                    style="@style/text_black_16"
+                    style="@style/text_black_14"
                     android:layout_width="0dip"
                     android:layout_height="match_parent"
                     android:layout_weight="5"
@@ -231,7 +230,7 @@
                     android:textColorHint="@color/color_b7b7b7"
                     android:inputType="numberPassword"
                     android:gravity="center_vertical"
-                    android:hint="请重新输入6位新支付密码"
+                    android:hint="@string/jrmf_input_new_pwd_confirm"
                     android:paddingRight="@dimen/base_padding" />
             </LinearLayout>
 
@@ -247,7 +246,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/btn_height"
                     android:background="@drawable/_bg_gray_round"
-                    android:text="提交" />
+                    android:text="@string/jrmf_submit" />
             </LinearLayout>
 
         </LinearLayout>

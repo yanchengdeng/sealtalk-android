@@ -60,7 +60,6 @@ public class MultiAudioCallActivity extends BaseCallActivity {
         if (!requestCallPermissions(RongCallCommon.CallMediaType.AUDIO, REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS)) {
             return;
         }
-        RongContext.getInstance().getEventBus().register(this);
         initView();
     }
 
@@ -223,6 +222,31 @@ public class MultiAudioCallActivity extends BaseCallActivity {
     }
 
     @Override
+    protected void onAddMember(List<String> newMemberIds) {
+        if (newMemberIds == null || newMemberIds.isEmpty()) {
+            return;
+        }
+        List<String> added = new ArrayList<>();
+        List<String> participants = new ArrayList<>();
+        List<CallUserProfile> list = RongCallClient.getInstance().getCallSession().getParticipantProfileList();
+        for (CallUserProfile profile : list) {
+            participants.add(profile.getUserId());
+        }
+        for (String id : newMemberIds) {
+            if (participants.contains(id)) {
+                continue;
+            } else {
+                added.add(id);
+            }
+        }
+        if (added.isEmpty()) {
+            return;
+        }
+
+        RongCallClient.getInstance().addParticipants(callSession.getCallId(), added);
+    }
+
+    @Override
     public void onRemoteUserRinging(String userId) {
 
     }
@@ -346,7 +370,7 @@ public class MultiAudioCallActivity extends BaseCallActivity {
                             intent.putStringArrayListExtra("allMembers", (ArrayList<String>) discussion.getMemberIdList());
                             intent.putStringArrayListExtra("invitedMembers", added);
                             intent.putExtra("mediaType", RongCallCommon.CallMediaType.AUDIO.getValue());
-                            startActivityForResult(intent, 110);
+                            startActivityForResult(intent, REQUEST_CODE_ADD_MEMBER);
                         }
 
                         @Override
@@ -364,7 +388,14 @@ public class MultiAudioCallActivity extends BaseCallActivity {
                     intent.putStringArrayListExtra("invitedMembers", added);
                     intent.putExtra("groupId", callSession.getTargetId());
                     intent.putExtra("mediaType", RongCallCommon.CallMediaType.AUDIO.getValue());
-                    startActivityForResult(intent, 110);
+                    startActivityForResult(intent, REQUEST_CODE_ADD_MEMBER);
+                } else {
+                    ArrayList<String> added = new ArrayList<>();
+                    List<CallUserProfile> list = RongCallClient.getInstance().getCallSession().getParticipantProfileList();
+                    for (CallUserProfile profile : list) {
+                        added.add(profile.getUserId());
+                    }
+                    addMember(added);
                 }
             }
         });
@@ -430,7 +461,7 @@ public class MultiAudioCallActivity extends BaseCallActivity {
                 }
             }
 
-        } else {
+        } else if (requestCode == REQUEST_CODE_ADD_MEMBER) {
             if (callSession.getEndTime() != 0) {
                 finish();
                 return;
@@ -445,7 +476,6 @@ public class MultiAudioCallActivity extends BaseCallActivity {
 
     @Override
     protected void onDestroy() {
-        RongContext.getInstance().getEventBus().unregister(this);
         if (wakeLock != null && wakeLock.isHeld()) {
             wakeLock.setReferenceCounted(false);
             wakeLock.release();

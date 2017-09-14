@@ -146,7 +146,12 @@ public class CallEndMessageItemProvider extends IContainerItemProvider.MessagePr
     public void onItemClick(View view, int position, CallSTerminateMessage content, UIMessage message) {
         RongCallSession profile = RongCallClient.getInstance().getCallSession();
         if (profile != null && profile.getActiveTime() > 0) {
-            Toast.makeText(view.getContext(), view.getContext().getString(R.string.rc_voip_call_start_fail), Toast.LENGTH_SHORT).show();
+            Toast.makeText(view.getContext(),
+                    profile.getMediaType() == RongCallCommon.CallMediaType.AUDIO ?
+                            view.getContext().getString(R.string.rc_voip_call_audio_start_fail) :
+                            view.getContext().getString(R.string.rc_voip_call_video_start_fail),
+                    Toast.LENGTH_SHORT)
+                    .show();
             return;
         }
         RongCallCommon.CallMediaType mediaType = content.getMediaType();

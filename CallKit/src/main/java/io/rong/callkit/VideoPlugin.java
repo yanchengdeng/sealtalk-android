@@ -58,7 +58,12 @@ public class VideoPlugin implements IPluginModule {
 
         RongCallSession profile = RongCallClient.getInstance().getCallSession();
         if (profile != null && profile.getActiveTime() > 0) {
-            Toast.makeText(context, context.getString(R.string.rc_voip_call_start_fail), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context,
+                    profile.getMediaType() == RongCallCommon.CallMediaType.AUDIO ?
+                            context.getString(R.string.rc_voip_call_audio_start_fail) :
+                            context.getString(R.string.rc_voip_call_video_start_fail),
+                    Toast.LENGTH_SHORT)
+                    .show();
             return;
         }
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);

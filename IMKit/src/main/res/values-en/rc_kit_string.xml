@@ -10,6 +10,7 @@
     <string name="rc_voice_short">Message too short</string>
     <string name="rc_voice_failure"> Message error!</string>
     <string name="rc_voice_too_long">Message too long</string>
+    <string name="rc_voip_occupying">Audio is holding by other function. Try again later.</string>
 
     <!-- discussion_notification_msg -->
     <string name="rc_discussion_nt_msg_for_rename">"%1$s Modify the discussion group name is %2$s"</string>
@@ -84,10 +85,10 @@
     <string name="rc_pub_service_info_unfollow">Unfollow</string>
     <string name="rc_pub_service_info_account">Official Account：%1$s</string>
 
-    <string name="rc_notice_network_unavailable">Network unavailable, check network</string>
+    <string name="rc_notice_network_unavailable">Network disconnected. Check network.</string>
     <string name="rc_notice_disconnect">Unable to access the server</string>
     <string name="rc_notice_tick">The account has been logged in to other devices</string>
-    <string name="rc_notice_connecting">Connecting to server</string>
+    <string name="rc_notice_connecting">Connecting...</string>
     <string name="rc_notice_create_discussion">Creating discussion</string>
     <string name="rc_notice_create_discussion_fail">Failed to create discussion groups</string>
     <string name="rc_notice_enter_chatroom">Enter the chatroom</string>
@@ -145,7 +146,7 @@
     <string name="rc_cs_cancel">Cancel</string>
 
     <!-- LargePictureActivity -->
-    <string name="rc_save_picture">Save Picture</string>
+    <string name="rc_save_picture">Save Photo</string>
     <string name="rc_save_picture_at">Picture saved at %s</string>
     <string name="rc_src_file_not_found">Source file not found.</string>
 

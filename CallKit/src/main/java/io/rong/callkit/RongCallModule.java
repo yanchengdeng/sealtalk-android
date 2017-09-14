@@ -107,7 +107,8 @@ public class RongCallModule implements IExternalModule {
         RLog.d("VoIPReceiver", "startVoIPActivity");
         String action;
         if (callSession.getConversationType().equals(Conversation.ConversationType.DISCUSSION)
-                || callSession.getConversationType().equals(Conversation.ConversationType.GROUP)) {
+                || callSession.getConversationType().equals(Conversation.ConversationType.GROUP)
+                || callSession.getConversationType().equals(Conversation.ConversationType.NONE)) {
             if (callSession.getMediaType().equals(RongCallCommon.CallMediaType.VIDEO)) {
                 action = RongVoIPIntent.RONG_INTENT_ACTION_VOIP_MULTIVIDEO;
             } else {

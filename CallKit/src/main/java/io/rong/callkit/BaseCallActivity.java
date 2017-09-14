@@ -26,8 +26,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import io.rong.calllib.IRongCallListener;
+import io.rong.calllib.RongCallClient;
 import io.rong.calllib.RongCallCommon;
 import io.rong.calllib.RongCallSession;
 import io.rong.common.RLog;
@@ -45,12 +48,13 @@ public class BaseCallActivity extends Activity implements IRongCallListener, Pic
     private static final String TAG = "BaseCallActivity";
     private final static long DELAY_TIME = 1000;
     static final int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 100;
+    static final int REQUEST_CODE_ADD_MEMBER = 110;
     private static final String SYSTEM_DIALOG_REASON_KEY = "reason";
     private static final String SYSTEM_DIALOG_REASON_HOME_KEY = "homekey";
 
     private MediaPlayer mMediaPlayer;
     private Vibrator mVibrator;
-    private int time = 0;
+    private long time = 0;
     private Runnable updateTimeRunnable;
     private boolean shouldShowFloat;
     private boolean shouldRestoreFloat;
@@ -120,6 +124,7 @@ public class BaseCallActivity extends Activity implements IRongCallListener, Pic
 
         AudioPlayManager.getInstance().stopPlay();
         AudioRecordManager.getInstance().destroyRecord();
+        RongContext.getInstance().getEventBus().register(this);
     }
 
     @Override
@@ -168,7 +173,7 @@ public class BaseCallActivity extends Activity implements IRongCallListener, Pic
         handler.post(updateTimeRunnable);
     }
 
-    public int getTime() {
+    public long getTime() {
         return time;
     }
 
@@ -194,6 +199,9 @@ public class BaseCallActivity extends Activity implements IRongCallListener, Pic
 
     @Override
     public void onCallDisconnected(RongCallSession callProfile, RongCallCommon.CallDisconnectedReason reason) {
+        if (RongCallKit.getCustomerHandlerListener() != null) {
+            RongCallKit.getCustomerHandlerListener().onCallDisconnected(callProfile, reason);
+        }
         shouldShowFloat = false;
 
         String text = null;
@@ -237,7 +245,9 @@ public class BaseCallActivity extends Activity implements IRongCallListener, Pic
 
     @Override
     public void onRemoteUserInvited(String userId, RongCallCommon.CallMediaType mediaType) {
-
+        if (RongCallKit.getCustomerHandlerListener() != null) {
+            RongCallKit.getCustomerHandlerListener().onRemoteUserInvited(userId, mediaType);
+        }
     }
 
     @Override
@@ -261,7 +271,11 @@ public class BaseCallActivity extends Activity implements IRongCallListener, Pic
 
     @Override
     public void onCallConnected(RongCallSession callProfile, SurfaceView localVideo) {
+        if (RongCallKit.getCustomerHandlerListener() != null) {
+            RongCallKit.getCustomerHandlerListener().onCallConnected(callProfile, localVideo);
+        }
         shouldShowFloat = true;
+        AudioRecordManager.getInstance().destroyRecord();
     }
 
 
@@ -281,7 +295,7 @@ public class BaseCallActivity extends Activity implements IRongCallListener, Pic
                 String action = onSaveFloatBoxState(bundle);
                 if (action != null) {
                     bundle.putString("action", action);
-                    CallFloatBoxView.showFloatBox(getApplicationContext(), bundle, time);
+                    CallFloatBoxView.showFloatBox(getApplicationContext(), bundle);
                     int mediaType = bundle.getInt("mediaType");
                     showOnGoingNotification(getString(R.string.rc_call_on_going),
                             mediaType == RongCallCommon.CallMediaType.AUDIO.getValue() ? getString(R.string.rc_audio_call_on_going) : getString(R.string.rc_video_call_on_going));
@@ -297,8 +311,11 @@ public class BaseCallActivity extends Activity implements IRongCallListener, Pic
         RLog.d(TAG, "BaseCallActivity onResume");
         RongCallProxy.getInstance().setCallListener(this);
         if (shouldRestoreFloat) {
-            time = CallFloatBoxView.hideFloatBox();
+            CallFloatBoxView.hideFloatBox();
         }
+        RongCallSession session = RongCallClient.getInstance().getCallSession();
+        long activeTime = session != null ? session.getActiveTime() : 0;
+        time = activeTime == 0 ? 0 : (System.currentTimeMillis() - activeTime) / 1000;
         shouldRestoreFloat = true;
     }
 
@@ -306,10 +323,16 @@ public class BaseCallActivity extends Activity implements IRongCallListener, Pic
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         shouldRestoreFloat = false;
+        if (RongCallKit.getCustomerHandlerListener() != null) {
+            List<String> selectedUserIds = RongCallKit.getCustomerHandlerListener().handleActivityResult(requestCode, resultCode, data);
+            if (selectedUserIds != null && selectedUserIds.size() > 0)
+                onAddMember(selectedUserIds);
+        }
     }
 
     @Override
     protected void onDestroy() {
+        RongContext.getInstance().getEventBus().unregister(this);
         isFinishing = false;
         handler.removeCallbacks(updateTimeRunnable);
         super.onDestroy();
@@ -322,6 +345,17 @@ public class BaseCallActivity extends Activity implements IRongCallListener, Pic
 
     public void onRestoreFloatBox(Bundle bundle) {
 
+    }
+
+    protected void addMember(ArrayList<String> currentMemberIds) {
+        // do your job to add more member
+        // after got your new member, call onAddMember
+        if (RongCallKit.getCustomerHandlerListener() != null) {
+            RongCallKit.getCustomerHandlerListener().addMember(this, currentMemberIds);
+        }
+    }
+
+    protected void onAddMember(List<String> newMemberIds) {
     }
 
     public String onSaveFloatBoxState(Bundle bundle) {
@@ -379,7 +413,8 @@ public class BaseCallActivity extends Activity implements IRongCallListener, Pic
     }
 
     void onMinimizeClick(View view) {
-        if (Build.BRAND.toLowerCase().contains("xiaomi")) {
+        if (Build.BRAND.toLowerCase().contains("xiaomi")
+                || Build.VERSION.SDK_INT >= 23) {
             if (PermissionCheckUtil.canDrawOverlays(this)) {
                 finish();
             } else {

@@ -70,7 +70,6 @@ public class MultiVideoCallActivity extends BaseCallActivity {
 
         Intent intent = getIntent();
         startForCheckPermissions = intent.getBooleanExtra("checkPermissions", false);
-        RongContext.getInstance().getEventBus().register(this);
         if (!requestCallPermissions(RongCallCommon.CallMediaType.VIDEO, REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS)) {
             return;
         }
@@ -146,7 +145,7 @@ public class MultiVideoCallActivity extends BaseCallActivity {
                 }
             }
 
-        } else {
+        } else if (requestCode == REQUEST_CODE_ADD_MEMBER) {
             if (callSession.getEndTime() != 0) {
                 finish();
                 return;
@@ -161,7 +160,6 @@ public class MultiVideoCallActivity extends BaseCallActivity {
 
     @Override
     protected void onDestroy() {
-        RongContext.getInstance().getEventBus().unregister(this);
         super.onDestroy();
     }
 
@@ -185,7 +183,7 @@ public class MultiVideoCallActivity extends BaseCallActivity {
             if (!callAction.equals(RongCallAction.ACTION_RESUME_CALL))
                 return;
             localViewUserId = bundle.getString("localViewUserId");
-            if (callSession == null){
+            if (callSession == null) {
                 setShouldShowFloat(false);
                 finish();
             }
@@ -309,6 +307,12 @@ public class MultiVideoCallActivity extends BaseCallActivity {
     public void onCallConnected(RongCallSession callSession, SurfaceView localVideo) {
         super.onCallConnected(callSession, localVideo);
         this.callSession = callSession;
+        AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+        if (audioManager.isWiredHeadsetOn()) {
+            RongCallClient.getInstance().setEnableSpeakerphone(false);
+        } else {
+            RongCallClient.getInstance().setEnableSpeakerphone(true);
+        }
         if (localView == null) {
             localView = localVideo;
             localViewContainer.addView(localView, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
@@ -622,7 +626,7 @@ public class MultiVideoCallActivity extends BaseCallActivity {
                     intent.putStringArrayListExtra("allMembers", (ArrayList<String>) discussion.getMemberIdList());
                     intent.putStringArrayListExtra("invitedMembers", added);
                     intent.putExtra("mediaType", RongCallCommon.CallMediaType.VIDEO.getValue());
-                    startActivityForResult(intent, 110);
+                    startActivityForResult(intent, REQUEST_CODE_ADD_MEMBER);
                 }
 
                 @Override
@@ -640,8 +644,41 @@ public class MultiVideoCallActivity extends BaseCallActivity {
             intent.putStringArrayListExtra("invitedMembers", added);
             intent.putExtra("groupId", callSession.getTargetId());
             intent.putExtra("mediaType", RongCallCommon.CallMediaType.VIDEO.getValue());
-            startActivityForResult(intent, 110);
+            startActivityForResult(intent, REQUEST_CODE_ADD_MEMBER);
+        } else {
+            ArrayList<String> added = new ArrayList<>();
+            List<CallUserProfile> list = RongCallClient.getInstance().getCallSession().getParticipantProfileList();
+            for (CallUserProfile profile : list) {
+                added.add(profile.getUserId());
+            }
+            addMember(added);
         }
+    }
+
+
+    @Override
+    protected void onAddMember(List<String> newMemberIds) {
+        if (newMemberIds == null || newMemberIds.isEmpty()) {
+            return;
+        }
+        List<String> added = new ArrayList<>();
+        List<String> participants = new ArrayList<>();
+        List<CallUserProfile> list = RongCallClient.getInstance().getCallSession().getParticipantProfileList();
+        for (CallUserProfile profile : list) {
+            participants.add(profile.getUserId());
+        }
+        for (String id : newMemberIds) {
+            if (participants.contains(id)) {
+                continue;
+            } else {
+                added.add(id);
+            }
+        }
+        if (added.isEmpty()) {
+            return;
+        }
+
+        RongCallClient.getInstance().addParticipants(callSession.getCallId(), added);
     }
 
     public void onSwitchCameraClick(View view) {

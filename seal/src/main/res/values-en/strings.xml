@@ -194,6 +194,7 @@
     <string name="sdk_version_update">SDK Version</string>
     <string name="sealtalk_version_update">SealTalk 当前版本</string>
     <string name="all_group_member">Total Group Member</string>
+    <string name="group_member_online_status">Group Member Online Status</string>
     <string name="group_announcement">Group Notice</string>
     <string name="group_code">Group Code</string>
     <string name="total_member">Total Group Member</string>
@@ -224,10 +225,14 @@
     <string name="other_devices_text">Your account log in on other device, you are forced to log out!</string>
     <string name="i_know">I know</string>
     <string name="update_name">Update Name</string>
+    <string name="online">online</string>
     <string name="offline">offline</string>
     <string name="web_online">Web online</string>
     <string name="pc_online">PC online</string>
     <string name="phone_online">Phone online</string>
+    <string name="ipad_online">iPad online</string>
+    <string name="imac_online">iMac online</string>
+    <string name="set_user_online_status">Set User Online Status</string>
     <string name="read_receipt_detail">read receipt detail</string>
     <string name="read_receipt_unread_persons">%1$d unread</string>
     <string name="read_receipt_read_persons">%1$d read</string>

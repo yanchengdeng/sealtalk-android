@@ -42,6 +42,7 @@ import cn.rongcloud.im.ui.widget.SinglePopWindow;
 import io.rong.callkit.RongCallAction;
 import io.rong.callkit.RongVoIPIntent;
 import io.rong.calllib.RongCallClient;
+import io.rong.calllib.RongCallCommon;
 import io.rong.calllib.RongCallSession;
 //CallKit end 1
 
@@ -131,19 +132,23 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
             RongIMClient.getInstance().getUserOnlineStatus(mFriend.getUserId(), new IRongCallback.IGetUserOnlineStatusCallback() {
                 @Override
                 public void onSuccess(final ArrayList<UserOnlineStatusInfo> userOnlineStatusInfoList) {
-                    if (userOnlineStatusInfoList != null) {
-                        if (userOnlineStatusInfoList.size() > 1) {
-                            Message message = mHandler.obtainMessage();
-                            message.arg1 = 0;
-                            mHandler.sendMessage(message);
-                        } else if (userOnlineStatusInfoList.size() == 1) {
-                            Message message = mHandler.obtainMessage();
-                            message.arg1 = userOnlineStatusInfoList.get(0).getPlatform().getValue();
-                            mHandler.sendMessage(message);
+                    if (userOnlineStatusInfoList != null && userOnlineStatusInfoList.size() > 0) {
+                        UserOnlineStatusInfo userOnlineStatusInfo = null;
+                        for (int i = 0; i < userOnlineStatusInfoList.size(); ++i) {
+                            if (i == 0) {
+                                userOnlineStatusInfo = userOnlineStatusInfoList.get(i);
+                            } else {
+                                if (userOnlineStatusInfoList.get(i).getPlatform().getValue() > userOnlineStatusInfo.getPlatform().getValue()) {
+                                    userOnlineStatusInfo = userOnlineStatusInfoList.get(i);
+                                }
+                            }
                         }
+                        Message message = mHandler.obtainMessage();
+                        message.obj = userOnlineStatusInfo;
+                        mHandler.sendMessage(message);
                     } else {
                         Message message = mHandler.obtainMessage();
-                        message.arg1 = 5;
+                        message.obj = null;
                         mHandler.sendMessage(message);
                     }
 
@@ -225,7 +230,12 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
     public void startVoice(View view) {
         RongCallSession profile = RongCallClient.getInstance().getCallSession();
         if (profile != null && profile.getActiveTime() > 0) {
-            Toast.makeText(mContext, getString(io.rong.callkit.R.string.rc_voip_call_start_fail), Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext,
+                    profile.getMediaType() == RongCallCommon.CallMediaType.AUDIO ?
+                            getString(io.rong.callkit.R.string.rc_voip_call_audio_start_fail) :
+                            getString(io.rong.callkit.R.string.rc_voip_call_video_start_fail),
+                    Toast.LENGTH_SHORT)
+                    .show();
             return;
         }
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -247,7 +257,12 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
     public void startVideo(View view) {
         RongCallSession profile = RongCallClient.getInstance().getCallSession();
         if (profile != null && profile.getActiveTime() > 0) {
-            Toast.makeText(mContext, getString(io.rong.callkit.R.string.rc_voip_call_start_fail), Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext,
+                    profile.getMediaType() == RongCallCommon.CallMediaType.AUDIO ?
+                            getString(io.rong.callkit.R.string.rc_voip_call_audio_start_fail) :
+                            getString(io.rong.callkit.R.string.rc_voip_call_video_start_fail),
+                    Toast.LENGTH_SHORT)
+                    .show();
             return;
         }
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -526,25 +541,42 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
                 UserDetailActivity activity = mActivity.get();
                 if (activity != null) {
                     activity.mUserLineStatus.setVisibility(View.VISIBLE);
-                    switch (msg.arg1) {
-                        case 0:
-                        case 4:
-                            activity.mUserLineStatus.setText(R.string.pc_online);
+                    UserOnlineStatusInfo userOnlineStatusInfo = (UserOnlineStatusInfo) msg.obj;
+                    if (userOnlineStatusInfo.getCustomerStatus() > 1) {
+                        if (userOnlineStatusInfo.getCustomerStatus() == 5) {
+                            activity.mUserLineStatus.setText(activity.getString(R.string.ipad_online));
                             activity.mUserLineStatus.setTextColor(Color.parseColor("#60E23F"));
-                            break; //PC
-                        case 1:
-                        case 2:
-                            activity.mUserLineStatus.setText(R.string.phone_online);
+                        } else if (userOnlineStatusInfo.getCustomerStatus() == 6) {
+                            activity.mUserLineStatus.setText(activity.getString(R.string.imac_online));
                             activity.mUserLineStatus.setTextColor(Color.parseColor("#60E23F"));
-                            break; //phone
-                        case 3:
-                            activity.mUserLineStatus.setText(R.string.pc_online);
-                            activity.mUserLineStatus.setTextColor(Color.parseColor("#60E23F"));
-                            break; //web
-                        case 5:
-                            activity.mUserLineStatus.setTextColor(Color.parseColor("#666666"));
-                            activity.mUserLineStatus.setText(R.string.offline);
-                            break; // offline
+                        }
+                    } else if (userOnlineStatusInfo.getServiceStatus() == 0) {
+                        activity.mUserLineStatus.setTextColor(Color.parseColor("#666666"));
+                        activity.mUserLineStatus.setText(R.string.offline);
+                    } else if (userOnlineStatusInfo != null){
+                        switch (userOnlineStatusInfo.getPlatform()) {
+                            case Platform_PC:
+                                activity.mUserLineStatus.setText(R.string.pc_online);
+                                activity.mUserLineStatus.setTextColor(Color.parseColor("#60E23F"));
+                                break; //PC
+                            case Platform_Android:
+                            case Platform_iOS:
+                                activity.mUserLineStatus.setText(R.string.phone_online);
+                                activity.mUserLineStatus.setTextColor(Color.parseColor("#60E23F"));
+                                break; //phone
+                            case Platform_Web:
+                                activity.mUserLineStatus.setText(R.string.pc_online);
+                                activity.mUserLineStatus.setTextColor(Color.parseColor("#60E23F"));
+                                break; //web
+                            case Platform_Other:
+                            default:
+                                activity.mUserLineStatus.setTextColor(Color.parseColor("#666666"));
+                                activity.mUserLineStatus.setText(R.string.offline);
+                                break; // offline
+                        }
+                    } else {
+                        activity.mUserLineStatus.setTextColor(Color.parseColor("#666666"));
+                        activity.mUserLineStatus.setText(R.string.offline);
                     }
                 }
             }

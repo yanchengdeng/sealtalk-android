@@ -103,7 +103,10 @@ public class CallSelectMemberActivity extends Activity {
                     if (!invitedMembers.contains(userId)) {
                         if (mMediaType.equals(RongCallCommon.CallMediaType.VIDEO)
                                 && !v.isSelected() && selectedMember.size() + invitedMembers.size() >= 9) {
-                            Toast.makeText(CallSelectMemberActivity.this, "您最多只能选择9人", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(CallSelectMemberActivity.this,
+                                    String.format(getString(R.string.rc_voip_over_limit), 9),
+                                    Toast.LENGTH_SHORT)
+                                    .show();
                             return;
                         }
                         if (selectedMember.contains(userId)) {
