@@ -29,6 +29,9 @@
     <!-- 设置已读回执，目前仅支持单聊、群聊、讨论组 -->
     <bool name="rc_read_receipt">false</bool>
 
+    <!-- 设置已读回执有效时间（单位：秒）-->
+    <integer name="rc_read_receipt_request_interval">120</integer>
+
     <!-- 开启之后，用户在其他端上阅读过的消息，当前客户端会清掉该消息的未读数。目前仅支持单聊、群聊、讨论组。-->
     <bool name="rc_enable_sync_read_status">false</bool>
 </resources>

@@ -29,9 +29,9 @@
     <string name="rc_conversation_list_my_chatroom">My chat room</string>
     <string name="rc_conversation_list_my_customer_service">Customer service list</string>
     <string name="rc_conversation_list_system_conversation">System message</string>
-    <string name="rc_conversation_list_app_public_service">Application Publice Servic</string>
-    <string name="rc_conversation_list_public_service">Publice Servic</string>
-    <string name="rc_conversation_list_dialog_set_top">Sticky on top</string>
+    <string name="rc_conversation_list_app_public_service">Application Public Service</string>
+    <string name="rc_conversation_list_public_service">Public Service</string>
+    <string name="rc_conversation_list_dialog_set_top">Sticky on Top</string>
     <string name="rc_conversation_list_dialog_cancel_top">Remove from top</string>
     <string name="rc_conversation_list_dialog_remove">Delete conversation</string>
     <string name="rc_conversation_list_popup_set_top">Stuck on top</string>
@@ -85,7 +85,7 @@
     <string name="rc_pub_service_info_unfollow">Unfollow</string>
     <string name="rc_pub_service_info_account">Official Account：%1$s</string>
 
-    <string name="rc_notice_network_unavailable">Network disconnected. Check network.</string>
+    <string name="rc_notice_network_unavailable">Network unavailable, check network</string>
     <string name="rc_notice_disconnect">Unable to access the server</string>
     <string name="rc_notice_tick">The account has been logged in to other devices</string>
     <string name="rc_notice_connecting">Connecting...</string>
