@@ -581,7 +581,6 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
             } else {
                 message.setDirection("MT");
                 io.rong.imlib.model.Message.ReceivedStatus receivedStatus = new io.rong.imlib.model.Message.ReceivedStatus(0);
-                receivedStatus.setRead();
                 RongIM.getInstance().insertIncomingMessage(Conversation.ConversationType.PRIVATE, callSession.getTargetId(), senderId, receivedStatus, message, null);
             }
         }
@@ -637,8 +636,8 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
         onCallConnected(callSession, localVideo);
         if (remoteVideo != null && remoteVideo.getParent() != null) {
             ((ViewGroup) remoteVideo.getParent()).removeView(remoteVideo);
-            onRemoteUserJoined(remoteUserId, mediaType, remoteVideo);
         }
+        onRemoteUserJoined(remoteUserId, mediaType, remoteVideo);
     }
 
     @Override

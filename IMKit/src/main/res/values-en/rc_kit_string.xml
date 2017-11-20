@@ -85,7 +85,7 @@
     <string name="rc_pub_service_info_unfollow">Unfollow</string>
     <string name="rc_pub_service_info_account">Official Account：%1$s</string>
 
-    <string name="rc_notice_network_unavailable">Network unavailable, please check your network</string>
+    <string name="rc_notice_network_unavailable">Network unavailable, check network</string>
     <string name="rc_notice_disconnect">Unable to access the server</string>
     <string name="rc_notice_tick">The account has been logged in to other devices</string>
     <string name="rc_notice_connecting">Connecting...</string>
@@ -186,7 +186,7 @@
     <string name="rc_ac_file_send_preview">Send File</string>
     <string name="rc_ad_send_file_no_select_file">Send</string>
     <string name="rc_ad_send_file_select_file">Send(%1$s/20)</string>
-    <string name="rc_fr_no_file_message"> No file %1$scurrently</string>
+    <string name="rc_fr_no_file_message">%1$s file does not exist</string>
     <string name="rc_fr_loading_file_message">Loading...</string>
     <string name="rc_fr_file_category_title_text">Document</string>
     <string name="rc_fr_file_category_title_video">Video</string>

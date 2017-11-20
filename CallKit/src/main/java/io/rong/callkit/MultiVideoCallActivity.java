@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
@@ -54,7 +53,6 @@ public class MultiVideoCallActivity extends BaseCallActivity {
     ImageView minimizeButton;
     ImageView addButton;
     ImageView switchCameraButton;
-    AsyncImageView userPortrait;
 
     int remoteUserViewWidth;
 
@@ -340,7 +338,6 @@ public class MultiVideoCallActivity extends BaseCallActivity {
         bottomButtonContainer.addView(bottomButtonLayout);
         topContainer.setVisibility(View.VISIBLE);
         minimizeButton.setVisibility(View.VISIBLE);
-        userPortrait.setVisibility(View.GONE);
         addButton.setVisibility(View.VISIBLE);
         switchCameraButton.setVisibility(View.VISIBLE);
         waitingContainer.setVisibility(View.GONE);
@@ -487,7 +484,6 @@ public class MultiVideoCallActivity extends BaseCallActivity {
         bottomButtonContainer = (LinearLayout) findViewById(R.id.rc_bottom_button_container);
         participantPortraitContainer = (LinearLayout) findViewById(R.id.rc_participant_portait_container);
         minimizeButton = (ImageView) findViewById(R.id.rc_voip_call_minimize);
-        userPortrait = (AsyncImageView) findViewById(R.id.rc_voip_user_portrait);
         addButton = (ImageView) findViewById(R.id.rc_voip_call_add);
         switchCameraButton = (ImageView) findViewById(R.id.rc_voip_switch_camera);
 
@@ -526,15 +522,12 @@ public class MultiVideoCallActivity extends BaseCallActivity {
                 userNameView.setTag(callSession.getInviterUserId() + "name");
                 if (userInfo != null) {
                     userNameView.setText(userInfo.getName());
-                    if (userInfo.getPortraitUri() != null) {
-                        userPortrait.setAvatar(userInfo.getPortraitUri());
-                    }
                 } else {
                     userNameView.setText(callSession.getInviterUserId());
                 }
                 List<CallUserProfile> list = callSession.getParticipantProfileList();
                 for (CallUserProfile profile : list) {
-//                    if (!profile.getUserId().equals(callSession.getSelfUserId()))
+                    if (!profile.getUserId().equals(callSession.getSelfUserId()))
                         invitedList.add(profile.getUserId());
                 }
 
@@ -728,9 +721,7 @@ public class MultiVideoCallActivity extends BaseCallActivity {
         FrameLayout layout = (FrameLayout) view;
         SurfaceView fromView = (SurfaceView) layout.getChildAt(0);
         SurfaceView toView = localView;
-        if (fromView == null || toView == null){
-            return;
-        }
+
         localViewContainer.removeAllViews();
         layout.removeAllViews();
 

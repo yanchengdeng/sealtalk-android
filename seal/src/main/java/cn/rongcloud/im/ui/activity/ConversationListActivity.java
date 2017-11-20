@@ -3,18 +3,12 @@ package cn.rongcloud.im.ui.activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import cn.rongcloud.im.SealUserInfoManager;
-import cn.rongcloud.im.server.utils.NLog;
 import cn.rongcloud.im.ui.widget.LoadingDialog;
 import io.rong.imkit.RongIM;
 import io.rong.imlib.RongIMClient;
-import io.rong.push.RongPushClient;
 
 /**
  * Created by Bob on 15/11/3.
@@ -33,38 +27,12 @@ public class ConversationListActivity extends BaseActivity {
         sp = getSharedPreferences("config", MODE_PRIVATE);
         mDialog = new LoadingDialog(this);
         Intent intent = getIntent();
-        NLog.d(TAG, "intent:", getIntent());
+
         //push
-        if (intent.getData().getScheme().equals("rong") && intent.getData().getQueryParameter("isFromPush") != null) {
+        if (intent.getData().getScheme().equals("rong") && intent.getData().getQueryParameter("push") != null) {
 
             //通过intent.getData().getQueryParameter("push") 为true，判断是否是push消息
-            if (intent.getData().getQueryParameter("isFromPush").equals("true")) {
-                String options = getIntent().getStringExtra("options");
-                if(options != null) {
-                    NLog.d(TAG, "options:", options);
-                    try {
-                        JSONObject jsonObject = new JSONObject(options);
-                        if (jsonObject.has("appData")) {
-                            NLog.d(TAG, "pushData:", jsonObject.getString("appData"));
-                        }
-                        if (jsonObject.has("rc")) {
-                            JSONObject rc = jsonObject.getJSONObject("rc");
-                            NLog.d(TAG, "rc:", rc);
-                            String targetId = rc.getString("tId");
-                            String pushId = rc.getString("id");
-                            if (!TextUtils.isEmpty(pushId)) {
-                                RongPushClient.recordNotificationEvent(pushId);
-                                NLog.d(TAG, "pushId:", pushId);
-                            }
-                            if (rc.has("ext") && rc.getJSONObject("ext") != null) {
-                                String ext = rc.getJSONObject("ext").toString();
-                                NLog.d(TAG, "ext:", ext);
-                            }
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
+            if (intent.getData().getQueryParameter("push").equals("true")) {
                 enterActivity();
             }
 

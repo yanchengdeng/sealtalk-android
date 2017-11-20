@@ -23,7 +23,6 @@ import io.rong.common.RLog;
 import io.rong.imkit.RongContext;
 import io.rong.imkit.RongIM;
 import io.rong.imkit.utilities.PermissionCheckUtil;
-import io.rong.imkit.widget.AsyncImageView;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.Discussion;
@@ -144,15 +143,11 @@ public class MultiAudioCallActivity extends BaseCallActivity {
         if (callAction.equals(RongCallAction.ACTION_INCOMING_CALL)) {
             callSession = intent.getParcelableExtra("callSession");
             TextView name = (TextView) incomingLayout.findViewById(R.id.rc_user_name);
-            AsyncImageView userPortrait = (AsyncImageView) incomingLayout.findViewById(R.id.rc_voip_user_portrait);
             UserInfo userInfo = RongContext.getInstance().getUserInfoFromCache(callSession.getCallerUserId());
             if (userInfo != null && userInfo.getName() != null)
                 name.setText(userInfo.getName());
             else
                 name.setText(callSession.getCallerUserId());
-            if (userInfo != null && userInfo.getPortraitUri() != null)
-                userPortrait.setAvatar(userInfo.getPortraitUri());
-
             name.setTag(callSession.getCallerUserId() + "callerName");
             audioContainer.addView(incomingLayout);
             memberContainer = (CallUserGridView) audioContainer.findViewById(R.id.rc_voip_members_container);

@@ -120,7 +120,7 @@
     <string name="rc_saturday_format">周六</string>
     <string name="rc_sunsay_format">周日</string>
     <string name="rc_daybreak_format">凌晨</string>
-    <string name="rc_morning_format">上午</string>
+    <string name="rc_morning_format">早上</string>
     <string name="rc_noon_format">中午</string>
     <string name="rc_afternoon_format">下午</string>
     <string name="rc_night_format">晚上</string>
@@ -176,7 +176,7 @@
     <string name="rc_ac_file_send_preview">发文件</string>
     <string name="rc_ad_send_file_no_select_file">发送</string>
     <string name="rc_ad_send_file_select_file">发送(%1$s/20)</string>
-    <string name="rc_fr_no_file_message">没有%1$s文件</string>
+    <string name="rc_fr_no_file_message">还没有%1$s文件</string>
     <string name="rc_fr_loading_file_message">加载中...</string>
     <string name="rc_fr_file_category_title_text">文本</string>
     <string name="rc_fr_file_category_title_video">视频</string>

@@ -31,7 +31,7 @@ import io.rong.imlib.model.UserInfo;
  * Created by Beyond on 2016/12/5.
  */
 
-@ProviderTag(messageContent = ContactMessage.class, showProgress = false, showReadState = true)
+@ProviderTag(messageContent = ContactMessage.class, showProgress = false, showReadState = true, showSummaryWithName = false)
 public class ContactMessageItemProvider extends IContainerItemProvider.MessageProvider<ContactMessage> {
     private final static String TAG = "ContactMessageItemProvider";
     private IContactCardClickListener iContactCardClickListener;
