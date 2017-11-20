@@ -52,7 +52,8 @@
         <!--钱包 配置开始-->
         <activity
             android:name="com.jrmf360.rylib.wallet.ui.MyWalletActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:launchMode="singleTask"/>
         <activity
             android:name="com.jrmf360.rylib.wallet.ui.AccountInfoActivity"
             android:screenOrientation="portrait"/>

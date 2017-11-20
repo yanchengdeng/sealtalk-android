@@ -166,6 +166,9 @@
 -keep class com.jrmf360.rylib.rp.widget.**{*;}
 
 -keep class com.jrmf360.rylib.JrmfClient{*;}
+-keep class com.jrmf360.rylib.JrmfClient$* {
+    *;
+}
 
 #钱包
 -keepclassmembers class com.jrmf360.rylib.wallet.fragment.*{
