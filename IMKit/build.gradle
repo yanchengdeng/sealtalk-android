@@ -7,7 +7,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 23
         versionCode 2017121811
-        versionName "2.8.22 Stable"
+        versionName "2.8.23 Stable"
     }
     buildTypes {
         release {
