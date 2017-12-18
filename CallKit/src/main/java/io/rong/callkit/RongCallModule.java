@@ -38,6 +38,8 @@ public class RongCallModule implements IExternalModule {
     @Override
     public void onConnected(String token) {
         RongCallClient.getInstance().setVoIPCallListener(RongCallProxy.getInstance());
+        // 开启音视频日志，如果不需要开启，则去掉下面这句。
+        RongCallClient.getInstance().setEnablePrintLog(true);
     }
 
     @Override

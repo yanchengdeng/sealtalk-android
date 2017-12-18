@@ -191,7 +191,7 @@ public class CallSelectMemberActivity extends Activity {
                     holder.checkbox.setImageResource(R.drawable.rc_voip_checkbox);
                     holder.checkbox.setSelected(false);
                 }
-                holder.checkbox.setClickable(true);
+                holder.checkbox.setClickable(false);
                 holder.checkbox.setEnabled(true);
             }
 

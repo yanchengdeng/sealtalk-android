@@ -23,4 +23,20 @@
         <!--<item>group</item>-->
     <!--</string-array>-->
 
+    <!--自定义配置重连间隔-->
+    <!--SDK 会自动启动重连机制进行10次重连(根据配置的数量)，分别是1, 2, 4, 8, 16, 32, 64, 128, 256, 512秒后-->
+    <!--轮询一遍后，再从 1 秒开始-->
+    <integer-array name="rc_reconnect_interval">
+        <item>1</item>
+        <item>2</item>
+        <item>4</item>
+        <item>8</item>
+        <item>16</item>
+        <item>32</item>
+        <item>64</item>
+        <item>128</item>
+        <item>256</item>
+        <item>512</item>
+    </integer-array>
+
 </resources>

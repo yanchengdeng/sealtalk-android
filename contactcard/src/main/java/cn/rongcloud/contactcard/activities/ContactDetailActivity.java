@@ -24,6 +24,7 @@ import java.util.List;
 
 import cn.rongcloud.contactcard.R;
 import cn.rongcloud.contactcard.message.ContactMessage;
+import io.rong.eventbus.EventBus;
 import io.rong.imkit.RongContext;
 import io.rong.imkit.RongIM;
 import io.rong.imkit.emoticon.AndroidEmoji;
@@ -67,8 +68,15 @@ public class ContactDetailActivity extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.rc_ac_contact_detail);
         getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        EventBus.getDefault().register(this);
         initView();
         initData();
+    }
+
+    @Override
+    protected void onDestroy() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
     }
 
     private void initView() {
@@ -94,25 +102,11 @@ public class ContactDetailActivity extends Activity {
         switch (mConversationType) {
             case PRIVATE:
                 UserInfo mine = RongUserInfoManager.getInstance().getUserInfo(mTargetId);
-                if (mine == null) {
-                    finish();
-                    return;
-                }
-                if (mine.getPortraitUri() != null)
-                    mTargetPortrait.setAvatar(mine.getPortraitUri());
-                if (mine.getName() != null)
-                    mTargetName.setText(mine.getName());
+                onEventMainThread(mine);
                 break;
             case GROUP:
                 final Group group = RongUserInfoManager.getInstance().getGroupInfo(mTargetId);
-                if (group == null) {
-                    finish();
-                    return;
-                }
-                if (group.getPortraitUri() != null)
-                    mTargetPortrait.setAvatar(group.getPortraitUri());
-                if (group.getName() != null)
-                    mTargetName.setText(group.getName());
+                onEventMainThread(group);
 
                 RongIM.IGroupMembersProvider groupMembersProvider = RongMentionManager.getInstance().getGroupMembersProvider();
                 if (groupMembersProvider != null) {
@@ -250,6 +244,24 @@ public class ContactDetailActivity extends Activity {
         });
     }
 
+    public void onEventMainThread(UserInfo mine) {
+        if (mine != null) {
+            if (mine.getPortraitUri() != null)
+                mTargetPortrait.setAvatar(mine.getPortraitUri());
+            if (mine.getName() != null)
+                mTargetName.setText(mine.getName());
+        }
+    }
+
+    public void onEventMainThread(Group group) {
+        if (group != null) {
+            if (group.getPortraitUri() != null)
+                mTargetPortrait.setAvatar(group.getPortraitUri());
+            if (group.getName() != null)
+                mTargetName.setText(group.getName());
+        }
+    }
+
     private static class GridAdapter extends BaseAdapter {
 
         private List<UserInfo> list;
@@ -310,5 +322,6 @@ public class ContactDetailActivity extends Activity {
 
     @Override
     public void onBackPressed() {
+
     }
 }

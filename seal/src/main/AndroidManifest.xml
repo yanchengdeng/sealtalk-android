@@ -454,14 +454,14 @@
         <!-- HMS 配置结束-->
 
         <!-- GCM 配置 < -->
-        <receiver
+        <!--<receiver
             android:name="com.google.android.gms.gcm.GcmReceiver"
             android:exported="true"
             android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <category android:name="cn.rongcloud.im" />
-                <!-- 替换为自己的packagename < -->
+                &lt;!&ndash; 替换为自己的packagename < &ndash;&gt;
             </intent-filter>
         </receiver>
 
@@ -478,8 +478,29 @@
             <intent-filter>
                 <action android:name="com.google.android.gms.iid.InstanceID" />
             </intent-filter>
-        </service>
+        </service>-->
         <!-- GCM 配置结束 < -->
+
+        <!-- [START firebase_service] -->
+        <service
+            android:name="io.rong.push.platform.RongFirebaseMessagingService"
+            android:stopWithTask="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+        <!-- [END firebase_service] -->
+        <!-- [START firebase_iid_service] -->
+        <service
+            android:name="io.rong.push.platform.RongFirebaseInstanceIDService"
+            android:stopWithTask="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </service>
+        <!-- [END firebase_iid_service] -->
+
+
 
         <!--第三方推送的权限 广播 服务 配置结束-->
 

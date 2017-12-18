@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
@@ -49,10 +50,13 @@ public class MultiVideoCallActivity extends BaseCallActivity {
     LinearLayout waitingContainer;
     LinearLayout bottomButtonContainer;
     LinearLayout participantPortraitContainer;
+    LinearLayout portraitContainer1;
+    LinearLayout portraitContainer2;
     LayoutInflater inflater;
     ImageView minimizeButton;
     ImageView addButton;
     ImageView switchCameraButton;
+    AsyncImageView userPortrait;
 
     int remoteUserViewWidth;
 
@@ -251,6 +255,20 @@ public class MultiVideoCallActivity extends BaseCallActivity {
 
     @Override
     public void onRemoteUserLeft(String userId, RongCallCommon.CallDisconnectedReason reason) {
+        // incomming state
+        if (participantPortraitContainer != null && participantPortraitContainer.getVisibility() == View.VISIBLE) {
+            View participantView = participantPortraitContainer.findViewWithTag(userId + "participantPortraitView");
+            if (participantView == null) return;
+            LinearLayout portraitContainer = (LinearLayout) participantView.getParent();
+            portraitContainer.removeView(participantView);
+            if (portraitContainer.equals(portraitContainer2)) {
+                if (portraitContainer1.getChildCount() > 0) {
+                    View childPortraitView = portraitContainer1.getChildAt(0);
+                    portraitContainer1.removeView(childPortraitView);
+                    portraitContainer2.addView(childPortraitView);
+                }
+            }
+        }
         //incoming状态，localViewUserId为空
         if (localViewUserId == null)
             return;
@@ -274,8 +292,7 @@ public class MultiVideoCallActivity extends BaseCallActivity {
 
         View singleRemoteView = remoteViewContainer.findViewWithTag(userId + "view");
 
-        if (singleRemoteView == null)
-            return;
+        if (singleRemoteView == null) return;
 
         LinearLayout container = (LinearLayout) singleRemoteView.getParent();
         container.removeView(singleRemoteView);
@@ -338,6 +355,7 @@ public class MultiVideoCallActivity extends BaseCallActivity {
         bottomButtonContainer.addView(bottomButtonLayout);
         topContainer.setVisibility(View.VISIBLE);
         minimizeButton.setVisibility(View.VISIBLE);
+        userPortrait.setVisibility(View.GONE);
         addButton.setVisibility(View.VISIBLE);
         switchCameraButton.setVisibility(View.VISIBLE);
         waitingContainer.setVisibility(View.GONE);
@@ -484,6 +502,7 @@ public class MultiVideoCallActivity extends BaseCallActivity {
         bottomButtonContainer = (LinearLayout) findViewById(R.id.rc_bottom_button_container);
         participantPortraitContainer = (LinearLayout) findViewById(R.id.rc_participant_portait_container);
         minimizeButton = (ImageView) findViewById(R.id.rc_voip_call_minimize);
+        userPortrait = (AsyncImageView) findViewById(R.id.rc_voip_user_portrait);
         addButton = (ImageView) findViewById(R.id.rc_voip_call_add);
         switchCameraButton = (ImageView) findViewById(R.id.rc_voip_switch_camera);
 
@@ -522,13 +541,16 @@ public class MultiVideoCallActivity extends BaseCallActivity {
                 userNameView.setTag(callSession.getInviterUserId() + "name");
                 if (userInfo != null) {
                     userNameView.setText(userInfo.getName());
+                    if (userInfo.getPortraitUri() != null) {
+                        userPortrait.setAvatar(userInfo.getPortraitUri());
+                    }
                 } else {
                     userNameView.setText(callSession.getInviterUserId());
                 }
                 List<CallUserProfile> list = callSession.getParticipantProfileList();
                 for (CallUserProfile profile : list) {
-                    if (!profile.getUserId().equals(callSession.getSelfUserId()))
-                        invitedList.add(profile.getUserId());
+//                    if (!profile.getUserId().equals(callSession.getSelfUserId()))
+                    invitedList.add(profile.getUserId());
                 }
 
                 FrameLayout bottomButtonLayout = (FrameLayout) inflater.inflate(R.layout.rc_voip_call_bottom_incoming_button_layout, null);
@@ -545,16 +567,16 @@ public class MultiVideoCallActivity extends BaseCallActivity {
                         portraitView.setAvatar(userInfo.getPortraitUri().toString(), R.drawable.rc_default_portrait);
                     }
 
-                    LinearLayout portraitContainer1 = (LinearLayout) participantPortraitContainer.findViewById(R.id.rc_participant_portait_container_1);
-                    LinearLayout portraitContainer2 = (LinearLayout) participantPortraitContainer.findViewById(R.id.rc_participant_portait_container_2);
+                    portraitContainer1 = (LinearLayout) participantPortraitContainer.findViewById(R.id.rc_participant_portait_container_1);
+                    portraitContainer2 = (LinearLayout) participantPortraitContainer.findViewById(R.id.rc_participant_portait_container_2);
                     LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                     params.setMargins(10, 0, 0, 0);
                     if (i < 4) {
                         portraitContainer1.addView(userPortraitView, params);
-                        portraitContainer1.setTag(invitedList.get(i) + "participantPortraitView");
+                        userPortraitView.setTag(invitedList.get(i) + "participantPortraitView");
                     } else {
                         portraitContainer2.addView(userPortraitView, params);
-                        portraitContainer2.setTag(invitedList.get(i) + "participantPortraitView");
+                        userPortraitView.setTag(invitedList.get(i) + "participantPortraitView");
                     }
                 }
             }
@@ -721,7 +743,9 @@ public class MultiVideoCallActivity extends BaseCallActivity {
         FrameLayout layout = (FrameLayout) view;
         SurfaceView fromView = (SurfaceView) layout.getChildAt(0);
         SurfaceView toView = localView;
-
+        if (fromView == null || toView == null) {
+            return;
+        }
         localViewContainer.removeAllViews();
         layout.removeAllViews();
 

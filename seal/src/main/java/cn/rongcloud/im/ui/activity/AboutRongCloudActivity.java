@@ -98,10 +98,10 @@ public class AboutRongCloudActivity extends BaseActivity {
                         public void onClick(View v) {
                             NToast.shortToast(mContext, getString(R.string.downloading_apk));
                             UpdateService.Builder.create(url)
-                            .setStoreDir("update/flag")
-                            .setDownloadSuccessNotificationFlag(Notification.DEFAULT_ALL)
-                            .setDownloadErrorNotificationFlag(Notification.DEFAULT_ALL)
-                            .build(mContext);
+                                    .setStoreDir("update/flag")
+                                    .setDownloadSuccessNotificationFlag(Notification.DEFAULT_ALL)
+                                    .setDownloadErrorNotificationFlag(Notification.DEFAULT_ALL)
+                                    .build(mContext);
                             dlg.cancel();
                         }
                     });

@@ -75,7 +75,7 @@ public class App extends MultiDexApplication {
             RongPushClient.registerHWPush(this);
             RongPushClient.registerMiPush(this, "2882303761517473625", "5451747338625");
             try {
-                RongPushClient.registerGCM(this);
+                RongPushClient.registerFCM(this);
             } catch (RongException e) {
                 e.printStackTrace();
             }
