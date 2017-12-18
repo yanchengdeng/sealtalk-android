@@ -106,6 +106,7 @@ public class ContactDetailActivity extends Activity {
                 break;
             case GROUP:
                 final Group group = RongUserInfoManager.getInstance().getGroupInfo(mTargetId);
+                if(group == null) return;
                 onEventMainThread(group);
 
                 RongIM.IGroupMembersProvider groupMembersProvider = RongMentionManager.getInstance().getGroupMembersProvider();
