@@ -3,6 +3,10 @@ package cn.rongcloud.im.ui.fragment;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ListView;
 
 import org.json.JSONObject;
 
@@ -12,6 +16,7 @@ import cn.rongcloud.im.SealCSEvaluateInfo;
 import cn.rongcloud.im.model.SealCSEvaluateItem;
 import cn.rongcloud.im.ui.activity.ReadReceiptDetailActivity;
 import cn.rongcloud.im.ui.widget.BottomEvaluateDialog;
+import io.rong.imkit.RongExtension;
 import io.rong.imkit.fragment.ConversationFragment;
 import io.rong.imlib.CustomServiceConfig;
 import io.rong.imlib.RongIMClient;
@@ -25,10 +30,12 @@ import io.rong.imlib.model.Conversation;
  * 如果不需要重写 onResendItemClick 和 onReadReceiptStateClick ,可以不必定义此类,直接集成 ConversationFragment 就可以了
  */
 public class ConversationFragmentEx extends ConversationFragment {
-    OnShowAnnounceListener onShowAnnounceListener;
+    private OnShowAnnounceListener onShowAnnounceListener;
     private BottomEvaluateDialog dialog;
     private List<SealCSEvaluateItem> mEvaluateList;
     private String mTargetId = "";
+    private RongExtension rongExtension;
+    private ListView listView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,6 +48,15 @@ public class ConversationFragmentEx extends ConversationFragment {
                 mEvaluateList = sealCSEvaluateInfo.getSealCSEvaluateInfoList();
             }
         });
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View v = super.onCreateView(inflater, container, savedInstanceState);
+        rongExtension = (RongExtension) v.findViewById(io.rong.imkit.R.id.rc_extension);
+        View messageListView = findViewById(v, io.rong.imkit.R.id.rc_layout_msg_list);
+        listView = findViewById(messageListView, io.rong.imkit.R.id.rc_list);
+        return v;
     }
 
     @Override
@@ -68,9 +84,9 @@ public class ConversationFragmentEx extends ConversationFragment {
     }
 
     @Override
-    public void onShowAnnounceView(String announceMsg, String annouceUrl) {
+    public void onShowAnnounceView(String announceMsg, String announceUrl) {
         if (onShowAnnounceListener != null) {
-            onShowAnnounceListener.onShowAnnounceView(announceMsg, annouceUrl);
+            onShowAnnounceListener.onShowAnnounceView(announceMsg, announceUrl);
         }
     }
 
@@ -128,6 +144,32 @@ public class ConversationFragmentEx extends ConversationFragment {
         super.onPause();
         if (getActivity() != null && getActivity().isFinishing()) {
             RongIMClient.getInstance().setCustomServiceHumanEvaluateListener(null);
+        }
+    }
+
+    @Override
+    public void onPluginToggleClick(View v, ViewGroup extensionBoard) {
+        if (!rongExtension.isExtensionExpanded()) {
+            listView.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    listView.requestFocusFromTouch();
+                    listView.setSelection(listView.getCount() - listView.getFooterViewsCount() - listView.getHeaderViewsCount());
+                }
+            }, 100);
+        }
+    }
+
+    @Override
+    public void onEmoticonToggleClick(View v, ViewGroup extensionBoard) {
+        if (!rongExtension.isExtensionExpanded()) {
+            listView.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    listView.requestFocusFromTouch();
+                    listView.setSelection(listView.getCount() - listView.getFooterViewsCount() - listView.getHeaderViewsCount());
+                }
+            }, 100);
         }
     }
 }

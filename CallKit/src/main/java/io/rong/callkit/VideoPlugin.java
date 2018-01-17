@@ -93,6 +93,7 @@ public class VideoPlugin implements IPluginModule {
                     ArrayList<String> invited = new ArrayList<>();
                     invited.add(myId);
                     intent.putStringArrayListExtra("invitedMembers", invited);
+                    intent.putExtra("conversationType", conversationType.getValue());
                     intent.putExtra("mediaType", RongCallCommon.CallMediaType.VIDEO.getValue());
                     extension.startActivityForPluginResult(intent, 110, VideoPlugin.this);
                 }
@@ -109,6 +110,7 @@ public class VideoPlugin implements IPluginModule {
             invited.add(myId);
             intent.putStringArrayListExtra("invitedMembers", invited);
             intent.putExtra("groupId", targetId);
+            intent.putExtra("conversationType", conversationType.getValue());
             intent.putExtra("mediaType", RongCallCommon.CallMediaType.VIDEO.getValue());
             extension.startActivityForPluginResult(intent, 110, this);
         }

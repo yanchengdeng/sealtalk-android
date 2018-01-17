@@ -54,7 +54,7 @@
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <service
-            android:name=".core.MessageHandleService"
+            android:name="io.rong.push.core.MessageHandleService"
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />
         <!-- push服务 -->

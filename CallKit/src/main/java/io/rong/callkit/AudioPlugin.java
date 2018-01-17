@@ -88,6 +88,7 @@ public class AudioPlugin implements IPluginModule {
                     Intent intent = new Intent(context, CallSelectMemberActivity.class);
                     allMembers = (ArrayList<String>) discussion.getMemberIdList();
                     intent.putStringArrayListExtra("allMembers", allMembers);
+                    intent.putExtra("conversationType", conversationType.getValue());
                     String myId = RongIMClient.getInstance().getCurrentUserId();
                     ArrayList<String> invited = new ArrayList<>();
                     invited.add(myId);
@@ -107,6 +108,7 @@ public class AudioPlugin implements IPluginModule {
             ArrayList<String> invited = new ArrayList<>();
             invited.add(myId);
             intent.putStringArrayListExtra("invitedMembers", invited);
+            intent.putExtra("conversationType", conversationType.getValue());
             intent.putExtra("groupId", targetId);
             intent.putExtra("mediaType", RongCallCommon.CallMediaType.AUDIO.getValue());
             extension.startActivityForPluginResult(intent, 110, this);
