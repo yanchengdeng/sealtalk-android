@@ -334,4 +334,14 @@
     <string name="seal_set_push_language">Set Push Language CN</string>
     <string name="seal_set_push_detail">Show Push Detail</string>
     <string name="seal_set_push_receive">Receive Push</string>
+    <string name="cs_evaluation">Evaluation</string>
+    <string name="cs_submit_evaluation">Submit</string>
+    <string name="cs_evaluate_resolved_title">Have your problem been resolved</string>
+    <string name="cs_evaluate_resolved">Resolved</string>
+    <string name="cs_evaluate_unresolved">Unresolved</string>
+    <string name="cs_evaluate_star_title">Please evaluate for the service</string>
+    <string name="cs_evaluate_problem_title">Problems to be improved</string>
+    <string name="cs_evaluate_tag_must">Tags are necessary</string>
+    <string name="cs_evaluate_input_must">Suggestions are necessary </string>
+    <string name="cs_evaluate_select_must">Necessary</string>
 </resources>

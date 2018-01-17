@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import cn.rongcloud.im.App;
 import cn.rongcloud.im.R;
@@ -246,7 +247,7 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
         }
 
         Intent intent = new Intent(RongVoIPIntent.RONG_INTENT_ACTION_VOIP_SINGLEAUDIO);
-        intent.putExtra("conversationType", Conversation.ConversationType.PRIVATE.getName().toLowerCase());
+        intent.putExtra("conversationType", Conversation.ConversationType.PRIVATE.getName().toLowerCase(Locale.US));
         intent.putExtra("targetId", mFriend.getUserId());
         intent.putExtra("callAction", RongCallAction.ACTION_OUTGOING_CALL.getName());
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -272,7 +273,7 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
             return;
         }
         Intent intent = new Intent(RongVoIPIntent.RONG_INTENT_ACTION_VOIP_SINGLEVIDEO);
-        intent.putExtra("conversationType", Conversation.ConversationType.PRIVATE.getName().toLowerCase());
+        intent.putExtra("conversationType", Conversation.ConversationType.PRIVATE.getName().toLowerCase(Locale.US));
         intent.putExtra("targetId", mFriend.getUserId());
         intent.putExtra("callAction", RongCallAction.ACTION_OUTGOING_CALL.getName());
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

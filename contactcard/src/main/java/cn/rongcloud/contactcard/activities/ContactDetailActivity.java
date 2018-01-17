@@ -59,6 +59,7 @@ public class ContactDetailActivity extends Activity {
     private Conversation.ConversationType mConversationType;
     private String mTargetId;
     private UserInfo mContactFriend;
+    private Group group;
     private List<UserInfo> mGroupMember;
     private boolean mGroupMemberShown = false;
 
@@ -105,8 +106,7 @@ public class ContactDetailActivity extends Activity {
                 onEventMainThread(mine);
                 break;
             case GROUP:
-                final Group group = RongUserInfoManager.getInstance().getGroupInfo(mTargetId);
-                if(group == null) return;
+                group = RongUserInfoManager.getInstance().getGroupInfo(mTargetId);
                 onEventMainThread(group);
 
                 RongIM.IGroupMembersProvider groupMembersProvider = RongMentionManager.getInstance().getGroupMembersProvider();
@@ -116,7 +116,10 @@ public class ContactDetailActivity extends Activity {
                         public void onGetGroupMembersResult(final List<UserInfo> members) {
                             mGroupMember = members;
                             if (mGroupMember != null) {
-                                mTargetName.setText(group.getName() + "(" + mGroupMember.size() + getString(R.string.rc_contact_group_member_count_unit) + ")");
+                                if (group != null) {
+                                    mTargetName.setText(String.format(getResources().getString(R.string.rc_contact_group_member_count),
+                                            group.getName(), mGroupMember.size()));
+                                }
                                 mGridView.setAdapter(new GridAdapter(ContactDetailActivity.this, mGroupMember));
                             }
                         }
@@ -256,10 +259,17 @@ public class ContactDetailActivity extends Activity {
 
     public void onEventMainThread(Group group) {
         if (group != null) {
+            this.group = group;
             if (group.getPortraitUri() != null)
                 mTargetPortrait.setAvatar(group.getPortraitUri());
-            if (group.getName() != null)
-                mTargetName.setText(group.getName());
+            if (group.getName() != null) {
+                if (mGroupMember != null && mGroupMember.size() > 0) {
+                    mTargetName.setText(String.format(getResources().getString(R.string.rc_contact_group_member_count),
+                            group.getName(), mGroupMember.size()));
+                } else {
+                    mTargetName.setText(group.getName());
+                }
+            }
         }
     }
 

@@ -65,6 +65,8 @@ public class CallFloatBoxView {
         int type;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && Build.VERSION.SDK_INT < 24) {
             type = WindowManager.LayoutParams.TYPE_TOAST;
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
         } else {
             type = WindowManager.LayoutParams.TYPE_PHONE;
         }

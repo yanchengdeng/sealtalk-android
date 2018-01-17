@@ -11,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 import io.rong.calllib.RongCallClient;
 import io.rong.calllib.RongCallCommon;
@@ -74,7 +75,7 @@ public class VideoPlugin implements IPluginModule {
         }
         if (conversationType.equals(Conversation.ConversationType.PRIVATE)) {
             Intent intent = new Intent(RongVoIPIntent.RONG_INTENT_ACTION_VOIP_SINGLEVIDEO);
-            intent.putExtra("conversationType", conversationType.getName().toLowerCase());
+            intent.putExtra("conversationType", conversationType.getName().toLowerCase(Locale.US));
             intent.putExtra("targetId", targetId);
             intent.putExtra("callAction", RongCallAction.ACTION_OUTGOING_CALL.getName());
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -122,7 +123,7 @@ public class VideoPlugin implements IPluginModule {
         Intent intent = new Intent(RongVoIPIntent.RONG_INTENT_ACTION_VOIP_MULTIVIDEO);
         ArrayList<String> userIds = data.getStringArrayListExtra("invited");
         userIds.add(RongIMClient.getInstance().getCurrentUserId());
-        intent.putExtra("conversationType", conversationType.getName().toLowerCase());
+        intent.putExtra("conversationType", conversationType.getName().toLowerCase(Locale.US));
         intent.putExtra("targetId", targetId);
         intent.putExtra("callAction", RongCallAction.ACTION_OUTGOING_CALL.getName());
         intent.putStringArrayListExtra("invitedUsers", userIds);
