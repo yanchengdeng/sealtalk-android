@@ -125,7 +125,7 @@ public class AboutRongCloudActivity extends BaseActivity {
                             public void executeEvent() {
                                 SharedPreferences.Editor editor = getSharedPreferences("config", MODE_PRIVATE).edit();
                                 editor.putBoolean("isDebug", true);
-                                editor.apply();
+                                editor.commit();
                                 BroadcastManager.getInstance(mContext).sendBroadcast(SealConst.EXIT);
 
                             }
@@ -155,7 +155,7 @@ public class AboutRongCloudActivity extends BaseActivity {
                         public void executeEvent() {
                             SharedPreferences.Editor editor = getSharedPreferences("config", MODE_PRIVATE).edit();
                             editor.putBoolean("isDebug", false);
-                            editor.apply();
+                            editor.commit();
                             BroadcastManager.getInstance(mContext).sendBroadcast(SealConst.EXIT);
 
                         }

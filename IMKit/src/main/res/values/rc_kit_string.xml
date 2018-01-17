@@ -170,7 +170,7 @@
     <string name="rc_ad_file_size">大小:%1$s</string>
     <string name="rc_ac_file_download_btn">开始下载</string>
     <string name="rc_ac_file_download_progress_tv">正在下载...(%1$s/%2$s)</string>
-    <string name="rc_ac_file_download_open_file_btn">用其他应用打开</string>
+    <string name="rc_ac_file_download_open_file_btn">打开文件</string>
     <string name="rc_ac_file_send_preview">发文件</string>
     <string name="rc_ad_send_file_no_select_file">发送</string>
     <string name="rc_ad_send_file_select_file">发送(%1$s/20)</string>

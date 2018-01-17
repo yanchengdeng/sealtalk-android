@@ -125,3 +125,4 @@ public <methods>;
 -keep class com.melink.bqmmplugin.rc.bqmmsdk.widget.BQMMMessageText{
 public *;
 }
+-keep class com.melink.bqmmplugin.rc.** {*;}

@@ -356,7 +356,7 @@ public class SealUserInfoManager implements OnDataListener {
     private void setGetAllUserInfoDone() {
         RLog.d(TAG, "SealUserInfoManager setGetAllUserInfoDone = " + mGetAllUserInfoState);
         doingGetAllUserInfo = false;
-        sp.edit().putInt("getAllUserInfoState", mGetAllUserInfoState).apply();
+        sp.edit().putInt("getAllUserInfoState", mGetAllUserInfoState).commit();
     }
 
     private boolean fetchFriends() throws HttpException {
@@ -458,7 +458,7 @@ public class SealUserInfoManager implements OnDataListener {
                     e.printStackTrace();
                     NLog.d(TAG, "fetchGroups occurs JSONException e=" + e.toString() + "groupID=" + groupID);
                 }
-                sp.edit().putInt("getAllUserInfoState", mGetAllUserInfoState).apply();
+                sp.edit().putInt("getAllUserInfoState", mGetAllUserInfoState).commit();
             }
         });
     }
@@ -571,7 +571,7 @@ public class SealUserInfoManager implements OnDataListener {
                     } catch (HttpException e) {
                         e.printStackTrace();
                         setGetAllUserInfoWithPartGroupMembersState();
-                        sp.edit().putInt("getAllUserInfoState", mGetAllUserInfoState).apply();
+                        sp.edit().putInt("getAllUserInfoState", mGetAllUserInfoState).commit();
                         NLog.d(TAG, "getGroupMember occurs HttpException e=" + e.toString() + "groupID=" + groupID);
                         return;
                     } catch (JSONException e) {
@@ -587,7 +587,7 @@ public class SealUserInfoManager implements OnDataListener {
                         }
                     } else {
                         setGetAllUserInfoWithPartGroupMembersState();
-                        sp.edit().putInt("getAllUserInfoState", mGetAllUserInfoState).apply();
+                        sp.edit().putInt("getAllUserInfoState", mGetAllUserInfoState).commit();
                     }
                 } else {
                     if (hasGetPartGroupMembers()) {
@@ -598,10 +598,10 @@ public class SealUserInfoManager implements OnDataListener {
                     }
                     try {
                         fetchGroupMembers();
-                        sp.edit().putInt("getAllUserInfoState", mGetAllUserInfoState).apply();
+                        sp.edit().putInt("getAllUserInfoState", mGetAllUserInfoState).commit();
                     } catch (HttpException e) {
                         setGetAllUserInfoWithPartGroupMembersState();
-                        sp.edit().putInt("getAllUserInfoState", mGetAllUserInfoState).apply();
+                        sp.edit().putInt("getAllUserInfoState", mGetAllUserInfoState).commit();
                         NLog.d(TAG, "getGroupMember occurs HttpException e=" + e.toString() + "groupID=" + groupID);
                         return;
                     }
@@ -965,7 +965,7 @@ public class SealUserInfoManager implements OnDataListener {
                     }
                     try {
                         friendsList = pullFriends();
-                        sp.edit().putInt("getAllUserInfoState", mGetAllUserInfoState).apply();
+                        sp.edit().putInt("getAllUserInfoState", mGetAllUserInfoState).commit();
                     } catch (HttpException e) {
                         onCallBackFail(callback);
                         NLog.d(TAG, "getFriends occurs HttpException e=" + e.toString() + "mGetAllUserInfoState=" + mGetAllUserInfoState);
@@ -989,7 +989,7 @@ public class SealUserInfoManager implements OnDataListener {
             }
             try {
                 friendsList = pullFriends();
-                sp.edit().putInt("getAllUserInfoState", mGetAllUserInfoState).apply();
+                sp.edit().putInt("getAllUserInfoState", mGetAllUserInfoState).commit();
             } catch (HttpException e) {
                 NLog.d(TAG, "getFriends occurs HttpException e=" + e.toString() + "mGetAllUserInfoState=" + mGetAllUserInfoState);
             }
@@ -1028,7 +1028,7 @@ public class SealUserInfoManager implements OnDataListener {
                     }
                     try {
                         groupsList = pullGroups();
-                        sp.edit().putInt("getAllUserInfoState", mGetAllUserInfoState).apply();
+                        sp.edit().putInt("getAllUserInfoState", mGetAllUserInfoState).commit();
                     } catch (HttpException e) {
                         onCallBackFail(callback);
                         NLog.d(TAG, "getGroups occurs HttpException e=" + e.toString() + "mGetAllUserInfoState=" + mGetAllUserInfoState);
@@ -1105,7 +1105,7 @@ public class SealUserInfoManager implements OnDataListener {
                         }
                         try {
                             groupMembersList = pullGroupMembers(groupID);
-                            sp.edit().putInt("getAllUserInfoState", mGetAllUserInfoState).apply();
+                            sp.edit().putInt("getAllUserInfoState", mGetAllUserInfoState).commit();
                         } catch (HttpException e) {
                             onCallBackFail(callback);
                             NLog.d(TAG, "getGroupMembers occurs HttpException e=" + e.toString() + "mGetAllUserInfoState=" + mGetAllUserInfoState);
@@ -1154,7 +1154,7 @@ public class SealUserInfoManager implements OnDataListener {
                     }
                     try {
                         blackList = pullBlackList();
-                        sp.edit().putInt("getAllUserInfoState", mGetAllUserInfoState).apply();
+                        sp.edit().putInt("getAllUserInfoState", mGetAllUserInfoState).commit();
                     } catch (HttpException e) {
                         onCallBackFail(callback);
                         NLog.d(TAG, "getBlackList occurs HttpException e=" + e.toString() + "mGetAllUserInfoState=" + mGetAllUserInfoState);
@@ -1452,7 +1452,7 @@ public class SealUserInfoManager implements OnDataListener {
                         if (isNetworkConnected()) {
                             try {
                                 group = pullGroups(groupID);
-                                sp.edit().putInt("getAllUserInfoState", mGetAllUserInfoState).apply();
+                                sp.edit().putInt("getAllUserInfoState", mGetAllUserInfoState).commit();
                             } catch (HttpException e) {
                                 onCallBackFail(callback);
                                 NLog.d(TAG, "getGroupsByID occurs HttpException e=" + e.toString() + "mGetAllUserInfoState=" + mGetAllUserInfoState);
@@ -1522,7 +1522,7 @@ public class SealUserInfoManager implements OnDataListener {
                 if (tokenResponse.getCode() == 200) {
                     String token = tokenResponse.getResult().getToken();
                     SharedPreferences sp = mContext.getSharedPreferences("config", Context.MODE_PRIVATE);
-                    sp.edit().putString("loginToken", token).apply();
+                    sp.edit().putString("loginToken", token).commit();
                     if (!TextUtils.isEmpty(token)) {
                         RongIM.connect(token, new RongIMClient.ConnectCallback() {
                             @Override
@@ -1533,7 +1533,7 @@ public class SealUserInfoManager implements OnDataListener {
                             @Override
                             public void onSuccess(String s) {
                                 SharedPreferences sp = mContext.getSharedPreferences("config", Context.MODE_PRIVATE);
-                                sp.edit().putString(SealConst.SEALTALK_LOGIN_ID, s).apply();
+                                sp.edit().putString(SealConst.SEALTALK_LOGIN_ID, s).commit();
                             }
 
                             @Override

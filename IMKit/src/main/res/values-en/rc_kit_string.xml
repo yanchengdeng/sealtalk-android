@@ -177,7 +177,7 @@
     <string name="rc_ad_file_size">Size:%1$s</string>
     <string name="rc_ac_file_download_btn">Start downloading</string>
     <string name="rc_ac_file_download_progress_tv">Downloading...(%1$s/%2$s)</string>
-    <string name="rc_ac_file_download_open_file_btn">Open with other app</string>
+    <string name="rc_ac_file_download_open_file_btn">Open File</string>
     <string name="rc_ac_file_send_preview">Send File</string>
     <string name="rc_ad_send_file_no_select_file">Send</string>
     <string name="rc_ad_send_file_select_file">Send(%1$s/20)</string>
