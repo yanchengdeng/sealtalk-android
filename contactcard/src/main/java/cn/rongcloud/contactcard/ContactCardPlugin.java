@@ -3,10 +3,7 @@ package cn.rongcloud.contactcard;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
@@ -27,6 +24,7 @@ public class ContactCardPlugin implements IPluginModule {
     private Context context;
     private Conversation.ConversationType conversationType;
     private String targetId;
+    public static final String IS_FROM_CARD = "isFromCard";
 
     public ContactCardPlugin() {
     }
@@ -57,6 +55,7 @@ public class ContactCardPlugin implements IPluginModule {
         } else if (iContactInfoProvider != null) {
             Intent intent = new Intent(context, ContactListActivity.class);
             extension.startActivityForPluginResult(intent, REQUEST_CONTACT, this);
+            intent.putExtra(IS_FROM_CARD,true);
             extension.collapseExtension();
         } else {
             Toast.makeText(context, "尚未实现\"名片模块\"相关接口", Toast.LENGTH_LONG).show();

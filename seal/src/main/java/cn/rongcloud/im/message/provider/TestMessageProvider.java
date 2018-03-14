@@ -52,6 +52,11 @@ public class TestMessageProvider extends IContainerItemProvider.MessageProvider<
 
     @Override
     public Spannable getContentSummary(TestMessage data) {
+        return null;
+    }
+
+    @Override
+    public Spannable getContentSummary(Context context, TestMessage data) {
         if (data == null)
             return null;
 

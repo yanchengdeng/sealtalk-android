@@ -107,17 +107,22 @@ public class ContactMessageItemProvider extends IContainerItemProvider.MessagePr
 
     @Override
     public Spannable getContentSummary(final ContactMessage contactMessage) {
+        return null;
+    }
+
+    @Override
+    public Spannable getContentSummary(Context context, final ContactMessage contactMessage) {
         if (contactMessage != null && !TextUtils.isEmpty(contactMessage.getSendUserId())
                 && !TextUtils.isEmpty(contactMessage.getSendUserName())) {
             if (contactMessage.getSendUserId().equals(RongIM.getInstance().getCurrentUserId())) {
-                String str_RecommendClause = RongContext.getInstance().getResources().getString(R.string.rc_recommend_clause_to_others);
+                String str_RecommendClause = context.getResources().getString(R.string.rc_recommend_clause_to_others);
                 return new SpannableString(String.format(str_RecommendClause, contactMessage.getName()));
             } else {
-                String str_RecommendClause = RongContext.getInstance().getResources().getString(R.string.rc_recommend_clause_to_me);
+                String str_RecommendClause = context.getResources().getString(R.string.rc_recommend_clause_to_me);
                 return new SpannableString(String.format(str_RecommendClause, contactMessage.getSendUserName(), contactMessage.getName()));
             }
         }
-        return new SpannableString("[" + RongContext.getInstance().getResources().getString(R.string.rc_plugins_contact) + "]");
+        return new SpannableString("[" + context.getResources().getString(R.string.rc_plugins_contact) + "]");
     }
 
     @Override

@@ -67,6 +67,11 @@ public class ContactNotificationMessageProvider extends IContainerItemProvider.M
 
     @Override
     public Spannable getContentSummary(ContactNotificationMessage content) {
+        return null;
+    }
+
+    @Override
+    public Spannable getContentSummary(Context context, ContactNotificationMessage content) {
         if (content != null && !TextUtils.isEmpty(content.getExtra())) {
             ContactNotificationMessageData bean = null;
             try {

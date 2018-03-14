@@ -280,6 +280,7 @@ public class CallFloatBoxView {
         }
         RongCallClient.getInstance().setVoIPCallListener(RongCallProxy.getInstance());
         Intent intent = new Intent(mBundle.getString("action"));
+        intent.setPackage(mContext.getPackageName());
         intent.putExtra("floatbox", mBundle);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("callAction", RongCallAction.ACTION_RESUME_CALL.getName());

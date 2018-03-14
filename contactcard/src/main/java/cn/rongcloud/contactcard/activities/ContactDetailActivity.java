@@ -1,7 +1,6 @@
 package cn.rongcloud.contactcard.activities;
 
 import android.animation.ObjectAnimator;
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -25,6 +24,7 @@ import java.util.List;
 import cn.rongcloud.contactcard.R;
 import cn.rongcloud.contactcard.message.ContactMessage;
 import io.rong.eventbus.EventBus;
+import io.rong.imkit.RongBaseNoActionbarActivity;
 import io.rong.imkit.RongContext;
 import io.rong.imkit.RongIM;
 import io.rong.imkit.emoticon.AndroidEmoji;
@@ -44,7 +44,7 @@ import io.rong.message.TextMessage;
  * Created by Beyond on 2016/11/24.
  */
 
-public class ContactDetailActivity extends Activity {
+public class ContactDetailActivity extends RongBaseNoActionbarActivity {
 
     private AsyncImageView mTargetPortrait;
     private TextView mTargetName;

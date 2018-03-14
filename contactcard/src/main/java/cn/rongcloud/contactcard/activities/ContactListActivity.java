@@ -29,6 +29,7 @@ import java.util.List;
 import cn.rongcloud.contactcard.ContactCardContext;
 import cn.rongcloud.contactcard.IContactCardInfoProvider;
 import cn.rongcloud.contactcard.R;
+import io.rong.imkit.RongBaseNoActionbarActivity;
 import io.rong.imkit.mention.SideBar;
 import io.rong.imkit.tools.CharacterParser;
 import io.rong.imkit.widget.AsyncImageView;
@@ -40,7 +41,7 @@ import io.rong.imlib.model.UserInfo;
  * Created by Beyond on 30/12/2016.
  */
 
-public class ContactListActivity extends Activity {
+public class ContactListActivity extends RongBaseNoActionbarActivity {
     private ListView mListView;
     private List<MemberInfo> mAllMemberList;
     private MembersAdapter mAdapter;
