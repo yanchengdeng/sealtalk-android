@@ -49,7 +49,7 @@ public class VideoPlugin implements IPluginModule {
     @Override
     public void onClick(Fragment currentFragment, final RongExtension extension) {
 
-        String[] permissions = {Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO};
+        String[] permissions = {Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO, Manifest.permission.READ_PHONE_STATE};
         if (!PermissionCheckUtil.requestPermissions(currentFragment, permissions)) {
             return;
         }

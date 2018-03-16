@@ -24,6 +24,8 @@ import io.rong.imkit.utilities.OptionsPopupDialog;
 import io.rong.imkit.widget.provider.IContainerItemProvider;
 import io.rong.imlib.model.Message;
 
+import static io.rong.calllib.RongCallCommon.CallDisconnectedReason.OTHER_DEVICE_HAD_ACCEPTED;
+
 @ProviderTag(messageContent = CallSTerminateMessage.class, showSummaryWithName = false, showProgress = false, showWarning = false, showReadState = false)
 public class CallEndMessageItemProvider extends IContainerItemProvider.MessageProvider<CallSTerminateMessage> {
     private static class ViewHolder {
@@ -150,6 +152,9 @@ public class CallEndMessageItemProvider extends IContainerItemProvider.MessagePr
 
     @Override
     public void onItemClick(View view, int position, CallSTerminateMessage content, UIMessage message) {
+        if (content.getReason() == OTHER_DEVICE_HAD_ACCEPTED){
+            return;
+        }
         RongCallSession profile = RongCallClient.getInstance().getCallSession();
         if (profile != null && profile.getActiveTime() > 0) {
             Toast.makeText(view.getContext(),

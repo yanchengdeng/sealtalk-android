@@ -135,6 +135,7 @@ public class RongCallKit {
         intent.putExtra("conversationType", Conversation.ConversationType.NONE.getName().toLowerCase());
         intent.putExtra("callAction", RongCallAction.ACTION_OUTGOING_CALL.getName());
         intent.putStringArrayListExtra("invitedUsers", userIds);
+        intent.setPackage(context.getPackageName());
         context.startActivity(intent);
     }
 
@@ -160,6 +161,23 @@ public class RongCallKit {
             }
         }
 
+        if (isInVoipCall(context)) {
+            return false;
+        }
+        if (!RongIMClient.getInstance().getCurrentConnectionStatus().equals(RongIMClient.ConnectionStatusListener.ConnectionStatus.CONNECTED)) {
+            Toast.makeText(context, context.getResources().getString(io.rong.callkit.R.string.rc_voip_call_network_error), Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 是否在VOIP通话中
+     *
+     * @param context
+     * @return 是否在VOIP通话中
+     */
+    public static boolean isInVoipCall(Context context) {
         RongCallSession callSession = RongCallClient.getInstance().getCallSession();
         if (callSession != null && callSession.getActiveTime() > 0) {
             Toast.makeText(context,
@@ -168,13 +186,9 @@ public class RongCallKit {
                             context.getResources().getString(R.string.rc_voip_call_video_start_fail),
                     Toast.LENGTH_SHORT)
                     .show();
-            return false;
+            return true;
         }
-        if (!RongIMClient.getInstance().getCurrentConnectionStatus().equals(RongIMClient.ConnectionStatusListener.ConnectionStatus.CONNECTED)) {
-            Toast.makeText(context, context.getResources().getString(io.rong.callkit.R.string.rc_voip_call_network_error), Toast.LENGTH_SHORT).show();
-            return false;
-        }
-        return true;
+        return false;
     }
 
     /**

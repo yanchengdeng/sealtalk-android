@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
@@ -27,6 +26,7 @@ import io.rong.calllib.CallUserProfile;
 import io.rong.calllib.RongCallClient;
 import io.rong.calllib.RongCallCommon;
 import io.rong.calllib.RongCallSession;
+import io.rong.calllib.message.MultiCallEndMessage;
 import io.rong.common.RLog;
 import io.rong.imkit.RongContext;
 import io.rong.imkit.RongIM;
@@ -36,7 +36,6 @@ import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.Discussion;
 import io.rong.imlib.model.UserInfo;
-import io.rong.message.InformationNotificationMessage;
 
 public class MultiVideoCallActivity extends BaseCallActivity {
     private static final String TAG = "VoIPMultiVideoCallActivity";
@@ -261,11 +260,15 @@ public class MultiVideoCallActivity extends BaseCallActivity {
             if (participantView == null) return;
             LinearLayout portraitContainer = (LinearLayout) participantView.getParent();
             portraitContainer.removeView(participantView);
-            if (portraitContainer.equals(portraitContainer2)) {
-                if (portraitContainer1.getChildCount() > 0) {
-                    View childPortraitView = portraitContainer1.getChildAt(0);
-                    portraitContainer1.removeView(childPortraitView);
-                    portraitContainer2.addView(childPortraitView);
+            /*
+            如果第一排删除了一个头像(第一排不足4个头像了)，且第二排还有头像
+            则把第二排最左边的头像移动到第一排最右边
+            */
+            if (portraitContainer.equals(portraitContainer1)) {
+                if (portraitContainer2.getChildCount() > 0) {
+                    View childPortraitView = portraitContainer2.getChildAt(0);
+                    portraitContainer2.removeView(childPortraitView);
+                    portraitContainer1.addView(childPortraitView);
                 }
             }
         }
@@ -362,8 +365,10 @@ public class MultiVideoCallActivity extends BaseCallActivity {
         remoteViewContainer.setVisibility(View.VISIBLE);
         participantPortraitContainer.setVisibility(View.GONE);
         TextView remindInfo = (TextView) topContainer.findViewById(R.id.rc_voip_call_remind_info);
+        remindInfo.setShadowLayer(16F, 0F, 2F, getResources().getColor(R.color.rc_voip_reminder_shadow));
         setupTime(remindInfo);
         TextView userNameView = (TextView) topContainer.findViewById(R.id.rc_voip_user_name);
+        userNameView.setShadowLayer(16F, 0F, 2F, getResources().getColor(R.color.rc_voip_reminder_shadow));
         String currentUserId = RongIMClient.getInstance().getCurrentUserId();
         userNameView.setTag(currentUserId + "name");
         UserInfo userInfo = RongContext.getInstance().getUserInfoFromCache(currentUserId);
@@ -456,13 +461,11 @@ public class MultiVideoCallActivity extends BaseCallActivity {
             return;
         }
 
-        InformationNotificationMessage informationMessage;
-        if (reason.equals(RongCallCommon.CallDisconnectedReason.NO_RESPONSE)) {
-            informationMessage = InformationNotificationMessage.obtain(RongContext.getInstance().getString(R.string.rc_voip_video_no_response));
-        } else {
-            informationMessage = InformationNotificationMessage.obtain(RongContext.getInstance().getString(R.string.rc_voip_video_ended));
-        }
-        RongIM.getInstance().insertMessage(callSession.getConversationType(), callSession.getTargetId(), callSession.getCallerUserId(), informationMessage, null);
+        MultiCallEndMessage multiCallEndMessage = new MultiCallEndMessage();
+        multiCallEndMessage.setMediaType(RongIMClient.MediaType.VIDEO);
+        multiCallEndMessage.setReason(reason);
+
+        RongIM.getInstance().insertMessage(callSession.getConversationType(), callSession.getTargetId(), callSession.getCallerUserId(), multiCallEndMessage, null);
         stopRing();
         postRunnableDelay(new Runnable() {
             @Override
@@ -549,8 +552,9 @@ public class MultiVideoCallActivity extends BaseCallActivity {
                 }
                 List<CallUserProfile> list = callSession.getParticipantProfileList();
                 for (CallUserProfile profile : list) {
-//                    if (!profile.getUserId().equals(callSession.getSelfUserId()))
-                    invitedList.add(profile.getUserId());
+                    if (!profile.getUserId().equals(callSession.getCallerUserId())) {
+                        invitedList.add(profile.getUserId());
+                    }
                 }
 
                 FrameLayout bottomButtonLayout = (FrameLayout) inflater.inflate(R.layout.rc_voip_call_bottom_incoming_button_layout, null);

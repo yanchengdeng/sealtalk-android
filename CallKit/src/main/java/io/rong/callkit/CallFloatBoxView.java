@@ -28,7 +28,6 @@ import io.rong.calllib.RongCallCommon;
 import io.rong.calllib.RongCallSession;
 import io.rong.calllib.message.CallSTerminateMessage;
 import io.rong.common.RLog;
-import io.rong.imkit.RongContext;
 import io.rong.imkit.RongIM;
 import io.rong.imkit.utils.NotificationUtil;
 import io.rong.imlib.model.Conversation;
@@ -177,9 +176,9 @@ public class CallFloatBoxView {
                         case GROUP:
                             InformationNotificationMessage informationNotificationMessage;
                             if (reason.equals(RongCallCommon.CallDisconnectedReason.NO_RESPONSE)) {
-                                informationNotificationMessage = InformationNotificationMessage.obtain(RongContext.getInstance().getString(R.string.rc_voip_audio_no_response));
+                                informationNotificationMessage = InformationNotificationMessage.obtain(mContext.getString(R.string.rc_voip_audio_no_response));
                             } else {
-                                informationNotificationMessage = InformationNotificationMessage.obtain(RongContext.getInstance().getString(R.string.rc_voip_audio_ended));
+                                informationNotificationMessage = InformationNotificationMessage.obtain(mContext.getString(R.string.rc_voip_audio_ended));
                             }
 
                             if (senderId.equals(callProfile.getSelfUserId())) {

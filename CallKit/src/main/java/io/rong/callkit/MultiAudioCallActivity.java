@@ -19,6 +19,7 @@ import io.rong.calllib.CallUserProfile;
 import io.rong.calllib.RongCallClient;
 import io.rong.calllib.RongCallCommon;
 import io.rong.calllib.RongCallSession;
+import io.rong.calllib.message.MultiCallEndMessage;
 import io.rong.common.RLog;
 import io.rong.imkit.RongContext;
 import io.rong.imkit.RongIM;
@@ -361,7 +362,7 @@ public class MultiAudioCallActivity extends BaseCallActivity {
         imgvAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                shouldShowFloat = false;
+                setShouldShowFloat(false);
                 if (callSession.getConversationType().equals(Conversation.ConversationType.DISCUSSION)) {
                     RongIMClient.getInstance().getDiscussion(callSession.getTargetId(), new RongIMClient.ResultCallback<Discussion>() {
                         @Override
@@ -432,13 +433,11 @@ public class MultiAudioCallActivity extends BaseCallActivity {
             return;
         }
 
-        InformationNotificationMessage informationMessage;
-        if (reason.equals(RongCallCommon.CallDisconnectedReason.NO_RESPONSE)) {
-            informationMessage = InformationNotificationMessage.obtain(RongContext.getInstance().getString(R.string.rc_voip_audio_no_response));
-        } else {
-            informationMessage = InformationNotificationMessage.obtain(RongContext.getInstance().getString(R.string.rc_voip_audio_ended));
-        }
-        RongIM.getInstance().insertMessage(callSession.getConversationType(), callSession.getTargetId(), callSession.getCallerUserId(), informationMessage, null);
+        MultiCallEndMessage multiCallEndMessage = new MultiCallEndMessage();
+        multiCallEndMessage.setReason(reason);
+        multiCallEndMessage.setMediaType(RongIMClient.MediaType.AUDIO);
+
+        RongIM.getInstance().insertMessage(callSession.getConversationType(), callSession.getTargetId(), callSession.getCallerUserId(), multiCallEndMessage, null);
         stopRing();
         postRunnableDelay(new Runnable() {
             @Override

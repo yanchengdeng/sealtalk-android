@@ -47,7 +47,7 @@ public class AudioPlugin implements IPluginModule {
 
     @Override
     public void onClick(final Fragment currentFragment, final RongExtension extension) {
-        String[] permissions = {Manifest.permission.RECORD_AUDIO};
+        String[] permissions = {Manifest.permission.RECORD_AUDIO, Manifest.permission.READ_PHONE_STATE};
         if (!PermissionCheckUtil.requestPermissions(currentFragment, permissions)) {
             return;
         }

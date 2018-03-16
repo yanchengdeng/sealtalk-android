@@ -72,7 +72,7 @@
     <string name="rc_voice_short">录音时间太短</string>
     <string name="rc_voice_failure">录音失败！</string>
     <string name="rc_voice_too_long">录制时间超长</string>
-    <string name="rc_voip_occupying">声音通道正被占用，请稍后再试</string>
+    <string name="rc_voip_occupying">声音通道被占用，请稍后再试</string>
 
 
     <string name="rc_pub_service_info_description">功能介绍</string>
@@ -144,7 +144,7 @@
 
     <!-- LargePictureActivity -->
     <string name="rc_save_picture">保存图片</string>
-    <string name="rc_save_picture_at">图片保存在%s</string>
+    <string name="rc_save_picture_at">图片保存成功</string>
     <string name="rc_src_file_not_found">源文件不存在</string>
 
     <string name="rc_blacklist_prompt">您已被加入黑名单</string>
@@ -219,6 +219,8 @@
     <string name="rc_android.permission.RECORD_AUDIO">麦克风</string>
     <string name="rc_android.permission.READ_EXTERNAL_STORAGE">存储空间</string>
     <string name="rc_android.permission.WRITE_EXTERNAL_STORAGE">存储空间</string>
+    <string name="rc_android.permission.READ_PHONE_STATE">电话</string>
+    <string name="rc_android.permission.PROCESS_OUTGOING_CALLS">电话</string>
 
     <string name="rc_real_time_location_summary">我发起了位置共享</string>
     <string name="rc_real_time_location_sharing">发起了位置共享</string>

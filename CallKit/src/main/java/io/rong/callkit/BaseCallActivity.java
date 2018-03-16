@@ -161,6 +161,7 @@ public class BaseCallActivity extends BaseNoActionBarActivity implements IRongCa
     public void stopRing() {
         if (mMediaPlayer != null) {
             mMediaPlayer.stop();
+            mMediaPlayer.release();
             mMediaPlayer = null;
         }
         if (mVibrator != null) {
@@ -214,6 +215,9 @@ public class BaseCallActivity extends BaseNoActionBarActivity implements IRongCa
             case NETWORK_ERROR:
             case INIT_VIDEO_ERROR:
                 text = getString(R.string.rc_voip_call_terminalted);
+                break;
+            case OTHER_DEVICE_HAD_ACCEPTED:
+                text = getString(R.string.rc_voip_call_other);
                 break;
         }
         if (text != null) {
