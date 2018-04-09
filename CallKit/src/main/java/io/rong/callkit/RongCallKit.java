@@ -118,6 +118,8 @@ public class RongCallKit {
 
     /**
      * 发起的多人通话，不依赖群、讨论组等
+     * <p>
+     * <a href="http://support.rongcloud.cn/kb/Njcy">如何实现不基于于群组的voip</a>
      *
      * @param context
      * @param mediaType

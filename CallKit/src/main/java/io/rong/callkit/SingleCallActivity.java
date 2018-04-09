@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,7 @@ import io.rong.calllib.message.CallSTerminateMessage;
 import io.rong.common.RLog;
 import io.rong.imkit.RongContext;
 import io.rong.imkit.RongIM;
+import io.rong.imkit.manager.AudioPlayManager;
 import io.rong.imkit.utilities.PermissionCheckUtil;
 import io.rong.imkit.widget.AsyncImageView;
 import io.rong.imlib.RongIMClient;
@@ -68,7 +70,11 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.rc_voip_activity_single_call);
-
+        if (savedInstanceState != null && RongCallClient.getInstance() == null) {
+            // 音视频请求权限时，用户在设置页面取消权限，导致应用重启，退出当前activity.
+            finish();
+            return;
+        }
         Intent intent = getIntent();
         mLPreviewContainer = (FrameLayout) findViewById(R.id.rc_voip_call_large_preview);
         mSPreviewContainer = (FrameLayout) findViewById(R.id.rc_voip_call_small_preview);
@@ -97,10 +103,9 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
             inflater = LayoutInflater.from(this);
             initView(mediaType, callAction);
 
-            if (!requestCallPermissions(mediaType, REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS)) {
-                return;
+            if (requestCallPermissions(mediaType, REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS)) {
+                setupIntent();
             }
-            setupIntent();
         } else {
             RLog.w(TAG, "恢复的瞬间，对方已挂断");
             setShouldShowFloat(false);
@@ -129,15 +134,11 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
             callSession = RongCallClient.getInstance().getCallSession();
             mediaType = callSession.getMediaType();
         }
+        super.onNewIntent(intent);
 
-        if (!requestCallPermissions(mediaType, REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS)) {
-            return;
-        }
-        if (callSession != null) {
+        if (requestCallPermissions(mediaType, REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS)) {
             setupIntent();
         }
-
-        super.onNewIntent(intent);
     }
 
     @TargetApi(23)
@@ -160,6 +161,7 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
                         setupIntent();
                     }
                 } else {
+                    Toast.makeText(this, getString(R.string.rc_permission_grant_needed), Toast.LENGTH_SHORT).show();
                     if (startForCheckPermissions) {
                         startForCheckPermissions = false;
                         RongCallClient.getInstance().onPermissionDenied();
@@ -350,7 +352,7 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
             muteV.setSelected(muted);
         }
 
-        AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+        AudioManager audioManager = (AudioManager) this.getApplicationContext().getSystemService(AUDIO_SERVICE);
         if (audioManager.isWiredHeadsetOn()) {
             RongCallClient.getInstance().setEnableSpeakerphone(false);
         } else {
@@ -559,6 +561,7 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
                 @Override
                 public void run() {
                     finish();
+
                 }
             });
             return;
@@ -609,6 +612,11 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
         setShouldShowFloat(true);
 
         callSession = RongCallClient.getInstance().getCallSession();
+        if (callSession == null) {
+            setShouldShowFloat(false);
+            finish();
+            return;
+        }
         RongCallCommon.CallMediaType mediaType = callSession.getMediaType();
         RongCallAction callAction = RongCallAction.valueOf(getIntent().getStringExtra("callAction"));
         inflater = LayoutInflater.from(this);
@@ -688,6 +696,9 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
     }
 
     public void onEventMainThread(UserInfo userInfo) {
+        if (isFinishing()) {
+            return;
+        }
         if (targetId != null && targetId.equals(userInfo.getUserId())) {
             TextView userName = (TextView) mUserInfoContainer.findViewById(R.id.rc_voip_user_name);
             if (userInfo.getName() != null)

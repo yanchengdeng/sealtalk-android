@@ -132,7 +132,10 @@ public class ConversationActivity extends BaseActivity implements View.OnClickLi
 
         if (mConversationType.equals(Conversation.ConversationType.GROUP)) {
             mRightButton.setBackground(getResources().getDrawable(R.drawable.icon2_menu));
-        } else if (mConversationType.equals(Conversation.ConversationType.PRIVATE) | mConversationType.equals(Conversation.ConversationType.PUBLIC_SERVICE) | mConversationType.equals(Conversation.ConversationType.DISCUSSION)) {
+        } else if (mConversationType.equals(Conversation.ConversationType.PRIVATE)
+                || mConversationType.equals(Conversation.ConversationType.PUBLIC_SERVICE)
+                || mConversationType.equals(Conversation.ConversationType.APP_PUBLIC_SERVICE)
+                || mConversationType.equals(Conversation.ConversationType.DISCUSSION)) {
             mRightButton.setBackground(getResources().getDrawable(R.drawable.icon1_menu));
         } else {
             mRightButton.setVisibility(View.GONE);

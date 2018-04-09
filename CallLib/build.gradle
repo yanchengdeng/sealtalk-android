@@ -2,13 +2,13 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion '27.0.0'
+    buildToolsVersion '27'
 
     defaultConfig {
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 23
-        versionCode 2018031611
-        versionName "2.8.29 Stable"
+        versionCode 2018040917
+        versionName "2.8.30"
     }
 
     sourceSets {
@@ -23,4 +23,11 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:support-compat:26.0.0'
+}
+
+repositories {
+    maven {
+        url 'https://maven.google.com/'
+        name 'Google'
+    }
 }

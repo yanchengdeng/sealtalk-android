@@ -10,6 +10,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,8 +30,10 @@ import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.Discussion;
 import io.rong.imlib.model.UserInfo;
-import io.rong.message.InformationNotificationMessage;
 
+/**
+ * <a href="http://support.rongcloud.cn/kb/Njcy">如何实现不基于于群组的voip</a>
+ */
 public class MultiAudioCallActivity extends BaseCallActivity {
     private static final String TAG = "VoIPMultiAudioCallActivity";
     LinearLayout audioContainer;
@@ -50,7 +53,11 @@ public class MultiAudioCallActivity extends BaseCallActivity {
     @TargetApi(23)
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        if (savedInstanceState != null && RongCallClient.getInstance() == null) {
+            // 音视频请求权限时，用户在设置页面取消权限，导致应用重启，退出当前activity.
+            finish();
+            return;
+        }
         setContentView(R.layout.rc_voip_ac_muti_audio);
         audioContainer = (LinearLayout) findViewById(R.id.rc_voip_container);
         incomingLayout = (RelativeLayout) LayoutInflater.from(this).inflate(R.layout.rc_voip_item_incoming_maudio, null);
@@ -59,21 +66,18 @@ public class MultiAudioCallActivity extends BaseCallActivity {
         incomingController = (FrameLayout) LayoutInflater.from(this).inflate(R.layout.rc_voip_call_bottom_incoming_button_layout, null);
 
         startForCheckPermissions = getIntent().getBooleanExtra("checkPermissions", false);
-        if (!requestCallPermissions(RongCallCommon.CallMediaType.AUDIO, REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS)) {
-            return;
+        if (requestCallPermissions(RongCallCommon.CallMediaType.AUDIO, REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS)){
+            initView();
         }
-        initView();
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         startForCheckPermissions = getIntent().getBooleanExtra("checkPermissions", false);
-        if (!requestCallPermissions(RongCallCommon.CallMediaType.AUDIO, REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS)) {
-            return;
-        }
-        initView();
-
         super.onNewIntent(intent);
+        if (requestCallPermissions(RongCallCommon.CallMediaType.AUDIO, REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS)){
+            initView();
+        }
     }
 
     @TargetApi(23)
@@ -91,6 +95,7 @@ public class MultiAudioCallActivity extends BaseCallActivity {
                 } else {
                     if (startForCheckPermissions) {
                         startForCheckPermissions = false;
+                        Toast.makeText(this, "打设置相关权限", Toast.LENGTH_SHORT).show();
                         RongCallClient.getInstance().onPermissionDenied();
                     } else {
                         finish();
@@ -115,6 +120,7 @@ public class MultiAudioCallActivity extends BaseCallActivity {
             if (callSession == null) {
                 setShouldShowFloat(false);
                 finish();
+                return;
             }
             memberContainer.enableShowState(true);
 
@@ -535,6 +541,9 @@ public class MultiAudioCallActivity extends BaseCallActivity {
     }
 
     public void onEventMainThread(UserInfo userInfo) {
+        if (isFinishing()) {
+            return;
+        }
         TextView callerName = (TextView) audioContainer.findViewWithTag(userInfo.getUserId() + "callerName");
         if (callerName != null && userInfo.getName() != null)
             callerName.setText(userInfo.getName());

@@ -4,8 +4,13 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.res.AssetFileDescriptor;
+import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
@@ -15,6 +20,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.os.Vibrator;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
@@ -70,6 +77,11 @@ public class BaseCallActivity extends BaseNoActionBarActivity implements IRongCa
 
     public static final int CALL_NOTIFICATION_ID = 4000;
 
+    /**
+     * 判断是拨打界面还是接听界面
+     */
+    private boolean isIncoming;
+
     public void setShouldShowFloat(boolean shouldShowFloat) {
         this.shouldShowFloat = shouldShowFloat;
     }
@@ -81,6 +93,40 @@ public class BaseCallActivity extends BaseNoActionBarActivity implements IRongCa
     public void postRunnableDelay(Runnable runnable) {
         handler.postDelayed(runnable, DELAY_TIME);
     }
+
+    /**
+     * 监听情景模式（Ringer Mode）发生改变后，切换为铃声或振动
+     */
+    protected final BroadcastReceiver mRingModeReceiver = new BroadcastReceiver() {
+        boolean isFirstReceivedBroadcast = true;
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // 此类广播为 sticky 类型的，首次注册广播便会收到，因此第一次收到的广播不作处理
+            if (isFirstReceivedBroadcast) {
+                isFirstReceivedBroadcast = false;
+                return;
+            }
+            // 根据 isIncoming 判断只有在接听界面时做铃声和振动的切换，拨打界面不作处理
+            if (isIncoming && intent.getAction().equals(AudioManager.RINGER_MODE_CHANGED_ACTION)) {
+                AudioManager am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+                final int ringMode = am.getRingerMode();
+                switch (ringMode) {
+                    case AudioManager.RINGER_MODE_NORMAL:
+                        stopRing();
+                        startRing();
+                        break;
+                    case AudioManager.RINGER_MODE_SILENT:
+                        stopRing();
+                        break;
+                    case AudioManager.RINGER_MODE_VIBRATE:
+                        stopRing();
+                        startVibrator();
+                        break;
+                    default:
+                }
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,6 +152,22 @@ public class BaseCallActivity extends BaseNoActionBarActivity implements IRongCa
         AudioPlayManager.getInstance().stopPlay();
         AudioRecordManager.getInstance().destroyRecord();
         RongContext.getInstance().getEventBus().register(this);
+
+        mMediaPlayer = new MediaPlayer();
+        mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                if (mp != null) {
+                    mp.setLooping(true);
+                    mp.start();
+                }
+            }
+        });
+
+        //注册 BroadcastReceiver 监听情景模式的切换
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(AudioManager.RINGER_MODE_CHANGED_ACTION);
+        registerReceiver(mRingModeReceiver, filter);
     }
 
     @Override
@@ -119,29 +181,46 @@ public class BaseCallActivity extends BaseNoActionBarActivity implements IRongCa
     }
 
     public void onOutgoingCallRinging() {
-        mMediaPlayer = MediaPlayer.create(this, R.raw.voip_outgoing_ring);
-
-        mMediaPlayer.setLooping(true);
-        mMediaPlayer.start();
+        isIncoming = false;
+        try {
+            AssetFileDescriptor assetFileDescriptor = getResources().openRawResourceFd(R.raw.voip_outgoing_ring);
+            mMediaPlayer.setDataSource(assetFileDescriptor.getFileDescriptor(),
+                    assetFileDescriptor.getStartOffset(), assetFileDescriptor.getLength());
+            assetFileDescriptor.close();
+            // 设置 MediaPlayer 播放的声音用途
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                AudioAttributes attributes = new AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
+                        .build();
+                mMediaPlayer.setAudioAttributes(attributes);
+            } else {
+                mMediaPlayer.setAudioStreamType(AudioManager.STREAM_VOICE_CALL);
+            }
+            mMediaPlayer.prepareAsync();
+            final AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+            if (am != null) {
+                am.setSpeakerphoneOn(false);
+                // 设置此值可在拨打时控制响铃音量
+                am.setMode(AudioManager.MODE_IN_COMMUNICATION);
+                // 设置拨打时响铃音量默认值
+                am.setStreamVolume(AudioManager.STREAM_VOICE_CALL, 5, AudioManager.STREAM_VOICE_CALL);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void onIncomingCallRinging() {
+        isIncoming = true;
         int ringerMode = NotificationUtil.getRingerMode(this);
         if (ringerMode != AudioManager.RINGER_MODE_SILENT) {
             if (ringerMode == AudioManager.RINGER_MODE_VIBRATE) {
-                mVibrator = (Vibrator) RongContext.getInstance().getSystemService(Context.VIBRATOR_SERVICE);
-                mVibrator.vibrate(new long[]{500, 1000}, 0);
+                startVibrator();
             } else {
-                Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
-                mMediaPlayer = new MediaPlayer();
-                try {
-                    mMediaPlayer.setDataSource(this, uri);
-                    mMediaPlayer.setLooping(true);
-                    mMediaPlayer.prepare();
-                    mMediaPlayer.start();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                if (isVibrateWhenRinging()) {
+                    startVibrator();
                 }
+                startRing();
             }
         }
     }
@@ -158,16 +237,41 @@ public class BaseCallActivity extends BaseNoActionBarActivity implements IRongCa
         return time;
     }
 
-    public void stopRing() {
+    protected void stopRing() {
         if (mMediaPlayer != null) {
-            mMediaPlayer.stop();
-            mMediaPlayer.release();
-            mMediaPlayer = null;
+            mMediaPlayer.reset();
         }
         if (mVibrator != null) {
             mVibrator.cancel();
-            mVibrator = null;
         }
+    }
+
+    protected void startRing() {
+        Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+        try {
+            mMediaPlayer.setDataSource(this, uri);
+            mMediaPlayer.prepareAsync();
+        } catch (IOException e) {
+            e.printStackTrace();
+            RLog.e(TAG, "Ringtone not found : " + uri);
+            try {
+                uri = RingtoneManager.getValidRingtoneUri(this);
+                mMediaPlayer.setDataSource(this, uri);
+                mMediaPlayer.prepareAsync();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+                RLog.e(TAG, "Ringtone not found: " + uri);
+            }
+        }
+    }
+
+    protected void startVibrator() {
+        if (mVibrator == null) {
+            mVibrator = (Vibrator) RongContext.getInstance().getSystemService(Context.VIBRATOR_SERVICE);
+        } else {
+            mVibrator.cancel();
+        }
+        mVibrator.vibrate(new long[]{500, 1000}, 0);
     }
 
     @Override
@@ -213,8 +317,13 @@ public class BaseCallActivity extends BaseNoActionBarActivity implements IRongCa
             case REMOTE_HANGUP:
             case HANGUP:
             case NETWORK_ERROR:
-            case INIT_VIDEO_ERROR:
                 text = getString(R.string.rc_voip_call_terminalted);
+                break;
+            case INIT_MIC_ERROR:
+                text = getString(R.string.rc_voip_call_mic_error);
+                break;
+            case INIT_VIDEO_ERROR:
+                text = getString(R.string.rc_voip_call_camera_error);
                 break;
             case OTHER_DEVICE_HAD_ACCEPTED:
                 text = getString(R.string.rc_voip_call_other);
@@ -224,8 +333,11 @@ public class BaseCallActivity extends BaseNoActionBarActivity implements IRongCa
             showShortToast(text);
         }
         stopRing();
+        unregisterReceiver();
         NotificationUtil.clearNotification(this, BaseCallActivity.CALL_NOTIFICATION_ID);
         RongCallProxy.getInstance().setCallListener(null);
+        AudioPlayManager.getInstance().setInVoipMode(false);
+        ((AudioManager)BaseCallActivity.this.getApplicationContext().getSystemService(AUDIO_SERVICE)).setMode(AudioManager.MODE_NORMAL);
     }
 
     @Override
@@ -259,8 +371,14 @@ public class BaseCallActivity extends BaseNoActionBarActivity implements IRongCa
         if (RongCallKit.getCustomerHandlerListener() != null) {
             RongCallKit.getCustomerHandlerListener().onCallConnected(callProfile, localVideo);
         }
+
+        AudioManager audioManager = (AudioManager) this.getApplicationContext().getSystemService(AUDIO_SERVICE);
+        audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+        AudioPlayManager.getInstance().setInVoipMode(true);
+
         shouldShowFloat = true;
         AudioRecordManager.getInstance().destroyRecord();
+        unregisterReceiver();
     }
 
 
@@ -326,7 +444,24 @@ public class BaseCallActivity extends BaseNoActionBarActivity implements IRongCa
     protected void onDestroy() {
         RongContext.getInstance().getEventBus().unregister(this);
         handler.removeCallbacks(updateTimeRunnable);
+        unregisterReceiver();
+        mMediaPlayer.release();
+        if (!AudioPlayManager.getInstance().isInVOIPMode(this)){
+            // 退出此页面后应设置成正常模式，否则按下音量键无法更改其他音频类型的音量
+            AudioManager am = (AudioManager) this.getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+            if (am != null) {
+                am.setMode(AudioManager.MODE_NORMAL);
+            }
+        }
         super.onDestroy();
+    }
+
+    private void unregisterReceiver() {
+        try {
+            unregisterReceiver(mRingModeReceiver);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -370,18 +505,22 @@ public class BaseCallActivity extends BaseNoActionBarActivity implements IRongCa
 
     @TargetApi(23)
     boolean requestCallPermissions(RongCallCommon.CallMediaType type, int requestCode) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
-            return true;
-
-        String[] permissions;
+        String[] permissions = null;
         if (type.equals(RongCallCommon.CallMediaType.VIDEO)) {
             permissions = new String[]{Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO};
         } else if (type.equals(RongCallCommon.CallMediaType.AUDIO)) {
             permissions = new String[]{Manifest.permission.RECORD_AUDIO};
-        } else {
-            return true;
         }
-        return PermissionCheckUtil.requestPermissions(this, permissions, requestCode);
+        boolean result = false;
+        if (permissions != null) {
+            boolean granted = PermissionCheckUtil.checkPermissions(this, permissions);
+            if (granted) {
+                result = true;
+            } else {
+                PermissionCheckUtil.requestPermissions(this, permissions, requestCode);
+            }
+        }
+        return result;
     }
 
     private class UpdateTimeRunnable implements Runnable {
@@ -457,4 +596,26 @@ public class BaseCallActivity extends BaseNoActionBarActivity implements IRongCa
             }
         }
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (!PermissionCheckUtil.checkPermissions(this, permissions)) {
+            PermissionCheckUtil.showRequestPermissionFailedAlter(this, PermissionCheckUtil.getNotGrantedPermissionMsg(this, permissions, grantResults));
+        }
+    }
+
+    /**
+     * 判断系统是否设置了 响铃时振动
+     */
+    private boolean isVibrateWhenRinging() {
+        ContentResolver resolver = getApplicationContext().getContentResolver();
+        if (Build.MANUFACTURER.equals("Xiaomi")) {
+            return Settings.System.getInt(resolver, "vibrate_in_normal", 0) == 1;
+        } else if (Build.MANUFACTURER.equals("smartisan")) {
+            return Settings.Global.getInt(resolver, "telephony_vibration_enabled", 0) == 1;
+        } else {
+            return Settings.System.getInt(resolver, "vibrate_when_ringing", 0) == 1;
+        }
+    }
+
 }

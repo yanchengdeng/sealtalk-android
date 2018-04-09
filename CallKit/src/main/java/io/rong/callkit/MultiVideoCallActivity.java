@@ -15,6 +15,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,6 +38,9 @@ import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.Discussion;
 import io.rong.imlib.model.UserInfo;
 
+/**
+ * <a href="http://support.rongcloud.cn/kb/Njcy">如何实现不基于于群组的voip</a>
+ */
 public class MultiVideoCallActivity extends BaseCallActivity {
     private static final String TAG = "VoIPMultiVideoCallActivity";
     RongCallSession callSession;
@@ -68,27 +72,29 @@ public class MultiVideoCallActivity extends BaseCallActivity {
     @TargetApi(23)
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        if (savedInstanceState != null && RongCallClient.getInstance() == null) {
+            // 音视频请求权限时，用户在设置页面取消权限，导致应用重启，退出当前activity.
+            finish();
+            return;
+        }
         setContentView(R.layout.rc_voip_multi_video_call);
 
         Intent intent = getIntent();
         startForCheckPermissions = intent.getBooleanExtra("checkPermissions", false);
-        if (!requestCallPermissions(RongCallCommon.CallMediaType.VIDEO, REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS)) {
-            return;
+        if (requestCallPermissions(RongCallCommon.CallMediaType.VIDEO, REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS)){
+            initViews();
+            setupIntent();
         }
-        initViews();
-        setupIntent();
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         startForCheckPermissions = intent.getBooleanExtra("checkPermissions", false);
-        if (!requestCallPermissions(RongCallCommon.CallMediaType.VIDEO, REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS)) {
-            return;
-        }
-        initViews();
-        setupIntent();
         super.onNewIntent(intent);
+        if (requestCallPermissions(RongCallCommon.CallMediaType.VIDEO, REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS)){
+            initViews();
+            setupIntent();
+        }
     }
 
     @TargetApi(23)
@@ -115,6 +121,7 @@ public class MultiVideoCallActivity extends BaseCallActivity {
                 } else {
                     if (startForCheckPermissions) {
                         startForCheckPermissions = false;
+                        Toast.makeText(this, "打设置相关权限", Toast.LENGTH_SHORT).show();
                         RongCallClient.getInstance().onPermissionDenied();
                     } else {
                         finish();
@@ -189,6 +196,7 @@ public class MultiVideoCallActivity extends BaseCallActivity {
             if (callSession == null) {
                 setShouldShowFloat(false);
                 finish();
+                return;
             }
 
             boolean isLocalViewExist = false;
@@ -809,6 +817,9 @@ public class MultiVideoCallActivity extends BaseCallActivity {
     }
 
     public void onEventMainThread(UserInfo userInfo) {
+        if (isFinishing()) {
+            return;
+        }
         if (participantPortraitContainer.getVisibility() == View.VISIBLE) {
             View participantView = participantPortraitContainer.findViewWithTag(userInfo.getUserId() + "participantPortraitView");
             if (participantView != null && userInfo.getPortraitUri() != null) {
@@ -819,7 +830,7 @@ public class MultiVideoCallActivity extends BaseCallActivity {
         if (remoteViewContainer.getVisibility() == View.VISIBLE) {
             View remoteView = remoteViewContainer.findViewWithTag(userInfo.getUserId() + "view");
             if (remoteView != null && userInfo.getPortraitUri() != null) {
-                AsyncImageView portraitView = (AsyncImageView) remoteView.findViewById(R.id.rc_user_portrait);
+                AsyncImageView portraitView = (AsyncImageView) remoteView.findViewById(R.id.user_portrait);
                 portraitView.setAvatar(userInfo.getPortraitUri().toString(), R.drawable.rc_default_portrait);
             }
         }
