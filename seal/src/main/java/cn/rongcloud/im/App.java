@@ -72,7 +72,7 @@ public class App extends MultiDexApplication {
         if (getApplicationInfo().packageName.equals(getCurProcessName(getApplicationContext()))) {
 
 //            LeakCanary.install(this);//内存泄露检测
-            RongPushClient.registerHWPush(this); // 配置 HMS 推送
+            RongPushClient.registerHWPush(this);
             RongPushClient.registerMiPush(this, "2882303761517473625", "5451747338625");
             try {
                 RongPushClient.registerFCM(this);
@@ -118,7 +118,7 @@ public class App extends MultiDexApplication {
                     .cacheOnDisk(true)
                     .build();
 
-//            RongExtensionManager.getInstance().registerExtensionModule(new PTTExtensionModule(this, true, 1000 * 60));
+            //RongExtensionManager.getInstance().registerExtensionModule(new PTTExtensionModule(this, true, 1000 * 60));
             RongExtensionManager.getInstance().registerExtensionModule(new ContactCardExtensionModule(new IContactCardInfoProvider() {
                 @Override
                 public void getContactAllInfoProvider(final IContactCardInfoCallback contactInfoCallback) {

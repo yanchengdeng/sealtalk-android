@@ -99,6 +99,7 @@ public class BaseCallActivity extends BaseNoActionBarActivity implements IRongCa
      */
     protected final BroadcastReceiver mRingModeReceiver = new BroadcastReceiver() {
         boolean isFirstReceivedBroadcast = true;
+
         @Override
         public void onReceive(Context context, Intent intent) {
             // 此类广播为 sticky 类型的，首次注册广播便会收到，因此第一次收到的广播不作处理
@@ -337,7 +338,7 @@ public class BaseCallActivity extends BaseNoActionBarActivity implements IRongCa
         NotificationUtil.clearNotification(this, BaseCallActivity.CALL_NOTIFICATION_ID);
         RongCallProxy.getInstance().setCallListener(null);
         AudioPlayManager.getInstance().setInVoipMode(false);
-        ((AudioManager)BaseCallActivity.this.getApplicationContext().getSystemService(AUDIO_SERVICE)).setMode(AudioManager.MODE_NORMAL);
+        ((AudioManager) BaseCallActivity.this.getApplicationContext().getSystemService(AUDIO_SERVICE)).setMode(AudioManager.MODE_NORMAL);
     }
 
     @Override
@@ -446,7 +447,8 @@ public class BaseCallActivity extends BaseNoActionBarActivity implements IRongCa
         handler.removeCallbacks(updateTimeRunnable);
         unregisterReceiver();
         mMediaPlayer.release();
-        if (!AudioPlayManager.getInstance().isInVOIPMode(this)){
+        mMediaPlayer = null;
+        if (!AudioPlayManager.getInstance().isInVOIPMode(this)) {
             // 退出此页面后应设置成正常模式，否则按下音量键无法更改其他音频类型的音量
             AudioManager am = (AudioManager) this.getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
             if (am != null) {
@@ -545,6 +547,8 @@ public class BaseCallActivity extends BaseNoActionBarActivity implements IRongCa
     void onMinimizeClick(View view) {
         if (checkDrawOverlaysPermission(true)) {
             finish();
+        } else {
+            Toast.makeText(this, getString(R.string.rc_voip_float_window_not_allowed), Toast.LENGTH_SHORT).show();
         }
     }
 
