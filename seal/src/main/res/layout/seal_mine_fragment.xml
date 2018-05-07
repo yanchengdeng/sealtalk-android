@@ -41,70 +41,111 @@
 
     </LinearLayout>
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/mine_setting"
         android:layout_width="match_parent"
         android:layout_height="45.5dp"
         android:layout_marginTop="20dp"
         android:background="@drawable/btn_list_item_bg"
-        android:clickable="true">
+        android:clickable="true"
+        android:orientation="horizontal">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
+            android:layout_centerVertical="true"
             android:layout_marginLeft="14dp"
-            android:drawableLeft="@drawable/mine_set"
+            android:gravity="center"
+            android:drawableLeft="@drawable/baojia_mine_money"
             android:drawablePadding="14sp"
-            android:text="@string/mine_setting"
+            android:text="@string/baojia_mine_corn"
             android:textColor="@color/text_color"
             android:textSize="16sp" />
 
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="15dp"
+            android:src="@drawable/baojia_mine_right_arrow"/>
 
-    </LinearLayout>
+    </RelativeLayout>
 
-    <LinearLayout
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.25dp"
+        android:layout_marginLeft="14dp"
+        android:layout_marginRight="14dp"
+        android:background="#dfdfdd" />
+
+    <RelativeLayout
         android:id="@+id/my_wallet"
         android:layout_width="match_parent"
         android:layout_height="45.5dp"
-        android:layout_marginTop="20dp"
         android:background="@drawable/btn_list_item_bg"
         android:clickable="true">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
+            android:layout_centerVertical="true"
             android:layout_marginLeft="14dp"
-            android:drawableLeft="@drawable/_wallet"
+            android:gravity="center"
+            android:drawableLeft="@drawable/baojia_mine_collect"
             android:drawablePadding="14sp"
-            android:text="@string/my_wallet"
+            android:text="@string/baojia_mine_collection"
             android:textColor="@color/text_color"
             android:textSize="16sp" />
 
-    </LinearLayout>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="15dp"
+            android:src="@drawable/baojia_mine_right_arrow"/>
 
-    <LinearLayout
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.25dp"
+        android:layout_marginLeft="14dp"
+        android:layout_marginRight="14dp"
+        android:background="#dfdfdd" />
+
+    <RelativeLayout
         android:id="@+id/mine_service"
         android:layout_width="match_parent"
         android:layout_height="45.5dp"
-        android:layout_marginTop="20dp"
         android:background="@drawable/btn_list_item_bg"
         android:clickable="true">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
+            android:layout_centerVertical="true"
             android:layout_marginLeft="14dp"
-            android:drawableLeft="@drawable/mine_service"
+            android:drawableLeft="@drawable/baojia_mine_colletion"
             android:drawablePadding="14sp"
-            android:text="@string/mine_service"
+            android:gravity="center"
+            android:text="@string/baojia_mine_settings"
             android:textColor="@color/text_color"
             android:textSize="16sp" />
 
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="15dp"
+            android:src="@drawable/baojia_mine_right_arrow"/>
 
-    </LinearLayout>
+    </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/mine_xiaoneng"
@@ -159,8 +200,8 @@
             android:background="#dfdfdd" />
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/mine_about"
+    <RelativeLayout
+        android:id="@+id/rl_mine_qrcode"
         android:layout_width="match_parent"
         android:layout_height="45.5dp"
         android:background="@drawable/btn_list_item_bg"
@@ -169,25 +210,24 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
+            android:layout_centerVertical="true"
             android:layout_marginLeft="14dp"
-            android:drawableLeft="@drawable/mine_about"
             android:drawablePadding="14sp"
-            android:text="@string/mine_about"
+            android:gravity="center"
+            android:text="@string/baojia_mine_qrcode"
             android:textColor="@color/text_color"
             android:textSize="16sp" />
 
-
         <ImageView
-            android:id="@+id/new_version_icon"
-            android:layout_width="40dp"
-            android:layout_height="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginLeft="14dp"
-            android:src="@drawable/newversion"
-            android:visibility="gone" />
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="15dp"
+            android:src="@drawable/baojia_mine_right_arrow"/>
 
-    </LinearLayout>
+    </RelativeLayout>
 
 
 </LinearLayout>

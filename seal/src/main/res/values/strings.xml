@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">SealTalk</string>
+    <string name="app_name">宝+</string>
     <string name="action_settings">Settings</string>
 
 
@@ -362,4 +362,10 @@
     <string name="cs_evaluate_tag_must">必须选择标签</string>
     <string name="cs_evaluate_input_must">必须输入建议</string>
     <string name="cs_evaluate_select_must">必选</string>
+
+    <string name="baojia_mine_corn">收到的币</string>
+    <string name="baojia_mine_collection">收藏</string>
+    <string name="baojia_mine_settings">设置</string>
+    <string name="baojia_mine_qrcode">我的二维码</string>
+    <string name="baojia_qrcode_title">我的二维码</string>
 </resources>

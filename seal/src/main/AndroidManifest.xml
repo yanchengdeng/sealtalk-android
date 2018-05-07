@@ -197,6 +197,10 @@
             android:name=".ui.activity.GroupNoticeActivity"
             android:screenOrientation="portrait" />
 
+        <!-- 二维码-->
+        <activity android:name=".ui.activity.QRCodeActivity"
+            android:screenOrientation="portrait"/>
+
         <!--公众-->
         <activity
             android:name=".ui.activity.PublicServiceInfoActivity"
