@@ -31,6 +31,7 @@ import cn.rongcloud.im.ui.activity.LoginActivity;
 import cn.rongcloud.im.ui.activity.MainActivity;
 import cn.rongcloud.im.ui.activity.NewFriendListActivity;
 import cn.rongcloud.im.ui.activity.UserDetailActivity;
+import cn.rongcloud.im.ui.activity.loginWebActivity;
 import io.rong.calllib.RongCallClient;
 import io.rong.calllib.RongCallSession;
 import io.rong.imkit.DefaultExtensionModule;
@@ -589,7 +590,7 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
         SealUserInfoManager.getInstance().closeDB();
         RongIM.getInstance().logout();
         Intent loginActivityIntent = new Intent();
-        loginActivityIntent.setClass(mContext, LoginActivity.class);
+        loginActivityIntent.setClass(mContext, loginWebActivity.class);
         loginActivityIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         if (isKicked) {
             loginActivityIntent.putExtra("kickedByOtherClient", true);

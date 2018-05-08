@@ -141,6 +141,7 @@ public class NewFriendListActivity extends BaseActivity implements NewFriendList
     public void onFailure(int requestCode, int state, Object result) {
         switch (requestCode) {
             case GET_ALL:
+                LoadDialog.dismiss(mContext);
                 break;
 
         }

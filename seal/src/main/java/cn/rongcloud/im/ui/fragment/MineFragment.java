@@ -62,27 +62,9 @@ public class MineFragment extends Fragment implements View.OnClickListener {
     }
 
     private void initViews(View mView) {
-//        mNewVersionView = (ImageView) mView.findViewById(R.id.new_version_icon);
         imageView = (SelectableRoundedImageView) mView.findViewById(R.id.mine_header);
         mTvName = mView.findViewById(R.id.mine_name);
         mLayoutQrcode = mView.findViewById(R.id.rl_mine_qrcode);
-//        mName = (TextView) mView.findViewById(R.id.mine_name);
-//        LinearLayout mUserProfile = (LinearLayout) mView.findViewById(R.id.start_user_profile);
-//        LinearLayout mMineSetting = (LinearLayout) mView.findViewById(R.id.mine_setting);
-//        LinearLayout mMineService = (LinearLayout) mView.findViewById(R.id.mine_service);
-//        LinearLayout mMineXN = (LinearLayout) mView.findViewById(R.id.mine_xiaoneng);
-//        LinearLayout mMineAbout = (LinearLayout) mView.findViewById(R.id.mine_about);
-//        if(isDebug){
-//            mMineXN.setVisibility(View.VISIBLE);
-//        }else{
-//            mMineXN.setVisibility(View.GONE);
-//        }
-//        mUserProfile.setOnClickListener(this);
-//        mMineSetting.setOnClickListener(this);
-//        mMineService.setOnClickListener(this);
-//        mMineAbout.setOnClickListener(this);
-//        mMineXN.setOnClickListener(this);
-//        mView.findViewById(R.id.my_wallet).setOnClickListener(this);
 
         mLayoutQrcode.setOnClickListener(this);
     }

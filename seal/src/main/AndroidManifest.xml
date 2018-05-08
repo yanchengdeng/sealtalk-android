@@ -201,6 +201,13 @@
         <activity android:name=".ui.activity.QRCodeActivity"
             android:screenOrientation="portrait"/>
 
+        <!-- 登录h5界面-->
+        <activity android:name=".ui.activity.loginWebActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name=".ui.activity.CompleteInfoActivity"
+            android:screenOrientation="portrait"/>
+
         <!--公众-->
         <activity
             android:name=".ui.activity.PublicServiceInfoActivity"
@@ -370,7 +377,7 @@
 
         <!--<meta-data-->
         <!--android:name="RONG_CLOUD_APP_KEY"-->
-        <!--android:value="e0x9wycfx7flq" />-->
+        <!--android:value="kj7swf8ok1x12" />-->
 
         <!-- 正式 n19jmcy59f1q9  测试 p5tvi9dst25b4  小乔 e0x9wycfx7flq-->
 

@@ -103,6 +103,8 @@ public class MainActivity extends FragmentActivity implements
         mineRLayout.setOnClickListener(this);
         moreImage.setOnClickListener(this);
         mSearchImageView.setOnClickListener(this);
+
+        //未读红点
         BroadcastManager.getInstance(mContext).addAction(MineFragment.SHOW_RED, new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
