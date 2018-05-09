@@ -5,6 +5,26 @@
     android:background="@color/main_regist"
     android:orientation="vertical">
 
+    <RelativeLayout
+        android:id="@+id/re_chatroom"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:background="@drawable/btn_list_item_bg"
+        android:clickable="true">
+
+        <TextView
+            android:id="@+id/tv_chatroom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="12dp"
+            android:layout_toRightOf="@id/iv_avatar2"
+            android:text="客服"
+            android:textColor="#353535"
+            android:textSize="16sp" />
+
+    </RelativeLayout>
+
     <fragment
         android:id="@+id/de_fr_public_service_subscribe_list"
         android:name="io.rong.imkit.fragment.PublicServiceSubscribeListFragment"
