@@ -25,6 +25,7 @@ public class SoftWareActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_baojia_software);
+        setTitle(getString(R.string.baojia_software_title));
         mSp = getSharedPreferences("config", MODE_PRIVATE);
         String syncName = mSp.getString(SealConst.BAOJIA_USER_SYNCNAME, "");
 
