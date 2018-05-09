@@ -7,7 +7,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 import java.util.UUID;
 
@@ -68,13 +70,32 @@ public class loginWebActivity extends BaseActivity {
         mAction = new BaojiaAction(this);
 
         mWebLogin = findViewById(R.id.web_login);
+        initWebView();
         //获取transid并存储，
         mTransId = UUID.randomUUID().toString();
         mSp.edit().putString("transid", mTransId);
         String url = String.format(mLoginUrl, mTransId, MD5.encrypt(mTransId + SECRET_KEY));
         RLog.v("loginWebActivity", url);
+
         mWebLogin.loadUrl(url);
         getLoginStatus();
+    }
+
+    private void initWebView() {
+        mWebLogin.getSettings().setJavaScriptEnabled(true);
+        mWebLogin.getSettings().setAppCacheEnabled(true);
+        //设置 缓存模式
+        mWebLogin.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
+        // 开启 DOM storage API 功能
+        mWebLogin.getSettings().setDomStorageEnabled(true);
+        mWebLogin.setWebViewClient(new WebViewClient() {
+            //覆盖shouldOverrideUrlLoading 方法
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                view.loadUrl(url);
+                return true;
+            }
+        });
     }
 
     /**
@@ -145,10 +166,12 @@ public class loginWebActivity extends BaseActivity {
         if (TextUtils.isEmpty(userinfo.getPortraitUri())) {
             userinfo.setPortraitUri(RongGenerate.generateDefaultAvatar(mUserData.getUserName(), mUserData.getId() + ""));
         }
-        String nickName = userinfo.getNickname();
+        String nickName = mUserData.getUserName();
         String portraitUri = userinfo.getPortraitUri();
+        editor.putString(SealConst.BAOJIA_USER_SYNCNAME, mUserData.getSyncName());
         editor.putString(SealConst.SEALTALK_LOGIN_NAME, nickName);
         editor.putString(SealConst.SEALTALK_LOGING_PORTRAIT, portraitUri);
+        editor.putString("loginToken", mUserData.getImToken());
         editor.commit();
         RongIM.getInstance().refreshUserInfoCache(new UserInfo(connectResultId, mUserData.getUserName(), Uri.parse(userinfo.getPortraitUri())));
         //不继续在login界面同步好友,群组,群组成员信息

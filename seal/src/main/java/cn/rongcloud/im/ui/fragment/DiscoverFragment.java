@@ -1,5 +1,6 @@
 package cn.rongcloud.im.ui.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -11,6 +12,7 @@ import android.widget.RelativeLayout;
 import com.jrmf360.rylib.common.util.ToastUtil;
 
 import cn.rongcloud.im.R;
+import cn.rongcloud.im.ui.activity.SoftWareActivity;
 
 
 public class DiscoverFragment extends Fragment implements View.OnClickListener {
@@ -40,7 +42,7 @@ public class DiscoverFragment extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.rl_discover_software: //TODO 小程序
-                ToastUtil.showToast(getContext(), "后续开放");
+                gotoSoftware();
                 break;
             case R.id.rl_discover_circle: //TODO 圈圈
                 ToastUtil.showToast(getContext(), "后续开放");
@@ -48,5 +50,10 @@ public class DiscoverFragment extends Fragment implements View.OnClickListener {
             default:
                 break;
         }
+    }
+
+    private void gotoSoftware() {
+        Intent intent = new Intent(getContext(), SoftWareActivity.class);
+        startActivity(intent);
     }
 }

@@ -19,4 +19,5 @@ public class SealConst {
     public static final String SEALTALK_LOGING_PHONE = "loginphone";
     public static final String SEALTALK_LOGING_PASSWORD = "loginpassword";
 
+    public static final String BAOJIA_USER_SYNCNAME = "user_syncname";
 }

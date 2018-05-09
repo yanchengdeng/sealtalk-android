@@ -159,10 +159,12 @@ public class CompleteInfoActivity extends BaseActivity implements View.OnClickLi
         if (TextUtils.isEmpty(userinfo.getPortraitUri())) {
             userinfo.setPortraitUri(RongGenerate.generateDefaultAvatar(mUserData.getUserName(), mUserData.getId() + ""));
         }
-        String nickName = userinfo.getNickname();
+        String nickName = mUserData.getUserName();
         String portraitUri = userinfo.getPortraitUri();
+        editor.putString(SealConst.BAOJIA_USER_SYNCNAME, mUserData.getSyncName());
         editor.putString(SealConst.SEALTALK_LOGIN_NAME, nickName);
         editor.putString(SealConst.SEALTALK_LOGING_PORTRAIT, portraitUri);
+        editor.putString("loginToken", mUserData.getImToken());
         editor.commit();
         RongIM.getInstance().refreshUserInfoCache(new UserInfo(connectResultId, mUserData.getUserName(), Uri.parse(userinfo.getPortraitUri())));
         //不继续在login界面同步好友,群组,群组成员信息

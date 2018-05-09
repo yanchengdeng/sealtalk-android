@@ -205,7 +205,12 @@
         <activity android:name=".ui.activity.loginWebActivity"
             android:screenOrientation="portrait"/>
 
+        <!-- 补充资料-->
         <activity android:name=".ui.activity.CompleteInfoActivity"
+            android:screenOrientation="portrait"/>
+
+        <!-- 小程序-->
+        <activity android:name=".ui.activity.SoftWareActivity"
             android:screenOrientation="portrait"/>
 
         <!--公众-->
