@@ -125,7 +125,7 @@ public class loginWebActivity extends BaseActivity {
                     //获取到登录状态，再判断是否信息完整
                     if (response.getData().getStatus() == NOT_COMPLETE_STATUS){
                         mUserData = response.getData();
-                        editor.putString(SealConst.BAOJIA_USER_SYNCNAME, mUserData.getSyncName());
+                        editor.putString(SealConst.BAOJIA_USER_SYNCNAME, mUserData.getSyncName()).commit();
                         gotoComplete(((GetLoginStatusResponse) result).getData());
                     }else {
                         mUserData = response.getData();

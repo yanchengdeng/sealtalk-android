@@ -12,6 +12,7 @@ import cn.rongcloud.im.server.request.CompleteInfoRequest;
 import cn.rongcloud.im.server.response.CompleteInfoResponse;
 import cn.rongcloud.im.server.response.GetLoginStatusResponse;
 import cn.rongcloud.im.server.response.SearchContactResponse;
+import cn.rongcloud.im.server.response.getAddFriendResponse;
 import io.rong.common.RLog;
 
 /**
@@ -86,13 +87,34 @@ public class BaojiaAction extends BaseAction {
      */
     public SearchContactResponse searchContact(String sycnName) throws HttpException {
         String url = String.format(BASE_URL + "/user/query/keyword?keyword=%s", sycnName);
-        RLog.v("CompleteInfoResponse", url);
-        String response = httpManager.get(url);
+        RLog.v("searchContact", url);
+        String response = httpManager.post(url);
+        RLog.v("searchContact", response);
         SearchContactResponse searchResponse = null;
         if (!TextUtils.isEmpty(response)){
             searchResponse = jsonToBean(response, SearchContactResponse.class);
         }
 
         return searchResponse;
+    }
+
+    /**
+     * 添加好友邀请
+     * @param user
+     * @param friend
+     * @return
+     * @throws HttpException
+     */
+    public getAddFriendResponse addFriend(String user, String friend) throws HttpException {
+        String url = String.format(BASE_URL + "/friend/request?friendname=%s&username=%s", friend, user);
+        RLog.v("getAddFriendResponse", url);
+        String response = httpManager.get(url);
+        RLog.v("getAddFriendResponse", response);
+        getAddFriendResponse getResponse = null;
+        if (!TextUtils.isEmpty(response)){
+            getResponse = jsonToBean(response, getAddFriendResponse.class);
+        }
+
+        return getResponse;
     }
 }

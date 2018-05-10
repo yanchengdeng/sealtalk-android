@@ -24,7 +24,8 @@
             android:drawableLeft="@drawable/sealtalk_search"
             android:drawablePadding="6dp"
             android:hint="@string/baojia_search_hint"
-            android:maxLines="1"/>
+            android:maxLines="1"
+            android:singleLine="true"/>
 
     </LinearLayout>
 

@@ -26,9 +26,8 @@ import cn.rongcloud.im.db.Friend;
 import cn.rongcloud.im.server.BaojiaAction;
 import cn.rongcloud.im.server.network.async.AsyncTaskManager;
 import cn.rongcloud.im.server.network.http.HttpException;
-import cn.rongcloud.im.server.response.FriendInvitationResponse;
-import cn.rongcloud.im.server.response.GetUserInfoByPhoneResponse;
 import cn.rongcloud.im.server.response.SearchContactResponse;
+import cn.rongcloud.im.server.response.getAddFriendResponse;
 import cn.rongcloud.im.server.utils.CommonUtils;
 import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.server.widget.DialogWithYesOrNoUtils;
@@ -53,8 +52,9 @@ public class SearchFriendActivity extends BaseActivity {
     private String mPhone;
     private String addFriendMessage;
     private String mFriendId;
-    private String mContactSyncName;
-    private String mInputSyncName;
+    private String mContactSyncName; //要添加的好友
+    private String mInputSyncName; //输入
+    private String mSelfSyncName; //当前用户
 
     private Friend mFriend;
 
@@ -65,9 +65,12 @@ public class SearchFriendActivity extends BaseActivity {
         setTitle((R.string.search_friend));
 
         mAction = new BaojiaAction(this);
+        mSelfSyncName = getSharedPreferences("config", MODE_PRIVATE).
+                getString(SealConst.BAOJIA_USER_SYNCNAME, "");
 
         mEtSearch = (EditText) findViewById(R.id.search_edit);
-        searchItem = (LinearLayout) findViewById(R.id.search_result);
+        searchItem = (LinearLayout) findViewById(R
+                .id.search_result);
         searchName = (TextView) findViewById(R.id.search_name);
         searchImage = (SelectableRoundedImageView) findViewById(R.id.search_header);
         mBtnSearch = findViewById(R.id.btn_contact_search);
@@ -118,9 +121,9 @@ public class SearchFriendActivity extends BaseActivity {
     public Object doInBackground(int requestCode, String id) throws HttpException {
         switch (requestCode) {
             case SEARCH_CONTACT:
-                mAction.searchContact(mInputSyncName);
+                return mAction.searchContact(mInputSyncName);
             case ADD_FRIEND:
-                return action.sendFriendInvitation(mFriendId, addFriendMessage);
+                return mAction.addFriend(mSelfSyncName, mContactSyncName);
         }
         return super.doInBackground(requestCode, id);
     }
@@ -149,7 +152,7 @@ public class SearchFriendActivity extends BaseActivity {
                         searchItem.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                if (isFriendOrSelf(mFriendId)) {
+                                if (isFriendOrSelf(mContactSyncName)) {
                                     Intent intent = new Intent(SearchFriendActivity.this, UserDetailActivity.class);
                                     intent.putExtra("friend", mFriend);
                                     intent.putExtra("type", CLICK_CONVERSATION_USER_PORTRAIT);
@@ -157,6 +160,7 @@ public class SearchFriendActivity extends BaseActivity {
                                     SealAppContext.getInstance().pushActivity(SearchFriendActivity.this);
                                     return;
                                 }
+
                                 DialogWithYesOrNoUtils.getInstance().showEditDialog(mContext, getString(R.string.add_text), getString(R.string.add_friend), new DialogWithYesOrNoUtils.DialogCallBack() {
                                     @Override
                                     public void executeEvent() {
@@ -178,7 +182,7 @@ public class SearchFriendActivity extends BaseActivity {
                                         if (TextUtils.isEmpty(editText)) {
                                             addFriendMessage = "我是" + getSharedPreferences("config", MODE_PRIVATE).getString(SealConst.SEALTALK_LOGIN_NAME, "");
                                         }
-                                        if (!TextUtils.isEmpty(mFriendId)) {
+                                        if (!TextUtils.isEmpty(mContactSyncName)) {
                                             LoadDialog.show(mContext);
                                             request(ADD_FRIEND);
                                         } else {
@@ -192,12 +196,12 @@ public class SearchFriendActivity extends BaseActivity {
                     }
                     break;
                 case ADD_FRIEND:
-                    FriendInvitationResponse fres = (FriendInvitationResponse) result;
-                    if (fres.getCode() == 200) {
+                    getAddFriendResponse response = (getAddFriendResponse) result;
+                    if (response.getCode() == 100000) {
                         NToast.shortToast(mContext, getString(R.string.request_success));
                         LoadDialog.dismiss(mContext);
                     } else {
-                        NToast.shortToast(mContext, "请求失败 错误码:" + fres.getCode());
+                        NToast.shortToast(mContext, "请求失败 错误码:" + response.getCode());
                         LoadDialog.dismiss(mContext);
                     }
                     break;
@@ -241,8 +245,10 @@ public class SearchFriendActivity extends BaseActivity {
 
     private boolean isFriendOrSelf(String syncName){
         SharedPreferences sp = getSharedPreferences("config", MODE_PRIVATE);
-        String selfSyncName = sp.getString(SealConst.BAOJIA_USER_SYNCNAME, "");
-        if (selfSyncName.equals(mInputSyncName)){
+        if (mSelfSyncName.equals(syncName)){
+            mFriend = new Friend(mSelfSyncName,
+                        sp.getString(SealConst.SEALTALK_LOGIN_NAME, ""),
+                        Uri.parse(sp.getString(SealConst.SEALTALK_LOGING_PORTRAIT, "")));
             //是自己
             return true;
         }else {
