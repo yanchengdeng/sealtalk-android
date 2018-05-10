@@ -58,8 +58,8 @@ public class BaojiaAction extends BaseAction {
      * @param phone
      * @return
      */
-    public CompleteInfoResponse completeInfo(String name, String phone) throws HttpException {
-        String url = String.format(BASE_URL + "/user/register/%s", name);
+    public CompleteInfoResponse completeInfo(String syncName, String name, String phone) throws HttpException {
+        String url = String.format(BASE_URL + "/user/register/%s", syncName);
         RLog.v("CompleteInfoResponse", url);
         StringEntity entity = null;
         try {

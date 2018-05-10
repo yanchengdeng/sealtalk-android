@@ -50,6 +50,7 @@ public class CompleteInfoActivity extends BaseActivity implements View.OnClickLi
     private String mNickName;
     private String mPhoneNumber;
     private String connectResultId;
+    private String mSyncName;
     private CompleteInfoResponse.ResultEntity mUserData;
 
     @Override
@@ -60,6 +61,7 @@ public class CompleteInfoActivity extends BaseActivity implements View.OnClickLi
 
         sp = getSharedPreferences("config", MODE_PRIVATE);
         editor = sp.edit();
+        mSyncName = sp.getString(SealConst.BAOJIA_USER_SYNCNAME, "");
         setTitle(R.string.baojia_complete_title, false);
         initView();
     }
@@ -105,7 +107,7 @@ public class CompleteInfoActivity extends BaseActivity implements View.OnClickLi
     public Object doInBackground(int requestCode, String id) throws HttpException {
         switch (requestCode){
             case COMPLETE_INFO:
-                return mAction.completeInfo(mNickName,  mPhoneNumber);
+                return mAction.completeInfo(mSyncName, mNickName,  mPhoneNumber);
             default:
                 break;
         }

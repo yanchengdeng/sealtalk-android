@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">SealTalk</string>
+    <string name="app_name">Baojia +</string>
     <string name="add_contacts">Add Contacts</string>
     <string name="group_chat">Group Chat</string>
     <string name="private_chat">Private Chat</string>
