@@ -10,7 +10,7 @@
         android:id="@+id/layout_head"
         android:layout_width="match_parent"
         android:layout_height="48dip"
-        android:background="@color/de_title_bg"
+        android:background="#000000"
         android:orientation="horizontal">
 
         <Button

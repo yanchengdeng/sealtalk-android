@@ -11,21 +11,24 @@ import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.dbcapp.club.R;
+
 import cn.rongcloud.im.App;
-import cn.rongcloud.im.R;
 import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.SealAppContext;
 import cn.rongcloud.im.SealConst;
 import cn.rongcloud.im.db.Friend;
+import cn.rongcloud.im.server.BaojiaAction;
 import cn.rongcloud.im.server.network.async.AsyncTaskManager;
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.response.FriendInvitationResponse;
 import cn.rongcloud.im.server.response.GetUserInfoByPhoneResponse;
-import cn.rongcloud.im.server.utils.AMUtils;
+import cn.rongcloud.im.server.response.SearchContactResponse;
 import cn.rongcloud.im.server.utils.CommonUtils;
 import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.server.widget.DialogWithYesOrNoUtils;
@@ -37,8 +40,12 @@ import io.rong.imlib.model.UserInfo;
 public class SearchFriendActivity extends BaseActivity {
 
     private static final int CLICK_CONVERSATION_USER_PORTRAIT = 1;
-    private static final int SEARCH_PHONE = 10;
+    private static final int SEARCH_CONTACT = 10;
     private static final int ADD_FRIEND = 11;
+
+    private BaojiaAction mAction;
+
+    private Button mBtnSearch;
     private EditText mEtSearch;
     private LinearLayout searchItem;
     private TextView searchName;
@@ -46,6 +53,8 @@ public class SearchFriendActivity extends BaseActivity {
     private String mPhone;
     private String addFriendMessage;
     private String mFriendId;
+    private String mContactSyncName;
+    private String mInputSyncName;
 
     private Friend mFriend;
 
@@ -55,10 +64,14 @@ public class SearchFriendActivity extends BaseActivity {
         setContentView(R.layout.activity_search);
         setTitle((R.string.search_friend));
 
+        mAction = new BaojiaAction(this);
+
         mEtSearch = (EditText) findViewById(R.id.search_edit);
         searchItem = (LinearLayout) findViewById(R.id.search_result);
         searchName = (TextView) findViewById(R.id.search_name);
         searchImage = (SelectableRoundedImageView) findViewById(R.id.search_header);
+        mBtnSearch = findViewById(R.id.btn_contact_search);
+
         mEtSearch.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -67,18 +80,18 @@ public class SearchFriendActivity extends BaseActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.length() == 11) {
-                    mPhone = s.toString().trim();
-                    if (!AMUtils.isMobile(mPhone)) {
-                        NToast.shortToast(mContext, "非法手机号");
-                        return;
-                    }
-                    hintKbTwo();
-                    LoadDialog.show(mContext);
-                    request(SEARCH_PHONE, true);
-                } else {
-                    searchItem.setVisibility(View.GONE);
-                }
+//                if (s.length() == 11) {
+//                    mPhone = s.toString().trim();
+//                    if (!AMUtils.isMobile(mPhone)) {
+//                        NToast.shortToast(mContext, "非法手机号");
+//                        return;
+//                    }
+//                    hintKbTwo();
+//                    LoadDialog.show(mContext);
+//                    request(SEARCH_CONTACT, true);
+//                } else {
+//                    searchItem.setVisibility(View.GONE);
+//                }
             }
 
             @Override
@@ -87,13 +100,25 @@ public class SearchFriendActivity extends BaseActivity {
             }
         });
 
+        mBtnSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mInputSyncName = mEtSearch.getText().toString().trim();
+                if (TextUtils.isEmpty(mInputSyncName)){
+                    NToast.shortToast(SearchFriendActivity.this, R.string.baojia_search_empty_tip);
+                    return;
+                }
+                LoadDialog.show(mContext);
+                request(SEARCH_CONTACT, true);
+            }
+        });
     }
 
     @Override
     public Object doInBackground(int requestCode, String id) throws HttpException {
         switch (requestCode) {
-            case SEARCH_PHONE:
-                return action.getUserInfoFromPhone("86", mPhone);
+            case SEARCH_CONTACT:
+                mAction.searchContact(mInputSyncName);
             case ADD_FRIEND:
                 return action.sendFriendInvitation(mFriendId, addFriendMessage);
         }
@@ -104,23 +129,23 @@ public class SearchFriendActivity extends BaseActivity {
     public void onSuccess(int requestCode, Object result) {
         if (result != null) {
             switch (requestCode) {
-                case SEARCH_PHONE:
-                    final GetUserInfoByPhoneResponse userInfoByPhoneResponse = (GetUserInfoByPhoneResponse) result;
-                    if (userInfoByPhoneResponse.getCode() == 200) {
+                case SEARCH_CONTACT:
+                    final SearchContactResponse searchResponse = (SearchContactResponse) result;
+                    if (searchResponse.getCode() == 100000) {
                         LoadDialog.dismiss(mContext);
                         NToast.shortToast(mContext, "success");
-                        mFriendId = userInfoByPhoneResponse.getResult().getId();
+                        mContactSyncName = searchResponse.getData().getSyncName();
                         searchItem.setVisibility(View.VISIBLE);
                         String portraitUri = null;
-                        if (userInfoByPhoneResponse.getResult() != null) {
-                            GetUserInfoByPhoneResponse.ResultEntity userInfoByPhoneResponseResult = userInfoByPhoneResponse.getResult();
-                            UserInfo userInfo = new UserInfo(userInfoByPhoneResponseResult.getId(),
-                                    userInfoByPhoneResponseResult.getNickname(),
-                                    Uri.parse(userInfoByPhoneResponseResult.getPortraitUri()));
+                        if (searchResponse.getData() != null) {
+                            SearchContactResponse.ResultEntity contactInfo = searchResponse.getData();
+                            UserInfo userInfo = new UserInfo(String.valueOf(contactInfo.getId()),
+                                    contactInfo.getUserName(),
+                                    Uri.parse(""));
                             portraitUri = SealUserInfoManager.getInstance().getPortraitUri(userInfo);
                         }
                         ImageLoader.getInstance().displayImage(portraitUri, searchImage, App.getOptions());
-                        searchName.setText(userInfoByPhoneResponse.getResult().getNickname());
+                        searchName.setText(searchResponse.getData().getSyncName());
                         searchItem.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -187,7 +212,7 @@ public class SearchFriendActivity extends BaseActivity {
                 NToast.shortToast(mContext, "你们已经是好友");
                 LoadDialog.dismiss(mContext);
                 break;
-            case SEARCH_PHONE:
+            case SEARCH_CONTACT:
                 if (state == AsyncTaskManager.HTTP_ERROR_CODE || state == AsyncTaskManager.HTTP_NULL_CODE) {
                     super.onFailure(requestCode, state, result);
                 } else {
@@ -214,23 +239,36 @@ public class SearchFriendActivity extends BaseActivity {
         }
     }
 
-    private boolean isFriendOrSelf(String id) {
-        String inputPhoneNumber = mEtSearch.getText().toString().trim();
+    private boolean isFriendOrSelf(String syncName){
         SharedPreferences sp = getSharedPreferences("config", MODE_PRIVATE);
-        String selfPhoneNumber = sp.getString(SealConst.SEALTALK_LOGING_PHONE, "");
-        if (inputPhoneNumber != null) {
-            if (inputPhoneNumber.equals(selfPhoneNumber)) {
-                mFriend = new Friend(sp.getString(SealConst.SEALTALK_LOGIN_ID, ""),
-                        sp.getString(SealConst.SEALTALK_LOGIN_NAME, ""),
-                        Uri.parse(sp.getString(SealConst.SEALTALK_LOGING_PORTRAIT, "")));
-                return true;
-            } else {
-                mFriend = SealUserInfoManager.getInstance().getFriendByID(id);
-                if (mFriend != null) {
-                    return true;
-                }
-            }
+        String selfSyncName = sp.getString(SealConst.BAOJIA_USER_SYNCNAME, "");
+        if (selfSyncName.equals(mInputSyncName)){
+            //是自己
+            return true;
+        }else {
+            // TODO: 2018/5/9 判断是否已是朋友
         }
+
         return false;
     }
+
+//    private boolean isFriendOrSelf(String id) {
+//        String inputPhoneNumber = mEtSearch.getText().toString().trim();
+//        SharedPreferences sp = getSharedPreferences("config", MODE_PRIVATE);
+//        String selfPhoneNumber = sp.getString(SealConst.SEALTALK_LOGING_PHONE, "");
+//        if (inputPhoneNumber != null) {
+//            if (inputPhoneNumber.equals(selfPhoneNumber)) {
+//                mFriend = new Friend(sp.getString(SealConst.SEALTALK_LOGIN_ID, ""),
+//                        sp.getString(SealConst.SEALTALK_LOGIN_NAME, ""),
+//                        Uri.parse(sp.getString(SealConst.SEALTALK_LOGING_PORTRAIT, "")));
+//                return true;
+//            } else {
+//                mFriend = SealUserInfoManager.getInstance().getFriendByID(id);
+//                if (mFriend != null) {
+//                    return true;
+//                }
+//            }
+//        }
+//        return false;
+//    }
 }

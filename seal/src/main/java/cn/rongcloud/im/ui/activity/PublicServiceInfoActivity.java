@@ -3,7 +3,8 @@ package cn.rongcloud.im.ui.activity;
 import android.os.Bundle;
 import android.util.Log;
 
-import cn.rongcloud.im.R;
+import com.dbcapp.club.R;
+
 
 public class PublicServiceInfoActivity extends BaseActivity {
 

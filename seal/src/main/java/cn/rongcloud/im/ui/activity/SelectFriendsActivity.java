@@ -18,6 +18,8 @@ import android.widget.SectionIndexer;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.dbcapp.club.R;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 
 import cn.rongcloud.im.App;
-import cn.rongcloud.im.R;
 import cn.rongcloud.im.SealConst;
 import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.db.Friend;

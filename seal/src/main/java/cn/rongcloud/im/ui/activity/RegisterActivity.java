@@ -14,7 +14,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import cn.rongcloud.im.R;
+import com.dbcapp.club.R;
+
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.response.CheckPhoneResponse;
 import cn.rongcloud.im.server.response.RegisterResponse;

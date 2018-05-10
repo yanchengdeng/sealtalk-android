@@ -25,11 +25,12 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.dbcapp.club.R;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import cn.rongcloud.im.App;
-import cn.rongcloud.im.R;
 import cn.rongcloud.im.SealConst;
 import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.db.DBManager;

@@ -4,7 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 
-import cn.rongcloud.im.R;
+import com.dbcapp.club.R;
+
 import cn.rongcloud.im.ui.adapter.SubConversationListAdapterEx;
 import io.rong.imkit.RongContext;
 import io.rong.imkit.fragment.SubConversationListFragment;

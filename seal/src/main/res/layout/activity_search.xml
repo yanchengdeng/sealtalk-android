@@ -23,9 +23,7 @@
             android:layout_marginRight="14dp"
             android:drawableLeft="@drawable/sealtalk_search"
             android:drawablePadding="6dp"
-            android:hint="@string/ac_search_phone_number"
-            android:inputType="phone"
-            android:maxLength="11"
+            android:hint="@string/baojia_search_hint"
             android:maxLines="1"/>
 
     </LinearLayout>
@@ -72,4 +70,16 @@
 
 
     </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"/>
+
+    <Button
+        android:id="@+id/btn_contact_search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="search"
+        android:gravity="center"/>
 </LinearLayout>

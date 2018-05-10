@@ -118,7 +118,7 @@
         android:background="#dfdfdd" />
 
     <RelativeLayout
-        android:id="@+id/mine_service"
+        android:id="@+id/rl_mine_settings"
         android:layout_width="match_parent"
         android:layout_height="45.5dp"
         android:background="@drawable/btn_list_item_bg"

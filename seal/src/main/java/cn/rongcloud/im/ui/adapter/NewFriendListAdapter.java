@@ -6,8 +6,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.dbcapp.club.R;
+
 import cn.rongcloud.im.App;
-import cn.rongcloud.im.R;
 import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.server.response.UserRelationshipResponse;
 import cn.rongcloud.im.server.widget.SelectableRoundedImageView;

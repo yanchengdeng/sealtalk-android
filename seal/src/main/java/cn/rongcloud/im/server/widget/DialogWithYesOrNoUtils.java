@@ -8,7 +8,8 @@ import android.view.LayoutInflater;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
-import cn.rongcloud.im.R;
+import com.dbcapp.club.R;
+
 import cn.rongcloud.im.SealConst;
 import cn.rongcloud.im.server.utils.NToast;
 

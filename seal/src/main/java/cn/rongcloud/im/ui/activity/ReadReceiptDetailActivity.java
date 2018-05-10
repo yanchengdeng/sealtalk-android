@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 
 import cn.rongcloud.im.App;
-import cn.rongcloud.im.R;
 import cn.rongcloud.im.SealAppContext;
 import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.db.DBManager;
@@ -53,6 +52,8 @@ import io.rong.message.TextMessage;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.dbcapp.club.R;
 
 /**
  * Created by Yuejunhong on 16/10/10.

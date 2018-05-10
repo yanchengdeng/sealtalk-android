@@ -18,7 +18,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import cn.rongcloud.im.R;
+import com.dbcapp.club.R;
+
 import cn.rongcloud.im.SealConst;
 import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.server.network.http.HttpException;

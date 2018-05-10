@@ -7,9 +7,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 
+import com.dbcapp.club.R;
+
 import java.util.List;
 
-import cn.rongcloud.im.R;
 import cn.rongcloud.im.utils.Resource;
 import io.rong.imkit.widget.AsyncImageView;
 import io.rong.imlib.model.UserInfo;

@@ -375,4 +375,6 @@
     <string name="baojia_complete">完成</string>
     <string name="baojia_complete_title">注册</string>
     <string name="baojia_software_title">小程序</string>
+    <string name="baojia_search_hint">联系人名字</string>
+    <string name="baojia_search_empty_tip">搜索内容不能为空</string>
 </resources>

@@ -2,7 +2,8 @@ package cn.rongcloud.im.ui.activity;
 
 import android.os.Bundle;
 
-import cn.rongcloud.im.R;
+import com.dbcapp.club.R;
+
 
 public class PublicServiceSearchActivity extends BaseActivity {
 

@@ -13,11 +13,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.dbcapp.club.R;
+
 import java.lang.ref.WeakReference;
 import java.util.Calendar;
 import java.util.Date;
 
-import cn.rongcloud.im.R;
 import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.utils.DateUtils;
 import cn.rongcloud.im.utils.SharedPreferencesContext;

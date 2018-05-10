@@ -10,7 +10,8 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Window;
 
-import cn.rongcloud.im.R;
+import com.dbcapp.club.R;
+
 import cn.rongcloud.im.SealAppContext;
 import io.rong.imkit.RongIM;
 

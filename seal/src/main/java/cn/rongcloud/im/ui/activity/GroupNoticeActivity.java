@@ -11,7 +11,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import cn.rongcloud.im.R;
+import com.dbcapp.club.R;
+
 import cn.rongcloud.im.server.widget.DialogWithYesOrNoUtils;
 import io.rong.imkit.emoticon.AndroidEmoji;
 import io.rong.imkit.RongContext;

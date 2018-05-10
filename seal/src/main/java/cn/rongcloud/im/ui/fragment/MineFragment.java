@@ -17,12 +17,14 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.dbcapp.club.R;
+
 import cn.rongcloud.im.App;
-import cn.rongcloud.im.R;
 import cn.rongcloud.im.SealConst;
 import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
+import cn.rongcloud.im.ui.activity.AccountSettingActivity;
 import cn.rongcloud.im.ui.activity.QRCodeActivity;
 import io.rong.imageloader.core.ImageLoader;
 import io.rong.imlib.model.UserInfo;
@@ -39,6 +41,7 @@ public class MineFragment extends Fragment implements View.OnClickListener {
     private SelectableRoundedImageView imageView;
     private TextView mTvName;
     private RelativeLayout mLayoutQrcode;
+    private RelativeLayout mLayoutSettings;
 
     @Nullable
     @Override
@@ -65,15 +68,20 @@ public class MineFragment extends Fragment implements View.OnClickListener {
         imageView = (SelectableRoundedImageView) mView.findViewById(R.id.mine_header);
         mTvName = mView.findViewById(R.id.mine_name);
         mLayoutQrcode = mView.findViewById(R.id.rl_mine_qrcode);
+        mLayoutSettings = mView.findViewById(R.id.rl_mine_settings);
 
         mLayoutQrcode.setOnClickListener(this);
+        mLayoutSettings.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()){
-            case R.id.rl_mine_qrcode:
+            case R.id.rl_mine_qrcode://二维码
                 gotoQrCode();
+                break;
+            case R.id.rl_mine_settings: //设置
+                startActivity(new Intent(getActivity(), AccountSettingActivity.class));
                 break;
             default:
                 break;

@@ -7,9 +7,10 @@ import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
 import android.view.View;
 
+import com.dbcapp.club.R;
+
 import java.util.Locale;
 
-import cn.rongcloud.im.R;
 import cn.rongcloud.im.server.utils.NToast;
 import io.rong.imkit.RongIM;
 import io.rong.imkit.fragment.ConversationFragment;

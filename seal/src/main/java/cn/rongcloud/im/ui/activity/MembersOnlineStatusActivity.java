@@ -11,10 +11,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 
+import com.dbcapp.club.R;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.rongcloud.im.R;
 import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.db.GroupMember;
 import io.rong.imlib.IRongCallback;

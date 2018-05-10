@@ -9,9 +9,9 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import com.dbcapp.club.R;
 import com.jrmf360.rylib.common.util.ToastUtil;
 
-import cn.rongcloud.im.R;
 import cn.rongcloud.im.ui.activity.SoftWareActivity;
 
 

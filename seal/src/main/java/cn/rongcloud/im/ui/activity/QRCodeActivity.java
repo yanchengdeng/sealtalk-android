@@ -5,7 +5,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 
-import cn.rongcloud.im.R;
+import com.dbcapp.club.R;
+
 import cn.rongcloud.im.server.utils.QRUtils;
 
 /**

@@ -11,6 +11,7 @@ import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.request.CompleteInfoRequest;
 import cn.rongcloud.im.server.response.CompleteInfoResponse;
 import cn.rongcloud.im.server.response.GetLoginStatusResponse;
+import cn.rongcloud.im.server.response.SearchContactResponse;
 import io.rong.common.RLog;
 
 /**
@@ -75,5 +76,23 @@ public class BaojiaAction extends BaseAction {
         }
 
         return infoResponse;
+    }
+
+    /**
+     * 搜索联系人
+     * @param sycnName
+     * @return
+     * @throws HttpException
+     */
+    public SearchContactResponse searchContact(String sycnName) throws HttpException {
+        String url = String.format(BASE_URL + "/user/query/keyword?keyword=%s", sycnName);
+        RLog.v("CompleteInfoResponse", url);
+        String response = httpManager.get(url);
+        SearchContactResponse searchResponse = null;
+        if (!TextUtils.isEmpty(response)){
+            searchResponse = jsonToBean(response, SearchContactResponse.class);
+        }
+
+        return searchResponse;
     }
 }

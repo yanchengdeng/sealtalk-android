@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_alignParentTop="true"
-        android:background="#ec6954" >
+        android:background="#000000" >
 
 
         <TextView
@@ -18,7 +18,7 @@
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:layout_marginLeft="14dp"
-            android:textColor="#fff"
+            android:textColor="#FFA500"
             android:textSize="14sp"
             android:text="@string/bj_title"/>
 

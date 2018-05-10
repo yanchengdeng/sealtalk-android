@@ -8,7 +8,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import cn.rongcloud.im.R;
+import com.dbcapp.club.R;
 
 
 @SuppressLint("SetJavaScriptEnabled")

@@ -7,7 +7,8 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 
-import cn.rongcloud.im.R;
+import com.dbcapp.club.R;
+
 import cn.rongcloud.im.SealConst;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.network.http.HttpException;

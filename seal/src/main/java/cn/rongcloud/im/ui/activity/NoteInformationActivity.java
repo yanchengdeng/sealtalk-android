@@ -11,7 +11,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import cn.rongcloud.im.R;
+import com.dbcapp.club.R;
+
 import cn.rongcloud.im.SealAppContext;
 import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.db.Friend;

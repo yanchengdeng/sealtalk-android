@@ -12,9 +12,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.dbcapp.club.R;
+
 import java.util.Date;
 
-import cn.rongcloud.im.R;
 import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.ui.widget.switchbutton.SwitchButton;
 import cn.rongcloud.im.utils.DateUtils;

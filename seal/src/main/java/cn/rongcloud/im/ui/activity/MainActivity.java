@@ -21,10 +21,11 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.dbcapp.club.R;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.rongcloud.im.R;
 import cn.rongcloud.im.server.HomeWatcherReceiver;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.utils.NToast;

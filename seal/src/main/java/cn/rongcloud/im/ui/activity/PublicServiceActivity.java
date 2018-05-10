@@ -5,7 +5,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-import cn.rongcloud.im.R;
+import com.dbcapp.club.R;
+
 import io.rong.imkit.RongIM;
 import io.rong.imlib.model.CSCustomServiceInfo;
 

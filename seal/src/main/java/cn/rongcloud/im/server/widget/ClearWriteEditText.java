@@ -12,7 +12,7 @@ import android.view.animation.CycleInterpolator;
 import android.view.animation.TranslateAnimation;
 import android.widget.EditText;
 
-import cn.rongcloud.im.R;
+import com.dbcapp.club.R;
 
 
 /**

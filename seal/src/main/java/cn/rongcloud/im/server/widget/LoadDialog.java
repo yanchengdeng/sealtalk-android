@@ -10,7 +10,8 @@ import android.view.WindowManager;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 
-import cn.rongcloud.im.R;
+import com.dbcapp.club.R;
+
 import cn.rongcloud.im.server.utils.NToast;
 
 

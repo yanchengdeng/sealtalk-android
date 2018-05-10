@@ -15,7 +15,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import cn.rongcloud.im.R;
+import com.dbcapp.club.R;
+
 import cn.rongcloud.im.SealConst;
 import cn.rongcloud.im.server.UpdateService;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;

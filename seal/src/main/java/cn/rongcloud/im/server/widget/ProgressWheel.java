@@ -17,7 +17,7 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.View;
 
-import cn.rongcloud.im.R;
+import com.dbcapp.club.R;
 
 
 /**

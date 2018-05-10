@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.RelativeLayout;
 
-import cn.rongcloud.im.R;
+import com.dbcapp.club.R;
 
 
 public class PrivacyActivity extends BaseActivity {

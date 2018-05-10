@@ -15,9 +15,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
 
+import com.dbcapp.club.R;
 import com.umeng.analytics.MobclickAgent;
 
-import cn.rongcloud.im.R;
 import cn.rongcloud.im.server.SealAction;
 import cn.rongcloud.im.server.network.async.AsyncTaskManager;
 import cn.rongcloud.im.server.network.async.OnDataListener;

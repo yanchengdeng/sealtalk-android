@@ -18,9 +18,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.dbcapp.club.R;
+
 import java.util.List;
 
-import cn.rongcloud.im.R;
 import cn.rongcloud.im.model.SealCSEvaluateItem;
 import io.rong.imlib.CustomServiceConfig;
 

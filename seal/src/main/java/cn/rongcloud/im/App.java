@@ -9,6 +9,7 @@ import android.support.multidex.MultiDexApplication;
 import android.text.TextUtils;
 import android.view.View;
 
+import com.dbcapp.club.R;
 import com.facebook.stetho.Stetho;
 import com.facebook.stetho.dumpapp.DumperPlugin;
 import com.facebook.stetho.inspector.database.DefaultDatabaseConnectionProvider;
@@ -110,9 +111,9 @@ public class App extends MultiDexApplication {
             openSealDBIfHasCachedToken();
 
             options = new DisplayImageOptions.Builder()
-                    .showImageForEmptyUri(cn.rongcloud.im.R.drawable.de_default_portrait)
-                    .showImageOnFail(cn.rongcloud.im.R.drawable.de_default_portrait)
-                    .showImageOnLoading(cn.rongcloud.im.R.drawable.de_default_portrait)
+                    .showImageForEmptyUri(R.drawable.de_default_portrait)
+                    .showImageOnFail(R.drawable.de_default_portrait)
+                    .showImageOnLoading(R.drawable.de_default_portrait)
                     .displayer(new FadeInBitmapDisplayer(300))
                     .cacheInMemory(true)
                     .cacheOnDisk(true)

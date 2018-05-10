@@ -11,9 +11,10 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.dbcapp.club.R;
+
 import java.util.UUID;
 
-import cn.rongcloud.im.R;
 import cn.rongcloud.im.SealConst;
 import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.server.BaojiaAction;
@@ -22,6 +23,7 @@ import cn.rongcloud.im.server.response.GetLoginStatusResponse;
 import cn.rongcloud.im.server.response.GetUserInfoByIdResponse;
 import cn.rongcloud.im.server.utils.MD5;
 import cn.rongcloud.im.server.utils.NLog;
+import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.server.utils.RongGenerate;
 import io.rong.common.RLog;
 import io.rong.imkit.RongIM;
@@ -71,13 +73,8 @@ public class loginWebActivity extends BaseActivity {
 
         mWebLogin = findViewById(R.id.web_login);
         initWebView();
-        //获取transid并存储，
-        mTransId = UUID.randomUUID().toString();
-        mSp.edit().putString("transid", mTransId);
-        String url = String.format(mLoginUrl, mTransId, MD5.encrypt(mTransId + SECRET_KEY));
-        RLog.v("loginWebActivity", url);
+        loadWebUrl();
 
-        mWebLogin.loadUrl(url);
         getLoginStatus();
     }
 
@@ -152,12 +149,25 @@ public class loginWebActivity extends BaseActivity {
                             }
                         });
                     }
+                }else if (response.getCode() == 110002){
+                    NToast.shortToast(this, response.getMessage());
+                    loadWebUrl();
+                    mHandler.sendEmptyMessageDelayed(LOOPER_WHAT, LOOPER_INTERVAL);
                 }else {
                     //没有登录成功，继续轮询
                     mHandler.sendEmptyMessageDelayed(LOOPER_WHAT, LOOPER_INTERVAL);
                 }
                 break;
         }
+    }
+
+    private void loadWebUrl(){
+        //获取transid并存储
+        mTransId = UUID.randomUUID().toString();
+        mSp.edit().putString("transid", mTransId);
+        String url = String.format(mLoginUrl, mTransId, MD5.encrypt(mTransId + SECRET_KEY));
+        RLog.v("loginWebActivity", url);
+        mWebLogin.loadUrl(url);
     }
 
     private void setUserInfo() {

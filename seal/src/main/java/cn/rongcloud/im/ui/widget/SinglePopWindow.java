@@ -11,7 +11,8 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import cn.rongcloud.im.R;
+import com.dbcapp.club.R;
+
 import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.db.BlackList;
 import cn.rongcloud.im.db.Friend;

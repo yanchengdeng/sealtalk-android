@@ -51,12 +51,13 @@ import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.Scroller;
 
+import com.dbcapp.club.R;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import cn.rongcloud.im.R;
 
 // @formatter:off
 /**

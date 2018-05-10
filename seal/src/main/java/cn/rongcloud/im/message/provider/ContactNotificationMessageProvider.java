@@ -10,10 +10,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.dbcapp.club.R;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import cn.rongcloud.im.R;
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.response.ContactNotificationMessageData;
 import cn.rongcloud.im.server.utils.json.JsonMananger;

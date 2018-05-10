@@ -27,7 +27,7 @@ import android.view.ViewParent;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.CompoundButton;
 
-import cn.rongcloud.im.R;
+import com.dbcapp.club.R;
 
 
 /**

@@ -26,7 +26,8 @@ import android.net.Uri;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
-import cn.rongcloud.im.R;
+import com.dbcapp.club.R;
+
 
 public class SelectableRoundedImageView extends ImageView {
 

@@ -35,7 +35,7 @@ import android.support.annotation.DrawableRes;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
-import cn.rongcloud.im.R;
+import com.dbcapp.club.R;
 
 
 public class CircleImageView extends ImageView {
