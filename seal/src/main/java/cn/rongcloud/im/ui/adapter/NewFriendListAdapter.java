@@ -10,7 +10,7 @@ import com.dbcapp.club.R;
 
 import cn.rongcloud.im.App;
 import cn.rongcloud.im.SealUserInfoManager;
-import cn.rongcloud.im.server.response.UserRelationshipResponse;
+import cn.rongcloud.im.server.response.GetRelationFriendResponse;
 import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
 import io.rong.imageloader.core.ImageLoader;
 import io.rong.imlib.model.UserInfo;
@@ -36,47 +36,25 @@ public class NewFriendListAdapter extends BaseAdapters {
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
-        final UserRelationshipResponse.ResultEntity bean = (UserRelationshipResponse.ResultEntity) dataSet.get(position);
-        holder.mName.setText(bean.getUser().getNickname());
+        final GetRelationFriendResponse.ResultEntity bean = (GetRelationFriendResponse.ResultEntity) dataSet.get(position);
+        holder.mName.setText(bean.getUserName());
         String portraitUri = null;
-        if (bean != null && bean.getUser() != null) {
-            UserRelationshipResponse.ResultEntity.UserEntity userEntity = bean.getUser();
+        if (bean != null) {
             portraitUri = SealUserInfoManager.getInstance().getPortraitUri(new UserInfo(
-                              userEntity.getId(), userEntity.getNickname(), Uri.parse(userEntity.getPortraitUri())));
+                              String.valueOf(bean.getId()), bean.getUserName(), Uri.parse("")));
         }
         ImageLoader.getInstance().displayImage(portraitUri, holder.mHead, App.getOptions());
-        holder.mMessage.setText(bean.getMessage());
+//        holder.mMessage.setText(bean.getMessage());
         holder.mState.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 if (mOnItemButtonClick != null) {
                     mOnItemButtonClick.onButtonClick(position, v, bean.getStatus());
                 }
             }
         });
 
-        switch (bean.getStatus()) {
-            case 11: //收到了好友邀请
-                holder.mState.setText(R.string.agree);
-                holder.mState.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.de_add_friend_selector));
-                break;
-            case 10: // 发出了好友邀请
-                holder.mState.setText(R.string.request);
-                holder.mState.setBackgroundDrawable(null);
-                break;
-            case 21: // 忽略好友邀请
-                holder.mState.setText(R.string.ignore);
-                holder.mState.setBackgroundDrawable(null);
-                break;
-            case 20: // 已是好友
-                holder.mState.setText(R.string.added);
-                holder.mState.setBackgroundDrawable(null);
-                break;
-            case 30: // 删除了好友关系
-                holder.mState.setText(R.string.deleted);
-                holder.mState.setBackgroundDrawable(null);
-                break;
-        }
         return convertView;
     }
 

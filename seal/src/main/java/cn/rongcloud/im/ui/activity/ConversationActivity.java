@@ -34,7 +34,7 @@ import cn.rongcloud.im.server.utils.NLog;
 import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.ui.fragment.ConversationFragmentEx;
 import cn.rongcloud.im.ui.widget.LoadingDialog;
-import io.rong.common.RLog;
+import io.rong.callkit.RongCallKit;
 import io.rong.imkit.RongIM;
 import io.rong.imkit.RongKitIntent;
 import io.rong.imkit.fragment.UriFragment;
@@ -50,7 +50,6 @@ import io.rong.message.TextMessage;
 import io.rong.message.VoiceMessage;
 
 //CallKit start 1
-import io.rong.callkit.RongCallKit;
 //CallKit end 1
 
 /**
@@ -415,7 +414,7 @@ public class ConversationActivity extends BaseActivity implements View.OnClickLi
         } else if (conversationType.equals(Conversation.ConversationType.PUBLIC_SERVICE)) {
             setPublicServiceActionBar(targetId);
         } else if (conversationType.equals(Conversation.ConversationType.CUSTOMER_SERVICE)) {
-            setTitle(R.string.main_customer);
+            setTitle(title);
         } else {
             setTitle(R.string.de_actionbar_sub_defult);
         }

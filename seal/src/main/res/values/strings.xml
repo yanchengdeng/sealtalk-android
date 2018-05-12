@@ -377,4 +377,5 @@
     <string name="baojia_software_title">小程序</string>
     <string name="baojia_search_hint">联系人名字</string>
     <string name="baojia_search_empty_tip">搜索内容不能为空</string>
+    <string name="baojia_custom_service">客服</string>
 </resources>

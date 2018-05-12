@@ -34,7 +34,7 @@ public class PublicServiceActivity extends BaseActivity {
                 //首先需要构造使用客服者的用户信息
                 CSCustomServiceInfo.Builder csBuilder = new CSCustomServiceInfo.Builder();
                 CSCustomServiceInfo csInfo = csBuilder.nickName("客服").build();
-                RongIM.getInstance().startCustomerServiceChat(PublicServiceActivity.this, "KEFU152578489679075 ", "在线客服",csInfo);
+                RongIM.getInstance().startCustomerServiceChat(PublicServiceActivity.this, "KEFU152578489679075", "VIP客服", null);
             }
         });
     }

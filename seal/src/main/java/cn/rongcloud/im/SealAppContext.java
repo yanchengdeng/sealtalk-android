@@ -228,14 +228,13 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
             if (contactNotificationMessage.getOperation().equals("Request")) {
                 //对方发来好友邀请
                 BroadcastManager.getInstance(mContext).sendBroadcast(UPDATE_RED_DOT);
-            } else if (contactNotificationMessage.getOperation().equals("AcceptResponse")) {
+            } else if (contactNotificationMessage.getOperation().equals("acceptRequest")) {
                 //对方同意我的好友请求
-                ContactNotificationMessageData contactNotificationMessageData;
+
+                ContactNotificationMessageData contactNotificationMessageData = null;
                 try {
-                    contactNotificationMessageData = JsonMananger.jsonToBean(contactNotificationMessage.getExtra(), ContactNotificationMessageData.class);
-                } catch (HttpException e) {
-                    e.printStackTrace();
-                    return false;
+                    contactNotificationMessageData = new ContactNotificationMessageData();
+                    contactNotificationMessageData.setSourceUserNickname(contactNotificationMessage.getExtra());
                 } catch (JSONException e) {
                     e.printStackTrace();
                     return false;
@@ -340,9 +339,10 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            return true;
+            return false;
         } else if (messageContent instanceof ImageMessage) {
             //ImageMessage imageMessage = (ImageMessage) messageContent;
+            return false;
         }
         return false;
     }

@@ -9,8 +9,11 @@ import java.io.UnsupportedEncodingException;
 
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.request.CompleteInfoRequest;
+import cn.rongcloud.im.server.response.AgreeFriendResponse;
 import cn.rongcloud.im.server.response.CompleteInfoResponse;
+import cn.rongcloud.im.server.response.GetFriendResponse;
 import cn.rongcloud.im.server.response.GetLoginStatusResponse;
+import cn.rongcloud.im.server.response.GetRelationFriendResponse;
 import cn.rongcloud.im.server.response.SearchContactResponse;
 import cn.rongcloud.im.server.response.getAddFriendResponse;
 import io.rong.common.RLog;
@@ -116,5 +119,66 @@ public class BaojiaAction extends BaseAction {
         }
 
         return getResponse;
+    }
+
+    /**
+     * 获取申请好友的列表
+     * @param syncName
+     * @param time
+     * @return
+     * @throws HttpException
+     */
+    public GetRelationFriendResponse getRaletionFriend(String syncName, long time) throws HttpException {
+        String url = String.format(BASE_URL + "/friend/request/list?pageSize=50&startTime=%d&username=%s", time, syncName);
+        RLog.v("getRaletionFriend", url);
+        String responseStr = httpManager.get(url);
+        RLog.v("getRaletionFriend", responseStr);
+        GetRelationFriendResponse response = null;
+        if (!TextUtils.isEmpty(responseStr)){
+            response = jsonToBean(responseStr, GetRelationFriendResponse.class);
+        }
+
+        return response;
+    }
+
+    /**
+     * 获取好友列表
+     * @param syncName
+     * @param time
+     * @return
+     * @throws HttpException
+     */
+    public GetFriendResponse getFriends(String syncName, long time) throws HttpException {
+        String url = String.format(BASE_URL + "/friend/list?pageSize=50&startTime=%d&username=%s", time, syncName);
+        RLog.v("getFriends", url);
+        String responseStr = httpManager.get(url);
+        RLog.v("getFriends", responseStr);
+        GetFriendResponse response = null;
+        if (!TextUtils.isEmpty(responseStr)){
+            response = jsonToBean(responseStr, GetFriendResponse.class);
+        }
+
+        return response;
+    }
+
+    /**
+     * 同意好友请求
+     * @param user
+     * @param friend
+     * @return
+     * @throws HttpException
+     */
+    public AgreeFriendResponse agreeFriend(String user, String friend) throws HttpException {
+        String url = String.format(BASE_URL + "/friend/accept?friendname=%s&username=%s", friend, user);
+        RLog.v("agreeFriend", url);
+        String responseStr = httpManager.get(url);
+        RLog.v("agreeFriend", responseStr);
+        AgreeFriendResponse response = null;
+        if (!TextUtils.isEmpty(responseStr)){
+            response = jsonToBean(responseStr, AgreeFriendResponse.class);
+        }
+
+        return response;
+
     }
 }

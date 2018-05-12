@@ -41,7 +41,7 @@ public class ContactNotificationMessageProvider extends IContainerItemProvider.M
                 try {
                     JSONObject jsonObject = new JSONObject(content.getExtra());
                     try {
-                        bean = JsonMananger.jsonToBean(content.getExtra(), ContactNotificationMessageData.class);
+                        bean = JsonMananger.jsonToBean(new JSONObject(content.getExtra()).toString(), ContactNotificationMessageData.class);
                     } catch (HttpException e) {
                         e.printStackTrace();
                     }
@@ -76,10 +76,12 @@ public class ContactNotificationMessageProvider extends IContainerItemProvider.M
         if (content != null && !TextUtils.isEmpty(content.getExtra())) {
             ContactNotificationMessageData bean = null;
             try {
-                bean = JsonMananger.jsonToBean(content.getExtra(), ContactNotificationMessageData.class);
-            } catch (HttpException e) {
+                bean = new ContactNotificationMessageData();
+                bean.setSourceUserNickname(content.getExtra());
+//                bean = JsonMananger.jsonToBean(content.getExtra(), ContactNotificationMessageData.class);
+            } /*catch (HttpException e) {
                 e.printStackTrace();
-            } finally {
+            }*/ finally {
                 if (bean != null && !TextUtils.isEmpty(bean.getSourceUserNickname())) {
                     if (content.getOperation().equals("AcceptResponse")) {
                         return new SpannableString(bean.getSourceUserNickname() + "已同意你的好友请求");

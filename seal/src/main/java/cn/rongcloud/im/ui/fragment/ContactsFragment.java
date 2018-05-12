@@ -352,7 +352,7 @@ public class ContactsFragment extends Fragment implements View.OnClickListener {
 
     private void updatePersonalUI() {
         SharedPreferences sp = SealAppContext.getInstance().getContext().getSharedPreferences("config", Context.MODE_PRIVATE);
-        mId = sp.getString(SealConst.SEALTALK_LOGIN_ID, "");
+        mId = sp.getString(SealConst.BAOJIA_USER_SYNCNAME, "");
         mCacheName = sp.getString(SealConst.SEALTALK_LOGIN_NAME, "");
         final String header = sp.getString(SealConst.SEALTALK_LOGING_PORTRAIT, "");
         mNameTextView.setText(mCacheName);

@@ -33,6 +33,7 @@ import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.server.widget.DialogWithYesOrNoUtils;
 import cn.rongcloud.im.server.widget.LoadDialog;
 import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
+import io.rong.common.RLog;
 import io.rong.imageloader.core.ImageLoader;
 import io.rong.imlib.model.UserInfo;
 
@@ -192,7 +193,9 @@ public class SearchFriendActivity extends BaseActivity {
                                 });
                             }
                         });
-
+                    }else {
+                        NToast.shortToast(mContext, searchResponse.getMessage());
+                        LoadDialog.dismiss(mContext);
                     }
                     break;
                 case ADD_FRIEND:
@@ -201,7 +204,8 @@ public class SearchFriendActivity extends BaseActivity {
                         NToast.shortToast(mContext, getString(R.string.request_success));
                         LoadDialog.dismiss(mContext);
                     } else {
-                        NToast.shortToast(mContext, "请求失败 错误码:" + response.getCode());
+                        RLog.w("SearchFriendActivity", "请求失败 错误码:" + response.getCode());
+                        NToast.shortToast(mContext, response.getMessage());
                         LoadDialog.dismiss(mContext);
                     }
                     break;
@@ -257,24 +261,4 @@ public class SearchFriendActivity extends BaseActivity {
 
         return false;
     }
-
-//    private boolean isFriendOrSelf(String id) {
-//        String inputPhoneNumber = mEtSearch.getText().toString().trim();
-//        SharedPreferences sp = getSharedPreferences("config", MODE_PRIVATE);
-//        String selfPhoneNumber = sp.getString(SealConst.SEALTALK_LOGING_PHONE, "");
-//        if (inputPhoneNumber != null) {
-//            if (inputPhoneNumber.equals(selfPhoneNumber)) {
-//                mFriend = new Friend(sp.getString(SealConst.SEALTALK_LOGIN_ID, ""),
-//                        sp.getString(SealConst.SEALTALK_LOGIN_NAME, ""),
-//                        Uri.parse(sp.getString(SealConst.SEALTALK_LOGING_PORTRAIT, "")));
-//                return true;
-//            } else {
-//                mFriend = SealUserInfoManager.getInstance().getFriendByID(id);
-//                if (mFriend != null) {
-//                    return true;
-//                }
-//            }
-//        }
-//        return false;
-//    }
 }

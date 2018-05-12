@@ -28,17 +28,18 @@ import cn.rongcloud.im.db.GroupMemberDao;
 import cn.rongcloud.im.db.Groups;
 import cn.rongcloud.im.db.GroupsDao;
 import cn.rongcloud.im.db.UserInfoBean;
+import cn.rongcloud.im.server.BaojiaAction;
 import cn.rongcloud.im.server.SealAction;
 import cn.rongcloud.im.server.network.async.AsyncTaskManager;
 import cn.rongcloud.im.server.network.async.OnDataListener;
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.pinyin.CharacterParser;
 import cn.rongcloud.im.server.response.GetBlackListResponse;
+import cn.rongcloud.im.server.response.GetFriendResponse;
 import cn.rongcloud.im.server.response.GetGroupInfoResponse;
 import cn.rongcloud.im.server.response.GetGroupMemberResponse;
 import cn.rongcloud.im.server.response.GetGroupResponse;
 import cn.rongcloud.im.server.response.GetTokenResponse;
-import cn.rongcloud.im.server.response.UserRelationshipResponse;
 import cn.rongcloud.im.server.utils.NLog;
 import cn.rongcloud.im.server.utils.RongGenerate;
 import io.rong.common.RLog;
@@ -93,6 +94,8 @@ public class SealUserInfoManager implements OnDataListener {
      */
     private static final int ALL = 27;//11011
 
+    private BaojiaAction mAction;
+
     private static SealUserInfoManager sInstance;
     private final Context mContext;
     private final AsyncTaskManager mAsyncTaskManager;
@@ -120,6 +123,7 @@ public class SealUserInfoManager implements OnDataListener {
         mAsyncTaskManager = AsyncTaskManager.getInstance(mContext);
         sp = context.getSharedPreferences("config", Context.MODE_PRIVATE);
         action = new SealAction(mContext);
+        mAction = new BaojiaAction(mContext);
         mHandler = new Handler(Looper.getMainLooper());
         mGroupsList = null;
     }
@@ -327,7 +331,7 @@ public class SealUserInfoManager implements OnDataListener {
                             }
                         }
                         //部分群组信息同步的情况,此时需要特殊处理,但是目前暂未处理
-                        //// TODO: 16/9/20
+                        // TODO: 16/9/20
                         if (!hasGetAllGroupMembers()) {
                             if (hasGetPartGroupMembers()) {
                                 syncDeleteGroupMembers();
@@ -360,42 +364,37 @@ public class SealUserInfoManager implements OnDataListener {
     }
 
     private boolean fetchFriends() throws HttpException {
-        UserRelationshipResponse userRelationshipResponse;
+        GetFriendResponse response;
         try {
-            userRelationshipResponse = action.getAllUserRelationship();
+            String syncName = mContext.getSharedPreferences("config", Context.MODE_PRIVATE).
+                    getString(SealConst.BAOJIA_USER_SYNCNAME, "");
+            response = mAction.getFriends(syncName,0);
         } catch (JSONException e) {
             NLog.d(TAG, "fetchFriends occurs JSONException e=" + e.toString());
             return true;
         }
-        if (userRelationshipResponse != null && userRelationshipResponse.getCode() == 200) {
-            List<UserRelationshipResponse.ResultEntity> list = userRelationshipResponse.getResult();
-            if (list != null && list.size() > 0) {
-                syncDeleteFriends();
-                addFriends(list);
-            }
+        List<GetFriendResponse.ResultEntity> list = response.getData();
+        if (list != null && list.size() > 0) {
+            syncDeleteFriends();
+            addFriends(list);
             mGetAllUserInfoState |= FRIEND;
             return true;
         }
+
         return false;
     }
 
     private List<Friend> pullFriends() throws HttpException {
         List<Friend> friendsList = null;
-        UserRelationshipResponse userRelationshipResponse;
-        try {
-            userRelationshipResponse = action.getAllUserRelationship();
-        } catch (JSONException e) {
-            NLog.d(TAG, "pullFriends occurs JSONException e=" + e.toString());
-            return null;
+        String syncName = mContext.getSharedPreferences("config", Context.MODE_PRIVATE).
+                getString(SealConst.BAOJIA_USER_SYNCNAME, "");
+        GetFriendResponse response = mAction.getFriends(syncName, 0);
+        List<GetFriendResponse.ResultEntity> list = response.getData();
+        if (list != null && list.size() > 0){
+            syncDeleteFriends();
+            friendsList = addFriends(list);
         }
-        if (userRelationshipResponse != null && userRelationshipResponse.getCode() == 200) {
-            List<UserRelationshipResponse.ResultEntity> list = userRelationshipResponse.getResult();
-            if (list != null && list.size() > 0) {
-                syncDeleteFriends();
-                friendsList = addFriends(list);
-            }
-            mGetAllUserInfoState |= FRIEND;
-        }
+        mGetAllUserInfoState |= FRIEND;
         return friendsList;
     }
 
@@ -793,27 +792,25 @@ public class SealUserInfoManager implements OnDataListener {
      * @param list server获取的好友信息
      * @return List<Friend> 好友列表
      */
-    private List<Friend> addFriends(final List<UserRelationshipResponse.ResultEntity> list) {
+    private List<Friend> addFriends(final List<GetFriendResponse.ResultEntity> list) {
         if (list != null && list.size() > 0) {
             List<Friend> friendsList = new ArrayList<>();
-            for (UserRelationshipResponse.ResultEntity resultEntity : list) {
-                if (resultEntity.getStatus() == 20) {
-                    Friend friend = new Friend(
-                            resultEntity.getUser().getId(),
-                            resultEntity.getUser().getNickname(),
-                            Uri.parse(resultEntity.getUser().getPortraitUri()),
-                            resultEntity.getDisplayName(),
-                            null, null, null, null,
-                            CharacterParser.getInstance().getSpelling(resultEntity.getUser().getNickname()),
-                            CharacterParser.getInstance().getSpelling(resultEntity.getDisplayName()));
-                    if (friend.getPortraitUri() == null || TextUtils.isEmpty(friend.getPortraitUri().toString())) {
-                        String portrait = getPortrait(friend);
-                        if (portrait != null) {
-                            friend.setPortraitUri(Uri.parse(getPortrait(friend)));
-                        }
+            for (GetFriendResponse.ResultEntity resultEntity : list) {
+                Friend friend = new Friend(
+                        resultEntity.getSyncName(),
+                        resultEntity.getUserName(),
+                        Uri.parse(resultEntity.getPortrait() + ""),
+                        resultEntity.getUserName(),
+                        null, null, null, null,
+                        CharacterParser.getInstance().getSpelling(resultEntity.getUserName()),
+                        CharacterParser.getInstance().getSpelling(resultEntity.getUserName()));
+                if (friend.getPortraitUri() == null || TextUtils.isEmpty(friend.getPortraitUri().toString())) {
+                    String portrait = getPortrait(friend);
+                    if (portrait != null) {
+                        friend.setPortraitUri(Uri.parse(getPortrait(friend)));
                     }
-                    friendsList.add(friend);
                 }
+                friendsList.add(friend);
             }
             if (friendsList.size() > 0) {
                 if (mFriendDao != null) {
