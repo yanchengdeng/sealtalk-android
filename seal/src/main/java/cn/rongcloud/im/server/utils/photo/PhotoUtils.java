@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
-import android.graphics.Interpolator;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -17,6 +16,7 @@ import java.io.File;
 import java.util.List;
 
 import cn.rongcloud.im.server.utils.CommonUtils;
+import cn.rongcloud.im.server.utils.FileUtils;
 
 
 /**
@@ -53,6 +53,21 @@ public class PhotoUtils {
 
     public PhotoUtils(OnPhotoResultListener onPhotoResultListener) {
         this.onPhotoResultListener = onPhotoResultListener;
+    }
+
+    /**
+     * 拍照（指定路径）
+     * @param activity
+     * @param savePath
+     */
+    public static void takePhoto(Activity activity, String savePath){
+        Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        File photoFile = FileUtils.createFile(savePath);
+        Uri u = Uri.fromFile(photoFile);
+        intent.putExtra(MediaStore.Images.Media.ORIENTATION, 0);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, u);
+        intent.putExtra("return-data", true);
+        activity.startActivityForResult(intent, INTENT_TAKE);
     }
 
     /**

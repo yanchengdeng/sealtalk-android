@@ -10,8 +10,10 @@ import android.widget.Button;
 import com.dbcapp.club.R;
 
 import cn.rongcloud.im.SealConst;
+import cn.rongcloud.im.server.BaojiaAction;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.network.http.HttpException;
+import cn.rongcloud.im.server.response.ModifyNameResponse;
 import cn.rongcloud.im.server.response.SetNameResponse;
 import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.server.widget.ClearWriteEditText;
@@ -26,10 +28,14 @@ import io.rong.imlib.model.UserInfo;
 public class UpdateNameActivity extends BaseActivity implements View.OnClickListener {
 
     private static final int UPDATE_NAME = 7;
+
+    private BaojiaAction mAction;
+
     private ClearWriteEditText mNameEditText;
     private String newName;
     private SharedPreferences sp;
     private SharedPreferences.Editor editor;
+    private String mSyncName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,22 +49,23 @@ public class UpdateNameActivity extends BaseActivity implements View.OnClickList
         mHeadRightText.setOnClickListener(this);
         mNameEditText = (ClearWriteEditText) findViewById(R.id.update_name);
         sp = getSharedPreferences("config", MODE_PRIVATE);
+        mAction = new BaojiaAction(this);
         mNameEditText.setText(sp.getString(SealConst.SEALTALK_LOGIN_NAME, ""));
         mNameEditText.setSelection(sp.getString(SealConst.SEALTALK_LOGIN_NAME, "").length());
         editor = sp.edit();
-
+        mSyncName = sp.getString(SealConst.BAOJIA_USER_SYNCNAME, "");
     }
 
 
     @Override
     public Object doInBackground(int requestCode, String id) throws HttpException {
-        return action.setName(newName);
+        return mAction.modifyName(mSyncName, newName);
     }
 
     @Override
     public void onSuccess(int requestCode, Object result) {
-        SetNameResponse sRes = (SetNameResponse) result;
-        if (sRes.getCode() == 200) {
+        ModifyNameResponse response = (ModifyNameResponse) result;
+        if (response.getCode() == 100000) {
             editor.putString(SealConst.SEALTALK_LOGIN_NAME, newName);
             editor.commit();
 
@@ -67,10 +74,12 @@ public class UpdateNameActivity extends BaseActivity implements View.OnClickList
             RongIM.getInstance().refreshUserInfoCache(new UserInfo(sp.getString(SealConst.SEALTALK_LOGIN_ID, ""), newName, Uri.parse(sp.getString(SealConst.SEALTALK_LOGING_PORTRAIT, ""))));
             RongIM.getInstance().setCurrentUserInfo(new UserInfo(sp.getString(SealConst.SEALTALK_LOGIN_ID, ""), newName, Uri.parse(sp.getString(SealConst.SEALTALK_LOGING_PORTRAIT, ""))));
 
-            LoadDialog.dismiss(mContext);
             NToast.shortToast(mContext, "昵称更改成功");
             finish();
+        }else {
+            NToast.shortToast(mContext, response.getMessage());
         }
+        LoadDialog.dismiss(mContext);
     }
 
     @Override

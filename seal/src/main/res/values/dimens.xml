@@ -10,4 +10,8 @@
     <dimen name="ksw_md_thumb_shadow_inset">11dp</dimen>
     <dimen name="ksw_md_thumb_shadow_inset_top">11dp</dimen>
     <dimen name="ksw_md_thumb_shadow_inset_bottom">10dp</dimen>
+    <dimen name="baojia_circle_photo_decoration">10dp</dimen>
+    <dimen name="baojia_circle_container_paddingleft">10dp</dimen>
+    <dimen name="baojia_circle_container_paddingright">20dp</dimen>
+    <dimen name="baojia_circle_portrait_size">45dp</dimen>
 </resources>

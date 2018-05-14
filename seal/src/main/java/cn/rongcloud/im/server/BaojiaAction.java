@@ -11,9 +11,11 @@ import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.request.CompleteInfoRequest;
 import cn.rongcloud.im.server.response.AgreeFriendResponse;
 import cn.rongcloud.im.server.response.CompleteInfoResponse;
+import cn.rongcloud.im.server.response.GetCircleResponse;
 import cn.rongcloud.im.server.response.GetFriendResponse;
 import cn.rongcloud.im.server.response.GetLoginStatusResponse;
 import cn.rongcloud.im.server.response.GetRelationFriendResponse;
+import cn.rongcloud.im.server.response.ModifyNameResponse;
 import cn.rongcloud.im.server.response.SearchContactResponse;
 import cn.rongcloud.im.server.response.getAddFriendResponse;
 import io.rong.common.RLog;
@@ -180,5 +182,45 @@ public class BaojiaAction extends BaseAction {
 
         return response;
 
+    }
+
+    /**
+     * 修改昵称
+     * @param syncName
+     * @param newName
+     * @return
+     * @throws HttpException
+     */
+    public ModifyNameResponse modifyName(String syncName, String newName) throws HttpException {
+        String url = String.format(BASE_URL + "/user/nickname/%s?nickname=%s", syncName, newName);
+        RLog.v("modifyName", url);
+        String responseStr = httpManager.post(url);
+        RLog.v("modifyName", responseStr);
+        ModifyNameResponse response = null;
+        if (!TextUtils.isEmpty(responseStr)){
+            response = jsonToBean(responseStr, ModifyNameResponse.class);
+        }
+
+        return response;
+    }
+
+    /**
+     * 朋友圈
+     * @param syncName
+     * @param time
+     * @return
+     * @throws HttpException
+     */
+    public GetCircleResponse getCircle(String syncName, long time) throws HttpException {
+        String url = String.format(BASE_URL + "/circle/list?pageSize=%d&startTime=%d&username=%s", 20, time, syncName);
+        RLog.v("getCircle", url);
+        String responseStr = httpManager.get(url);
+        RLog.v("getCircle", responseStr);
+        GetCircleResponse response = null;
+        if (!TextUtils.isEmpty(responseStr)){
+            response = jsonToBean(responseStr, GetCircleResponse.class);
+        }
+
+        return response;
     }
 }

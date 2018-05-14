@@ -174,18 +174,17 @@ public class loginWebActivity extends BaseActivity {
 
     private void setUserInfo() {
         //todo 头像暂不处理
-        GetUserInfoByIdResponse.ResultEntity userinfo = new GetUserInfoByIdResponse.ResultEntity();
-        if (TextUtils.isEmpty(userinfo.getPortraitUri())) {
-            userinfo.setPortraitUri(RongGenerate.generateDefaultAvatar(mUserData.getUserName(), mUserData.getId() + ""));
+        if (TextUtils.isEmpty(mUserData.getPortrait())) {
+            mUserData.setPortrait(RongGenerate.generateDefaultAvatar(mUserData.getUserName(), mUserData.getSyncName()));
         }
         String nickName = mUserData.getUserName();
-        String portraitUri = userinfo.getPortraitUri();
+        String portraitUri = mUserData.getPortrait();
         editor.putString(SealConst.BAOJIA_USER_SYNCNAME, mUserData.getSyncName());
         editor.putString(SealConst.SEALTALK_LOGIN_NAME, nickName);
         editor.putString(SealConst.SEALTALK_LOGING_PORTRAIT, portraitUri);
         editor.putString("loginToken", mUserData.getImToken());
         editor.commit();
-        RongIM.getInstance().refreshUserInfoCache(new UserInfo(connectResultId, mUserData.getUserName(), Uri.parse(userinfo.getPortraitUri())));
+        RongIM.getInstance().refreshUserInfoCache(new UserInfo(connectResultId, mUserData.getUserName(), Uri.parse(mUserData.getPortrait())));
         //不继续在login界面同步好友,群组,群组成员信息
         SealUserInfoManager.getInstance().getAllUserInfo();
         gotoMain();

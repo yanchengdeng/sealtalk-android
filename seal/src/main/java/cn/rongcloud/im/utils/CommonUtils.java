@@ -12,7 +12,9 @@ import android.net.Uri;
 import android.text.TextUtils;
 import android.view.WindowManager;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -167,4 +169,14 @@ public class CommonUtils {
         return (dips * densityDpi) / 160;
     }
 
+    /**
+     * 将时间戳转成指定日期格式
+     * @param time
+     * @return
+     */
+    public static String longToDate(long time, String format){
+        SimpleDateFormat dateFormat = new SimpleDateFormat(format);
+        Date date = new Date(time);
+        return dateFormat.format(date);
+    }
 }

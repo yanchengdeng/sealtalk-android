@@ -14,6 +14,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -25,6 +26,7 @@ import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
 import cn.rongcloud.im.ui.activity.AccountSettingActivity;
+import cn.rongcloud.im.ui.activity.MyAccountActivity;
 import cn.rongcloud.im.ui.activity.QRCodeActivity;
 import io.rong.imageloader.core.ImageLoader;
 import io.rong.imlib.model.UserInfo;
@@ -42,6 +44,7 @@ public class MineFragment extends Fragment implements View.OnClickListener {
     private TextView mTvName;
     private RelativeLayout mLayoutQrcode;
     private RelativeLayout mLayoutSettings;
+    private LinearLayout mLayoutMineInfo;
 
     @Nullable
     @Override
@@ -69,9 +72,11 @@ public class MineFragment extends Fragment implements View.OnClickListener {
         mTvName = mView.findViewById(R.id.mine_name);
         mLayoutQrcode = mView.findViewById(R.id.rl_mine_qrcode);
         mLayoutSettings = mView.findViewById(R.id.rl_mine_settings);
+        mLayoutMineInfo = mView.findViewById(R.id.start_user_profile);
 
         mLayoutQrcode.setOnClickListener(this);
         mLayoutSettings.setOnClickListener(this);
+        mLayoutMineInfo.setOnClickListener(this);
     }
 
     @Override
@@ -82,6 +87,9 @@ public class MineFragment extends Fragment implements View.OnClickListener {
                 break;
             case R.id.rl_mine_settings: //设置
                 startActivity(new Intent(getActivity(), AccountSettingActivity.class));
+                break;
+            case R.id.start_user_profile: //我的信息
+                startActivity(new Intent(getActivity(), MyAccountActivity.class));
                 break;
             default:
                 break;

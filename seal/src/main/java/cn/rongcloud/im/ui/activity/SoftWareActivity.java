@@ -16,7 +16,7 @@ import cn.rongcloud.im.SealConst;
 
 public class SoftWareActivity extends BaseActivity {
 
-    private static final String SOFTWARE_URL = "http://php.baojia.co/api/qqlogin/baojiamember?username=%s";
+    private static final String SOFTWARE_URL = "http://xcx.baojia.co/index.html?username=%s";
 
     private WebView mWebSofrware;
 

@@ -6,12 +6,11 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.dbcapp.club.R;
-import com.jrmf360.rylib.common.util.ToastUtil;
 
+import cn.rongcloud.im.ui.activity.CircleActivity;
 import cn.rongcloud.im.ui.activity.SoftWareActivity;
 
 
@@ -45,11 +44,16 @@ public class DiscoverFragment extends Fragment implements View.OnClickListener {
                 gotoSoftware();
                 break;
             case R.id.rl_discover_circle: //TODO 圈圈
-                ToastUtil.showToast(getContext(), "后续开放");
+                gotoCircle();
                 break;
             default:
                 break;
         }
+    }
+
+    private void gotoCircle() {
+        Intent intent = new Intent(getContext(), CircleActivity.class);
+        startActivity(intent);
     }
 
     private void gotoSoftware() {

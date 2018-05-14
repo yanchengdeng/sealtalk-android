@@ -14,34 +14,34 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.dbcapp.club.R;
-import com.qiniu.android.http.ResponseInfo;
-import com.qiniu.android.storage.UpCompletionHandler;
 import com.qiniu.android.storage.UploadManager;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 
 import cn.rongcloud.im.App;
 import cn.rongcloud.im.SealConst;
 import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.network.http.HttpException;
-import cn.rongcloud.im.server.response.QiNiuTokenResponse;
-import cn.rongcloud.im.server.response.SetPortraitResponse;
+import cn.rongcloud.im.server.response.ModifyNameResponse;
 import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.server.utils.photo.PhotoUtils;
 import cn.rongcloud.im.server.widget.BottomMenuDialog;
 import cn.rongcloud.im.server.widget.LoadDialog;
 import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
+import cn.rongcloud.im.utils.UpLoadImgManager;
+import io.rong.common.RLog;
 import io.rong.imageloader.core.ImageLoader;
 import io.rong.imkit.RongIM;
 import io.rong.imlib.model.UserInfo;
@@ -57,9 +57,9 @@ public class MyAccountActivity extends BaseActivity implements View.OnClickListe
     private TextView mName;
     private PhotoUtils photoUtils;
     private BottomMenuDialog dialog;
-    private UploadManager uploadManager;
-    private String imageUrl;
     private Uri selectUri;
+
+    private UpLoadImgManager mUpLoadImgManager;
 
 
     @Override
@@ -109,6 +109,9 @@ public class MyAccountActivity extends BaseActivity implements View.OnClickListe
                 if (uri != null && !TextUtils.isEmpty(uri.getPath())) {
                     selectUri = uri;
                     LoadDialog.show(mContext);
+                    if (mUpLoadImgManager == null){
+                        mUpLoadImgManager = new UpLoadImgManager();
+                    }
                     request(GET_QI_NIU_TOKEN);
                 }
             }
@@ -142,10 +145,22 @@ public class MyAccountActivity extends BaseActivity implements View.OnClickListe
     @Override
     public Object doInBackground(int requestCode, String id) throws HttpException {
         switch (requestCode) {
-            case UP_LOAD_PORTRAIT:
-                return action.setPortrait(imageUrl);
             case GET_QI_NIU_TOKEN:
-                return action.getQiNiuToken();
+                String syncName = sp.getString(SealConst.BAOJIA_USER_SYNCNAME, "");
+                try {
+//                    response = mUpLoadImgManager.uploadFile(new File(new URI(selectUri.toString())),
+//                            String.format("http://api.baojia.co/user/portrait/%s", syncName));
+                    Map<String, String> params = new HashMap<>();
+                    return mUpLoadImgManager.uploadForm(params, "file", new File(new URI(selectUri.toString())), "",
+                            String.format("http://api.baojia.co/user/portrait/%s", syncName));
+                } catch (URISyntaxException e) {
+                    RLog.w("uploadimg", "uploadimg fail");
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    RLog.w("uploadimg", "uploadimg fail");
+                }
+                return null;
         }
         return super.doInBackground(requestCode, id);
     }
@@ -154,25 +169,24 @@ public class MyAccountActivity extends BaseActivity implements View.OnClickListe
     public void onSuccess(int requestCode, Object result) {
         if (result != null) {
             switch (requestCode) {
-                case UP_LOAD_PORTRAIT:
-                    SetPortraitResponse spRes = (SetPortraitResponse) result;
-                    if (spRes.getCode() == 200) {
-                        editor.putString(SealConst.SEALTALK_LOGING_PORTRAIT, imageUrl);
+                case GET_QI_NIU_TOKEN:
+                    ModifyNameResponse response = (ModifyNameResponse) result;
+                    if (response.getCode() == 100000) {
+                        editor.putString(SealConst.SEALTALK_LOGING_PORTRAIT, response.getData());
                         editor.commit();
-                        ImageLoader.getInstance().displayImage(imageUrl, mImageView, App.getOptions());
+                        ImageLoader.getInstance().displayImage(response.getData(), mImageView, App.getOptions());
                         if (RongIM.getInstance() != null) {
-                            RongIM.getInstance().setCurrentUserInfo(new UserInfo(sp.getString(SealConst.SEALTALK_LOGIN_ID, ""), sp.getString(SealConst.SEALTALK_LOGIN_NAME, ""), Uri.parse(imageUrl)));
+                            RongIM.getInstance().setCurrentUserInfo(
+                                    new UserInfo(sp.getString(SealConst.SEALTALK_LOGIN_ID, ""),
+                                            sp.getString(SealConst.SEALTALK_LOGIN_NAME, ""),
+                                            Uri.parse(response.getData())));
                         }
                         BroadcastManager.getInstance(mContext).sendBroadcast(SealConst.CHANGEINFO);
                         NToast.shortToast(mContext, getString(R.string.portrait_update_success));
+                    }else {
+                        NToast.shortToast(this, response.getMessage());
                     }
                     LoadDialog.dismiss(mContext);
-                    break;
-                case GET_QI_NIU_TOKEN:
-                    QiNiuTokenResponse response = (QiNiuTokenResponse) result;
-                    if (response.getCode() == 200) {
-                        uploadImage(response.getResult().getDomain(), response.getResult().getToken(), selectUri);
-                    }
                     break;
             }
         }
@@ -209,6 +223,7 @@ public class MyAccountActivity extends BaseActivity implements View.OnClickListe
                     dialog.dismiss();
                 }
                 if (Build.VERSION.SDK_INT >= 23) {
+
                     int checkPermission = checkSelfPermission(Manifest.permission.CAMERA);
                     if (checkPermission != PackageManager.PERMISSION_GRANTED) {
                         if (shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
@@ -253,38 +268,5 @@ public class MyAccountActivity extends BaseActivity implements View.OnClickListe
                 photoUtils.onActivityResult(MyAccountActivity.this, requestCode, resultCode, data);
                 break;
         }
-    }
-
-
-    public void uploadImage(final String domain, String imageToken, Uri imagePath) {
-        if (TextUtils.isEmpty(domain) && TextUtils.isEmpty(imageToken) && TextUtils.isEmpty(imagePath.toString())) {
-            throw new RuntimeException("upload parameter is null!");
-        }
-        File imageFile = new File(imagePath.getPath());
-
-        if (this.uploadManager == null) {
-            this.uploadManager = new UploadManager();
-        }
-        this.uploadManager.put(imageFile, null, imageToken, new UpCompletionHandler() {
-
-            @Override
-            public void complete(String s, ResponseInfo responseInfo, JSONObject jsonObject) {
-                if (responseInfo.isOK()) {
-                    try {
-                        String key = (String) jsonObject.get("key");
-                        imageUrl = "http://" + domain + "/" + key;
-                        Log.e("uploadImage", imageUrl);
-                        if (!TextUtils.isEmpty(imageUrl)) {
-                            request(UP_LOAD_PORTRAIT);
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    NToast.shortToast(mContext, getString(R.string.upload_portrait_failed));
-                    LoadDialog.dismiss(mContext);
-                }
-            }
-        }, null);
     }
 }

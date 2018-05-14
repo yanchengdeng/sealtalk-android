@@ -195,12 +195,13 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
         MessageContent messageContent = uiConversation.getMessageContent();
         if (messageContent instanceof ContactNotificationMessage) {
             ContactNotificationMessage contactNotificationMessage = (ContactNotificationMessage) messageContent;
-            if (contactNotificationMessage.getOperation().equals("AcceptResponse")) {
+            if (contactNotificationMessage.getOperation().equals("acceptRequest")) {
                 // 被加方同意请求后
                 if (contactNotificationMessage.getExtra() != null) {
                     ContactNotificationMessageData bean = null;
                     try {
-                        bean = JsonMananger.jsonToBean(contactNotificationMessage.getExtra(), ContactNotificationMessageData.class);
+                        bean = new ContactNotificationMessageData();
+                        bean.setSourceUserNickname(contactNotificationMessage.getExtra());
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -225,7 +226,7 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
         MessageContent messageContent = message.getContent();
         if (messageContent instanceof ContactNotificationMessage) {
             ContactNotificationMessage contactNotificationMessage = (ContactNotificationMessage) messageContent;
-            if (contactNotificationMessage.getOperation().equals("Request")) {
+            if (contactNotificationMessage.getOperation().equals("friendRequest")) {
                 //对方发来好友邀请
                 BroadcastManager.getInstance(mContext).sendBroadcast(UPDATE_RED_DOT);
             } else if (contactNotificationMessage.getOperation().equals("acceptRequest")) {
@@ -240,6 +241,7 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
                     return false;
                 }
                 if (contactNotificationMessageData != null) {
+
                     if (SealUserInfoManager.getInstance().isFriendsRelationship(contactNotificationMessage.getSourceUserId())) {
                         return false;
                     }

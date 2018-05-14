@@ -378,4 +378,10 @@
     <string name="baojia_search_hint">联系人名字</string>
     <string name="baojia_search_empty_tip">搜索内容不能为空</string>
     <string name="baojia_custom_service">客服</string>
+    <string name="baojia_comtomer_title">客服</string>
+    <string name="baojia_custom_vip">VIP客服</string>
+    <string name="baojia_circlr_title">圈圈</string>
+    <string name="baojia_circle_publish">发布</string>
+    <string name="bapjia_publish_title">发布</string>
+    <string name="baojia_publish_submit">确定</string>
 </resources>

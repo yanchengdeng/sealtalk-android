@@ -50,4 +50,6 @@
     <color name="cs_evaluate_background_selected">#E3EEFF</color>
     <color name="cs_evaluate_edittext_background">#f1f3f5</color>
     <color name="cs_evaluate_edittext_textcolor">#939dab</color>
+
+    <color name="baojia_circle_decoration">#614f4e</color>
 </resources>

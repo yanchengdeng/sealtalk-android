@@ -213,6 +213,14 @@
         <activity android:name="cn.rongcloud.im.ui.activity.SoftWareActivity"
             android:screenOrientation="portrait"/>
 
+        <!-- 朋友圈-->
+        <activity android:name="cn.rongcloud.im.ui.activity.CircleActivity"
+            android:screenOrientation="portrait"/>
+
+        <!-- 发布-->
+        <activity android:name="cn.rongcloud.im.ui.activity.PublishActivity"
+            android:screenOrientation="portrait"/>
+
         <!--公众-->
         <activity
             android:name="cn.rongcloud.im.ui.activity.PublicServiceInfoActivity"

@@ -1,7 +1,5 @@
 package cn.rongcloud.im.server.response;
 
-import java.io.Serializable;
-
 /**
  * Created by star1209 on 2018/5/8.
  */
@@ -45,6 +43,7 @@ public class CompleteInfoResponse {
         private String syncName;
         private int status;
         private String imToken;
+        private String portrait;
 
         public String getImToken() {
             return imToken;
@@ -100,6 +99,14 @@ public class CompleteInfoResponse {
 
         public void setStatus(int status) {
             this.status = status;
+        }
+
+        public String getPortrait() {
+            return portrait;
+        }
+
+        public void setPortrait(String portrait) {
+            this.portrait = portrait;
         }
     }
 }
