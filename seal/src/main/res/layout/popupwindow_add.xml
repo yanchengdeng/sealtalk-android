@@ -48,7 +48,7 @@
                 android:drawableLeft="@drawable/pop_group"
                 android:drawablePadding="10dp"
                 android:gravity="center_vertical"
-                android:text="@string/group_chat"
+                android:text="@string/baojia_discussion_group"
                 android:textColor="@color/text_color"
                 android:textSize="16sp" />
 

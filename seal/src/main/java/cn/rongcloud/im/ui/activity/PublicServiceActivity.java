@@ -17,7 +17,7 @@ public class PublicServiceActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pub_list);
-        setTitle(R.string.de_actionbar_set_public);
+        setTitle(R.string.baojia_comtomer_title);
         Button rightButton = getHeadRightButton();
         rightButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.de_ic_add));
         rightButton.setOnClickListener(new View.OnClickListener() {

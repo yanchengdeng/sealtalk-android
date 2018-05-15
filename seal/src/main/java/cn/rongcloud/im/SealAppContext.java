@@ -22,18 +22,16 @@ import cn.rongcloud.im.db.GroupMember;
 import cn.rongcloud.im.db.Groups;
 import cn.rongcloud.im.message.module.SealExtensionModule;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
-import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.pinyin.CharacterParser;
 import cn.rongcloud.im.server.response.ContactNotificationMessageData;
 import cn.rongcloud.im.server.utils.NLog;
-import cn.rongcloud.im.server.utils.json.JsonMananger;
-import cn.rongcloud.im.ui.activity.LoginActivity;
 import cn.rongcloud.im.ui.activity.MainActivity;
 import cn.rongcloud.im.ui.activity.NewFriendListActivity;
 import cn.rongcloud.im.ui.activity.UserDetailActivity;
 import cn.rongcloud.im.ui.activity.loginWebActivity;
 import io.rong.calllib.RongCallClient;
 import io.rong.calllib.RongCallSession;
+import io.rong.common.RLog;
 import io.rong.imkit.DefaultExtensionModule;
 import io.rong.imkit.IExtensionModule;
 import io.rong.imkit.RongExtensionManager;
@@ -48,6 +46,7 @@ import io.rong.imlib.model.Message;
 import io.rong.imlib.model.MessageContent;
 import io.rong.imlib.model.UserInfo;
 import io.rong.message.ContactNotificationMessage;
+import io.rong.message.DiscussionNotificationMessage;
 import io.rong.message.GroupNotificationMessage;
 import io.rong.message.ImageMessage;
 
@@ -344,6 +343,10 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
             return false;
         } else if (messageContent instanceof ImageMessage) {
             //ImageMessage imageMessage = (ImageMessage) messageContent;
+            return false;
+        }else if (messageContent instanceof DiscussionNotificationMessage){
+            DiscussionNotificationMessage discussionMessage = (DiscussionNotificationMessage) messageContent;
+            RLog.v("discussionMessage", discussionMessage.getExtension());
             return false;
         }
         return false;

@@ -44,6 +44,7 @@ import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.server.widget.DialogWithYesOrNoUtils;
 import cn.rongcloud.im.server.widget.LoadDialog;
 import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
+import io.rong.common.RLog;
 import io.rong.imageloader.core.ImageLoader;
 import io.rong.imkit.RongIM;
 import io.rong.imkit.userInfoCache.RongUserInfoManager;
@@ -99,6 +100,8 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
     private boolean isAddGroupMember;
     private boolean isDeleteGroupMember;
 
+    private String mCurrentUsername;
+
     @Override
     @SuppressWarnings("unchecked")
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,6 +125,8 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
         }
         addDisList = (ArrayList<UserInfo>) getIntent().getSerializableExtra("AddDiscuMember");
         deleDisList = (ArrayList<UserInfo>) getIntent().getSerializableExtra("DeleteDiscuMember");
+
+        mCurrentUsername = getSharedPreferences("config", MODE_PRIVATE).getString(SealConst.SEALTALK_LOGIN_NAME, "");
 
         setTitle();
         initView();
@@ -693,9 +698,12 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
 
                     if (isConversationActivityStartDiscussion) {
                         if (RongIM.getInstance() != null) {
-                            RongIM.getInstance().addMemberToDiscussion(conversationStartId, startDisList, new RongIMClient.OperationCallback() {
+                            RongIM.getInstance().createDiscussionChat(this, startDisList,
+                                    String.format(getString(R.string.baojia_create_discusstion_title), mCurrentUsername),
+                                    new RongIMClient.CreateDiscussionCallback() {
                                 @Override
-                                public void onSuccess() {
+                                public void onSuccess(String s) {
+                                    RLog.w("create discusstion", "success !");
                                     NToast.shortToast(SelectFriendsActivity.this, getString(R.string.add_successful));
                                     BroadcastManager.getInstance(mContext).sendBroadcast(DISCUSSION_UPDATE);
                                     finish();
@@ -703,7 +711,7 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
 
                                 @Override
                                 public void onError(RongIMClient.ErrorCode errorCode) {
-
+                                    RLog.w("create discusstion", "fail :" + errorCode.getMessage());
                                 }
                             });
                         }

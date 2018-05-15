@@ -176,12 +176,14 @@ public class MainActivity extends FragmentActivity implements
                         .appendQueryParameter(Conversation.ConversationType.PUBLIC_SERVICE.getName(), "false")//公共服务号
                         .appendQueryParameter(Conversation.ConversationType.APP_PUBLIC_SERVICE.getName(), "false")//订阅号
                         .appendQueryParameter(Conversation.ConversationType.SYSTEM.getName(), "true")//系统
+                        .appendQueryParameter(Conversation.ConversationType.DISCUSSION.getName(), "true")
                         .build();
                 mConversationsTypes = new Conversation.ConversationType[]{Conversation.ConversationType.PRIVATE,
                         Conversation.ConversationType.GROUP,
                         Conversation.ConversationType.PUBLIC_SERVICE,
                         Conversation.ConversationType.APP_PUBLIC_SERVICE,
-                        Conversation.ConversationType.SYSTEM
+                        Conversation.ConversationType.SYSTEM,
+                        Conversation.ConversationType.DISCUSSION
                 };
             }
             listFragment.setUri(uri);

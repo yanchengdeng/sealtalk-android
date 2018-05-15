@@ -38,12 +38,12 @@ import cn.rongcloud.im.SealConst;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.response.PublishCircleResponse;
-import cn.rongcloud.im.server.utils.CommonUtils;
 import cn.rongcloud.im.server.utils.NLog;
 import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.server.utils.photo.PhotoUtils;
 import cn.rongcloud.im.server.widget.BottomMenuDialog;
 import cn.rongcloud.im.server.widget.LoadDialog;
+import cn.rongcloud.im.utils.CommonUtils;
 import cn.rongcloud.im.utils.UpLoadImgManager;
 
 /**
@@ -200,6 +200,8 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
                 }else {
                     if (response != null){
                         NToast.shortToast(this, response.getMessage());
+                    }else {
+                        NToast.shortToast(this, "发布失败！");
                     }
                 }
                 break;

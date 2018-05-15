@@ -55,10 +55,9 @@ public class MorePopWindow extends PopupWindow {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(new Intent(context, SelectFriendsActivity.class));
-                intent.putExtra("createGroup", true);
+                intent.putExtra("CONVERSATION_DISCUSSION", true);
                 context.startActivity(intent);
                 MorePopWindow.this.dismiss();
-
             }
 
         });

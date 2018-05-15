@@ -170,6 +170,16 @@ public class CommonUtils {
     }
 
     /**
+     * 获取当前日期的指定格式
+     * @param format
+     * @return
+     */
+    public static String dateToString(String format){
+        SimpleDateFormat dateFormat = new SimpleDateFormat(format);
+        return dateFormat.format(new Date());
+    }
+
+    /**
      * 将时间戳转成指定日期格式
      * @param time
      * @return

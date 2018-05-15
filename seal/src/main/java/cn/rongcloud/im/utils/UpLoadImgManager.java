@@ -314,6 +314,7 @@ public class UpLoadImgManager {
             RLog.v("upload", content);
             return response;
         } catch (Exception e) {
+            RLog.v("upload", e.getMessage());
             e.printStackTrace();
         }
         return null;

@@ -384,4 +384,6 @@
     <string name="baojia_circle_publish">发布</string>
     <string name="bapjia_publish_title">发布</string>
     <string name="baojia_publish_submit">确定</string>
+    <string name="baojia_discussion_group">创建讨论组</string>
+    <string name="baojia_create_discusstion_title">%s的讨论组</string>
 </resources>
