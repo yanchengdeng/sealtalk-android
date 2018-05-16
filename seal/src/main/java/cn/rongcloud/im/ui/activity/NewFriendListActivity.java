@@ -18,7 +18,6 @@ import cn.rongcloud.im.SealAppContext;
 import cn.rongcloud.im.SealConst;
 import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.db.Friend;
-import cn.rongcloud.im.server.BaojiaAction;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.pinyin.CharacterParser;
@@ -37,8 +36,6 @@ public class NewFriendListActivity extends BaseActivity implements NewFriendList
     private static final int AGREE_FRIENDS = 12;
     public static final int FRIEND_LIST_REQUEST_CODE = 1001;
 
-    private BaojiaAction mAction;
-
     private ListView shipListView;
     private NewFriendListAdapter adapter;
     private String mFriendSync;
@@ -51,7 +48,6 @@ public class NewFriendListActivity extends BaseActivity implements NewFriendList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_friendlist);
-        mAction = new BaojiaAction(this);
         mSyncName = getSharedPreferences("config", MODE_PRIVATE).getString(SealConst.BAOJIA_USER_SYNCNAME, "");
         initView();
         if (!CommonUtils.isNetworkConnected(mContext)) {

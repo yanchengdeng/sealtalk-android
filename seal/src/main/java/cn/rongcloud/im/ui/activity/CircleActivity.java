@@ -17,7 +17,6 @@ import com.dbcapp.club.R;
 import java.util.List;
 
 import cn.rongcloud.im.SealConst;
-import cn.rongcloud.im.server.BaojiaAction;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.response.GetCircleResponse;
@@ -31,8 +30,6 @@ import cn.rongcloud.im.ui.widget.AutoLoadListView;
 public class CircleActivity extends BaseActivity implements View.OnClickListener {
 
     private static int GET_CIRCLE = 55;
-
-    private BaojiaAction mAction;
 
     private SwipeRefreshLayout mRefreshLayout;
     private AutoLoadListView mLvCircle;
@@ -51,7 +48,6 @@ public class CircleActivity extends BaseActivity implements View.OnClickListener
         setContentView(R.layout.activity_circle);
         setTitle(R.string.baojia_circlr_title, false);
 
-        mAction = new BaojiaAction(this);
         mSyncName = getSharedPreferences("config", MODE_PRIVATE).
                 getString(SealConst.BAOJIA_USER_SYNCNAME, "");
 

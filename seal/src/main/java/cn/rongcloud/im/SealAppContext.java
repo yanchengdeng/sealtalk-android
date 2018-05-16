@@ -254,6 +254,16 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
                 }
                 BroadcastManager.getInstance(mContext).sendBroadcast(UPDATE_FRIEND);
                 BroadcastManager.getInstance(mContext).sendBroadcast(UPDATE_RED_DOT);
+            }else if (contactNotificationMessage.getOperation().equals("relieveRequest")){
+                //删除了好友
+                SealUserInfoManager.getInstance().deleteFriend(
+                        new Friend(contactNotificationMessage.getSourceUserId(),
+                                contactNotificationMessage.getExtra(),
+                                null, null, null, null,
+                                null, null,
+                                CharacterParser.getInstance().getSpelling(contactNotificationMessage.getExtra()),
+                                null));
+                BroadcastManager.getInstance(mContext).sendBroadcast(UPDATE_FRIEND);
             }
             /*// 发广播通知更新好友列表
             BroadcastManager.getInstance(mContext).sendBroadcast(UPDATE_RED_DOT);

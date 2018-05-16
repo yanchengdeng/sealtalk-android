@@ -18,6 +18,7 @@ import android.widget.ViewFlipper;
 import com.dbcapp.club.R;
 import com.umeng.analytics.MobclickAgent;
 
+import cn.rongcloud.im.server.BaojiaAction;
 import cn.rongcloud.im.server.SealAction;
 import cn.rongcloud.im.server.network.async.AsyncTaskManager;
 import cn.rongcloud.im.server.network.async.OnDataListener;
@@ -29,6 +30,7 @@ public abstract class BaseActivity extends FragmentActivity implements OnDataLis
     protected Context mContext;
     public AsyncTaskManager mAsyncTaskManager;
     protected SealAction action;
+    protected BaojiaAction mAction;
 
     private ViewFlipper mContentView;
     protected LinearLayout mHeadLayout;
@@ -60,6 +62,7 @@ public abstract class BaseActivity extends FragmentActivity implements OnDataLis
         mAsyncTaskManager = AsyncTaskManager.getInstance(getApplicationContext());
         // Activity管理
         action = new SealAction(mContext);
+        mAction = new BaojiaAction(this);
 
     }
 

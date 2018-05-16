@@ -12,11 +12,14 @@ import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.request.CompleteInfoRequest;
 import cn.rongcloud.im.server.response.AgreeFriendResponse;
 import cn.rongcloud.im.server.response.CompleteInfoResponse;
+import cn.rongcloud.im.server.response.DeleteContactResponse;
 import cn.rongcloud.im.server.response.GetCircleResponse;
 import cn.rongcloud.im.server.response.GetFriendResponse;
 import cn.rongcloud.im.server.response.GetLoginStatusResponse;
 import cn.rongcloud.im.server.response.GetMineAmountResponse;
+import cn.rongcloud.im.server.response.GetPlatformAmmountResponse;
 import cn.rongcloud.im.server.response.GetQiNiuTokenResponse;
+import cn.rongcloud.im.server.response.GetRechargeStatusResponse;
 import cn.rongcloud.im.server.response.GetRelationFriendResponse;
 import cn.rongcloud.im.server.response.ModifyNameResponse;
 import cn.rongcloud.im.server.response.ModifyPortraitResponse;
@@ -35,6 +38,8 @@ public class BaojiaAction extends BaseAction {
     public static String BASE_URL = "http://api.baojia.co";
     private final String CONTENT_TYPE = "application/json";
     private final String ENCODING = "utf-8";
+
+    private static final String PLATFORM_AMMOUNT = "***!@#!@#&*%jmanhelmirjuujasd89172!@#$$%%Aams0";
 
     /**
      * 构造方法
@@ -337,8 +342,73 @@ public class BaojiaAction extends BaseAction {
         String responseStr = httpManager.post(mContext, url, entity, CONTENT_TYPE);
         RLog.v("publishCircle", responseStr);
         PublishCircleResponse response = null;
-        if (!TextUtils.isEmpty(responseStr)){
+        if (!TextUtils.isEmpty(
+                responseStr)){
             response = jsonToBean(responseStr, PublishCircleResponse.class);
+        }
+
+        return response;
+    }
+
+    /**
+     * 平台余额
+     * @param syncName
+     * @return
+     * @throws HttpException
+     */
+    public GetPlatformAmmountResponse getPlatformAmmount(String syncName) throws HttpException {
+        String url = String.format(BASE_URL + "/account/cloud/balance?username=%s", syncName);
+
+        RLog.v("getPlatformAmmount", url);
+        String responseStr = httpManager.post(url);
+        RLog.v("getPlatformAmmount", responseStr);
+        GetPlatformAmmountResponse response = null;
+        if (!TextUtils.isEmpty(
+                responseStr)){
+            response = jsonToBean(responseStr, GetPlatformAmmountResponse.class);
+        }
+
+        return response;
+    }
+
+    /**
+     * 充值轮询结果
+     * @param recharge
+     * @param transId
+     * @param syncName
+     * @return
+     * @throws HttpException
+     */
+    public GetRechargeStatusResponse getRechargeStatus(double recharge, String transId, String syncName) throws HttpException {
+        String url = String.format(BASE_URL + "/password/check?amount=%f&transId=%s&username=%s", recharge, transId, syncName);
+        RLog.v("getRechargeStatus", url);
+        String responseStr = httpManager.post(url);
+        RLog.v("getRechargeStatus", responseStr);
+        GetRechargeStatusResponse response = null;
+        if (!TextUtils.isEmpty(
+                responseStr)){
+            response = jsonToBean(responseStr, GetRechargeStatusResponse.class);
+        }
+
+        return response;
+    }
+
+    /**
+     * 删除好友
+     * @param targetSync
+     * @param syncName
+     * @return
+     * @throws HttpException
+     */
+    public DeleteContactResponse deleteContact(String targetSync, String syncName) throws HttpException {
+        String url = String.format(BASE_URL + "/friend/relieve?friendname=%s&username=%s", targetSync, syncName);
+        RLog.v("deleteContact", url);
+        String responseStr = httpManager.get(url);
+        RLog.v("deleteContact", responseStr);
+        DeleteContactResponse response = null;
+        if (!TextUtils.isEmpty(
+                responseStr)){
+            response = jsonToBean(responseStr, DeleteContactResponse.class);
         }
 
         return response;

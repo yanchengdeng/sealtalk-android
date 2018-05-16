@@ -23,7 +23,6 @@ import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.SealAppContext;
 import cn.rongcloud.im.SealConst;
 import cn.rongcloud.im.db.Friend;
-import cn.rongcloud.im.server.BaojiaAction;
 import cn.rongcloud.im.server.network.async.AsyncTaskManager;
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.response.SearchContactResponse;
@@ -42,8 +41,6 @@ public class SearchFriendActivity extends BaseActivity {
     private static final int CLICK_CONVERSATION_USER_PORTRAIT = 1;
     private static final int SEARCH_CONTACT = 10;
     private static final int ADD_FRIEND = 11;
-
-    private BaojiaAction mAction;
 
     private Button mBtnSearch;
     private EditText mEtSearch;
@@ -65,7 +62,6 @@ public class SearchFriendActivity extends BaseActivity {
         setContentView(R.layout.activity_search);
         setTitle((R.string.search_friend));
 
-        mAction = new BaojiaAction(this);
         mSelfSyncName = getSharedPreferences("config", MODE_PRIVATE).
                 getString(SealConst.BAOJIA_USER_SYNCNAME, "");
 

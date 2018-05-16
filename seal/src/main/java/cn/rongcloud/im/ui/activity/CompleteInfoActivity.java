@@ -13,7 +13,6 @@ import com.dbcapp.club.R;
 
 import cn.rongcloud.im.SealConst;
 import cn.rongcloud.im.SealUserInfoManager;
-import cn.rongcloud.im.server.BaojiaAction;
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.response.CompleteInfoResponse;
 import cn.rongcloud.im.server.utils.CommonUtils;
@@ -36,8 +35,6 @@ public class CompleteInfoActivity extends BaseActivity implements View.OnClickLi
 
     private static final String TEMP_PSW = "syncname"; //todo 暂时固定密码
 
-    private BaojiaAction mAction;
-
     private EditText mEtName;
     private EditText mEtPhone;
     private Button mBtnComplete;
@@ -55,7 +52,6 @@ public class CompleteInfoActivity extends BaseActivity implements View.OnClickLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_complete_info);
-        mAction = new BaojiaAction(this);
 
         sp = getSharedPreferences("config", MODE_PRIVATE);
         editor = sp.edit();

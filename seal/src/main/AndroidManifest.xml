@@ -229,6 +229,18 @@
         <activity android:name="cn.rongcloud.im.ui.activity.TransferDetailActivity"
             android:screenOrientation="portrait"/>
 
+        <!-- 我的钱包-->
+        <activity android:name="cn.rongcloud.im.ui.activity.MineWalletActivity"
+            android:screenOrientation="portrait"/>
+
+        <!-- 修改讨论组名称-->
+        <activity android:name="cn.rongcloud.im.ui.activity.UpdateDiscussionNameActivity"
+            android:screenOrientation="portrait"/>
+
+        <!-- 充值输入页面-->
+        <activity android:name="cn.rongcloud.im.ui.activity.RechargeWebActivity"
+            android:screenOrientation="portrait"/>
+
         <!--公众-->
         <activity
             android:name="cn.rongcloud.im.ui.activity.PublicServiceInfoActivity"

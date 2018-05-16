@@ -14,7 +14,6 @@ import com.dbcapp.club.R;
 
 import cn.rongcloud.im.SealConst;
 import cn.rongcloud.im.message.plugins.TransferMessage;
-import cn.rongcloud.im.server.BaojiaAction;
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.response.GetMineAmountResponse;
 import cn.rongcloud.im.server.response.TransferResponse;
@@ -35,7 +34,6 @@ public class TransferActivity extends BaseActivity {
     private static final int GET_MINE_AMOUNT = 39;
     private static final int TRANSFER_MONEY = 38;
 
-    private BaojiaAction mAction;
     private String mSyncName;
     private String mTargetId;
     private SharedPreferences mSp;
@@ -61,7 +59,6 @@ public class TransferActivity extends BaseActivity {
         mUserName = mSp.getString(SealConst.SEALTALK_LOGIN_NAME, "");
         mPortrait = mSp.getString(SealConst.SEALTALK_LOGING_PORTRAIT, "");
         mTargetId = getIntent().getStringExtra("targetId");
-        mAction = new BaojiaAction(this);
         initView();
     }
 

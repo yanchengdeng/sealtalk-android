@@ -1,6 +1,8 @@
 package cn.rongcloud.im.ui.activity;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
@@ -31,6 +33,7 @@ import cn.rongcloud.im.db.Friend;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.pinyin.CharacterParser;
+import cn.rongcloud.im.server.response.DeleteContactResponse;
 import cn.rongcloud.im.server.response.FriendInvitationResponse;
 import cn.rongcloud.im.server.response.GetFriendInfoByIDResponse;
 import cn.rongcloud.im.server.response.GetUserInfoByIdResponse;
@@ -62,6 +65,8 @@ import io.rong.imlib.model.UserOnlineStatusInfo;
 
 public class UserDetailActivity extends BaseActivity implements View.OnClickListener {
 
+    private static final int DELETE_CONTACT = 110;
+
     private static final int SYNC_FRIEND_INFO = 129;
     private ImageView mUserPortrait;
     private TextView mUserNickName;
@@ -79,6 +84,7 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
     private String mGroupName;
     private String mPhoneString;
     private boolean mIsFriendsRelationship;
+    private String mSyncName;
 
     private int mType;
     private static final int CLICK_CONVERSATION_USER_PORTRAIT = 1;
@@ -112,6 +118,7 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
     }
 
     private void initData() {
+        mSyncName = getSharedPreferences("config", MODE_PRIVATE).getString(SealConst.BAOJIA_USER_SYNCNAME, "");
         mType = getIntent().getIntExtra("type", 0);
         if (mType == CLICK_CONVERSATION_USER_PORTRAIT) {
             SealAppContext.getInstance().pushActivity(this);
@@ -363,6 +370,8 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
                 return action.getUserInfoById(mFriend.getUserId());
             case SYNC_FRIEND_INFO:
                 return action.getFriendInfoByID(mFriend.getUserId());
+            case DELETE_CONTACT:
+                return mAction.deleteContact(mFriend.getUserId(), mSyncName);
         }
         return super.doInBackground(requestCode, id);
     }
@@ -465,6 +474,17 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
 
                     }
 
+                    break;
+                case DELETE_CONTACT:
+                    DeleteContactResponse deleteResponse = (DeleteContactResponse) result;
+                    if (deleteResponse.getCode() == 100000){
+                        SealUserInfoManager.getInstance().deleteFriend(mFriend);
+                        NToast.shortToast(this, "删除成功！");
+                        BroadcastManager.getInstance(this).sendBroadcast(SealAppContext.UPDATE_FRIEND);
+                        finish();
+                    }else {
+                        NToast.shortToast(this, deleteResponse.getMessage());
+                    }
                     break;
             }
         }
@@ -583,6 +603,25 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
                 }
             }
         }
+    }
+
+    public void deleteContact(View view){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("确定要删除吗？");
+        builder.setPositiveButton(R.string.baojia_delete_contact_sure, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                request(DELETE_CONTACT);
+            }
+        });
+        builder.setNegativeButton(R.string.baojia_delete_contact_cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        builder.create().show();
     }
 
     @Override

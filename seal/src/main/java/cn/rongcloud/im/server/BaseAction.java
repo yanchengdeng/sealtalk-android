@@ -5,6 +5,7 @@ import android.content.Context;
 import java.util.List;
 
 import cn.rongcloud.im.server.network.http.HttpException;
+import cn.rongcloud.im.server.network.http.MySSLSocketFactory;
 import cn.rongcloud.im.server.network.http.SyncHttpClient;
 import cn.rongcloud.im.server.utils.json.JsonMananger;
 
@@ -27,6 +28,10 @@ public class BaseAction {
     public BaseAction(Context context) {
         this.mContext = context;
         this.httpManager = SyncHttpClient.getInstance(context);
+    }
+
+    public void setSSl(){
+        SyncHttpClient.getInstance(mContext).setSSLSocketFactory(MySSLSocketFactory.getFixedSocketFactory());
     }
 
     /**

@@ -40,7 +40,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.rongcloud.im.SealConst;
-import cn.rongcloud.im.server.BaojiaAction;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.response.GetQiNiuTokenResponse;
@@ -77,7 +76,6 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
     private List<File> mFiles = new ArrayList<>();
     private String mPublishContent;
     private UploadManager mUploadManager;
-    private BaojiaAction mAction;
     private String mSyncName;
     private String mToken;
 
@@ -92,7 +90,6 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
         setContentView(R.layout.activity_publish);
         mSp = getSharedPreferences("config", MODE_PRIVATE);
         mSyncName = mSp.getString(SealConst.BAOJIA_USER_SYNCNAME, "");
-        mAction = new BaojiaAction(this);
 
         initView();
     }

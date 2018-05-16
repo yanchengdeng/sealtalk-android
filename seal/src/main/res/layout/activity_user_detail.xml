@@ -141,6 +141,18 @@
             android:text="@string/start_video"
             android:textColor="#363636"
             android:textSize="16sp" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginLeft="14dp"
+            android:layout_marginRight="14dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/contact_start_video"
+            android:onClick="deleteContact"
+            android:text="@string/baojia_delete_contact"
+            android:textColor="#363636"
+            android:textSize="16sp" />
         <!--CallKit end-->
     </LinearLayout>
 

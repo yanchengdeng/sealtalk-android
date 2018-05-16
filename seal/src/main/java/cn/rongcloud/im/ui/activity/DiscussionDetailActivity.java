@@ -25,6 +25,7 @@ import cn.rongcloud.im.App;
 import cn.rongcloud.im.SealConst;
 import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.db.Friend;
+import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.response.GetUserInfosResponse;
 import cn.rongcloud.im.server.utils.NToast;
@@ -50,6 +51,9 @@ import io.rong.imlib.model.UserInfo;
 public class DiscussionDetailActivity extends BaseActivity implements CompoundButton.OnCheckedChangeListener, View.OnClickListener {
 
     private static final int FIND_USER_INFO = 10;
+
+    private static final int UPDATE_DISCUSS_NAME = 55;
+
     private String targetId;
     private String createId;
     private Discussion mDiscussion;
@@ -60,6 +64,9 @@ public class DiscussionDetailActivity extends BaseActivity implements CompoundBu
     private boolean isCreated;
     private SwitchButton discussionTop, discussionNof;
     private List<String> ids;
+
+    private TextView mTvDiscussionName;
+    private LinearLayout mLayoutDiscussName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,10 +104,13 @@ public class DiscussionDetailActivity extends BaseActivity implements CompoundBu
         discussionNof = (SwitchButton) findViewById(R.id.sw_discu_notfaction);
         LinearLayout discussionClean = (LinearLayout) findViewById(R.id.discu_clean);
         Button deleteDiscussion = (Button) findViewById(R.id.discu_quit);
+        mTvDiscussionName = findViewById(R.id.tv_discusstion_name);
+        mLayoutDiscussName = findViewById(R.id.ll_discussion_name);
         discussionTop.setOnCheckedChangeListener(this);
         discussionNof.setOnCheckedChangeListener(this);
         discussionClean.setOnClickListener(this);
         deleteDiscussion.setOnClickListener(this);
+        mLayoutDiscussName.setOnClickListener(this);
         RongIM.getInstance().getConversation(Conversation.ConversationType.DISCUSSION, targetId, new RongIMClient.ResultCallback<Conversation>() {
             @Override
             public void onSuccess(Conversation conversation) {
@@ -143,6 +153,7 @@ public class DiscussionDetailActivity extends BaseActivity implements CompoundBu
     private void initData(Discussion mDiscussion) {
         memberSize.setText("讨论组成员(" + mDiscussion.getMemberIdList().size() + ")");
         createId = mDiscussion.getCreatorId();
+        mTvDiscussionName.setText(mDiscussion.getName());
         ids = mDiscussion.getMemberIdList();
         if (ids != null) {
             request(FIND_USER_INFO);
@@ -229,6 +240,11 @@ public class DiscussionDetailActivity extends BaseActivity implements CompoundBu
                     }
                 });
 
+                break;
+            case R.id.ll_discussion_name: //改名
+                Intent intent = new Intent(this, UpdateDiscussionNameActivity.class);
+                intent.putExtra("discussion_name", mDiscussion.getName());
+                startActivityForResult(intent, UPDATE_DISCUSS_NAME);
                 break;
         }
     }
@@ -393,6 +409,25 @@ public class DiscussionDetailActivity extends BaseActivity implements CompoundBu
                         memberList.remove(userInfo);
                     }
                     adapter.updateListView(memberList);
+                    break;
+                case UPDATE_DISCUSS_NAME:
+                    final String newName = data.getStringExtra("discussion_name");
+                    mDiscussion.setName(newName);
+                    RongIM.getInstance().setDiscussionName(targetId, newName, new RongIMClient.OperationCallback() {
+                        @Override
+                        public void onSuccess() {
+                            NToast.shortToast(DiscussionDetailActivity.this, R.string.baojia_update_discuss_name_success);
+                            mTvDiscussionName.setText(newName);
+                            BroadcastManager.getInstance(DiscussionDetailActivity.this).
+                                    sendBroadcast(SealConst.BAOJIA_UPDATE_DISCUSS_NAME, newName);
+                        }
+
+                        @Override
+                        public void onError(RongIMClient.ErrorCode errorCode) {
+                            NToast.shortToast(DiscussionDetailActivity.this, R.string.baojia_update_discuss_name_fail);
+                        }
+                    });
+
                     break;
             }
         }

@@ -29,20 +29,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
 
 import cn.rongcloud.im.App;
 import cn.rongcloud.im.SealConst;
 import cn.rongcloud.im.SealUserInfoManager;
-import cn.rongcloud.im.server.BaojiaAction;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.response.GetQiNiuTokenResponse;
-import cn.rongcloud.im.server.response.ModifyNameResponse;
 import cn.rongcloud.im.server.response.ModifyPortraitResponse;
 import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.server.utils.photo.PhotoUtils;
@@ -50,7 +43,6 @@ import cn.rongcloud.im.server.widget.BottomMenuDialog;
 import cn.rongcloud.im.server.widget.LoadDialog;
 import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
 import cn.rongcloud.im.utils.UpLoadImgManager;
-import io.rong.common.RLog;
 import io.rong.imageloader.core.ImageLoader;
 import io.rong.imkit.RongIM;
 import io.rong.imlib.model.UserInfo;
@@ -72,8 +64,6 @@ public class MyAccountActivity extends BaseActivity implements View.OnClickListe
 
     private UpLoadImgManager mUpLoadImgManager;
     private UploadManager mUploadManager;
-    private BaojiaAction mAction;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +71,6 @@ public class MyAccountActivity extends BaseActivity implements View.OnClickListe
         setContentView(R.layout.activity_myaccount);
         setTitle(R.string.de_actionbar_myacc);
         sp = getSharedPreferences("config", MODE_PRIVATE);
-        mAction = new BaojiaAction(this);
         mSyncName = sp.getString(SealConst.BAOJIA_USER_SYNCNAME, "");
         editor = sp.edit();
         initView();

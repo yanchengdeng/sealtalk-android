@@ -27,7 +27,7 @@
             android:layout_gravity="center_vertical"
             android:background="@null"
             android:layout_marginRight="5dp"
-            android:inputType="number"
+            android:inputType="numberDecimal"
             android:layout_marginLeft="8dp"
             android:maxLines="1"
             android:singleLine="true"

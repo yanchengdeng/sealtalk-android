@@ -1,6 +1,7 @@
 package cn.rongcloud.im.ui.activity;
 
 import android.annotation.TargetApi;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -28,8 +29,10 @@ import java.util.List;
 import java.util.Locale;
 
 import cn.rongcloud.im.SealAppContext;
+import cn.rongcloud.im.SealConst;
 import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.db.GroupMember;
+import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.utils.NLog;
 import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.ui.fragment.ConversationFragmentEx;
@@ -209,6 +212,13 @@ public class ConversationActivity extends BaseActivity implements View.OnClickLi
 
 
         //CallKit end 2
+
+        BroadcastManager.getInstance(this).addAction(SealConst.BAOJIA_UPDATE_DISCUSS_NAME, new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                setTitle(intent.getStringExtra("String"));
+            }
+        });
     }
 
     /**

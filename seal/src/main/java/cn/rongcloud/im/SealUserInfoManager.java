@@ -746,6 +746,19 @@ public class SealUserInfoManager implements OnDataListener {
         });
     }
 
+    public void deleteFriend(final Friend friend){
+        mWorkHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (mFriendDao != null) {
+                    if (friend != null) {
+                        mFriendDao.delete(friend);
+                    }
+                }
+            }
+        });
+    }
+
     public void addGroup(final Groups groups) {
         mWorkHandler.post(new Runnable() {
             @Override

@@ -10,11 +10,9 @@ import android.widget.Button;
 import com.dbcapp.club.R;
 
 import cn.rongcloud.im.SealConst;
-import cn.rongcloud.im.server.BaojiaAction;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.response.ModifyNameResponse;
-import cn.rongcloud.im.server.response.SetNameResponse;
 import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.server.widget.ClearWriteEditText;
 import cn.rongcloud.im.server.widget.LoadDialog;
@@ -28,8 +26,6 @@ import io.rong.imlib.model.UserInfo;
 public class UpdateNameActivity extends BaseActivity implements View.OnClickListener {
 
     private static final int UPDATE_NAME = 7;
-
-    private BaojiaAction mAction;
 
     private ClearWriteEditText mNameEditText;
     private String newName;
@@ -49,7 +45,6 @@ public class UpdateNameActivity extends BaseActivity implements View.OnClickList
         mHeadRightText.setOnClickListener(this);
         mNameEditText = (ClearWriteEditText) findViewById(R.id.update_name);
         sp = getSharedPreferences("config", MODE_PRIVATE);
-        mAction = new BaojiaAction(this);
         mNameEditText.setText(sp.getString(SealConst.SEALTALK_LOGIN_NAME, ""));
         mNameEditText.setSelection(sp.getString(SealConst.SEALTALK_LOGIN_NAME, "").length());
         editor = sp.edit();

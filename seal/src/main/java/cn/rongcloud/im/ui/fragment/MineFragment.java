@@ -26,6 +26,7 @@ import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
 import cn.rongcloud.im.ui.activity.AccountSettingActivity;
+import cn.rongcloud.im.ui.activity.MineWalletActivity;
 import cn.rongcloud.im.ui.activity.MyAccountActivity;
 import cn.rongcloud.im.ui.activity.QRCodeActivity;
 import io.rong.imageloader.core.ImageLoader;
@@ -45,6 +46,7 @@ public class MineFragment extends Fragment implements View.OnClickListener {
     private RelativeLayout mLayoutQrcode;
     private RelativeLayout mLayoutSettings;
     private LinearLayout mLayoutMineInfo;
+    private RelativeLayout mLayoutWallet;
 
     @Nullable
     @Override
@@ -73,10 +75,12 @@ public class MineFragment extends Fragment implements View.OnClickListener {
         mLayoutQrcode = mView.findViewById(R.id.rl_mine_qrcode);
         mLayoutSettings = mView.findViewById(R.id.rl_mine_settings);
         mLayoutMineInfo = mView.findViewById(R.id.start_user_profile);
+        mLayoutWallet = mView.findViewById(R.id.rl_mine_wallet);
 
         mLayoutQrcode.setOnClickListener(this);
         mLayoutSettings.setOnClickListener(this);
         mLayoutMineInfo.setOnClickListener(this);
+        mLayoutWallet.setOnClickListener(this);
     }
 
     @Override
@@ -84,6 +88,9 @@ public class MineFragment extends Fragment implements View.OnClickListener {
         switch (v.getId()){
             case R.id.rl_mine_qrcode://二维码
                 gotoQrCode();
+                break;
+            case R.id.rl_mine_wallet://钱包
+                gotoWallet();
                 break;
             case R.id.rl_mine_settings: //设置
                 startActivity(new Intent(getActivity(), AccountSettingActivity.class));
@@ -94,6 +101,11 @@ public class MineFragment extends Fragment implements View.OnClickListener {
             default:
                 break;
         }
+    }
+
+    private void gotoWallet() {
+        Intent intent = new Intent(getContext(), MineWalletActivity.class);
+        startActivity(intent);
     }
 
     //跳转二维码

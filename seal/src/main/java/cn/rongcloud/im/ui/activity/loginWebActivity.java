@@ -17,10 +17,8 @@ import java.util.UUID;
 
 import cn.rongcloud.im.SealConst;
 import cn.rongcloud.im.SealUserInfoManager;
-import cn.rongcloud.im.server.BaojiaAction;
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.response.GetLoginStatusResponse;
-import cn.rongcloud.im.server.response.GetUserInfoByIdResponse;
 import cn.rongcloud.im.server.utils.MD5;
 import cn.rongcloud.im.server.utils.NLog;
 import cn.rongcloud.im.server.utils.NToast;
@@ -42,7 +40,6 @@ public class loginWebActivity extends BaseActivity {
 
     private static final int LOOPER_REQUEST = 8;
 
-    private BaojiaAction mAction;
     private SharedPreferences.Editor editor;
 
     private static final String SECRET_KEY = "***!@#!@#&*%jmanhelmirjuujasd89172!@#$$%%Aams0";
@@ -69,7 +66,6 @@ public class loginWebActivity extends BaseActivity {
         setContentView(R.layout.activity_login_web);
         mSp = getSharedPreferences("config", MODE_PRIVATE);
         editor = mSp.edit();
-        mAction = new BaojiaAction(this);
 
         mWebLogin = findViewById(R.id.web_login);
         initWebView();
