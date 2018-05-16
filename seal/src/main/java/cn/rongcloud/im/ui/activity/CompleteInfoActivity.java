@@ -10,14 +10,12 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.dbcapp.club.R;
-import com.jrmf360.rylib.common.util.ToastUtil;
 
 import cn.rongcloud.im.SealConst;
 import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.server.BaojiaAction;
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.response.CompleteInfoResponse;
-import cn.rongcloud.im.server.response.GetUserInfoByIdResponse;
 import cn.rongcloud.im.server.utils.CommonUtils;
 import cn.rongcloud.im.server.utils.NLog;
 import cn.rongcloud.im.server.utils.NToast;
@@ -90,12 +88,12 @@ public class CompleteInfoActivity extends BaseActivity implements View.OnClickLi
         mPhoneNumber = mEtPhone.getText().toString().trim();
 
         if (TextUtils.isEmpty(mNickName)){
-            ToastUtil.showToast(this, "昵称不能为空！");
+            NToast.shortToast(this, "昵称不能为空！");
             return;
         }
 
         if (TextUtils.isEmpty(mPhoneNumber)){
-            ToastUtil.showToast(this, "号码不能为空！");
+            NToast.shortToast(this, "号码不能为空！");
             return;
         }
 

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/iv_top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="-5dp"
+        android:src="@drawable/transfer_detail_header_bg"/>
+
+    <ImageView
+        android:id="@+id/iv_portrait_transfer_detail"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_below="@+id/iv_top"
+        android:layout_marginTop="-25dp"
+        android:layout_centerHorizontal="true"/>
+
+    <TextView
+        android:id="@+id/tv_sender_transfer_detail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="5dp"
+        android:layout_below="@+id/iv_portrait_transfer_detail"/>
+
+    <TextView
+        android:id="@+id/tv_leave_transfer_detail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="5dp"
+        android:layout_below="@+id/tv_sender_transfer_detail"/>
+
+    <TextView
+        android:id="@+id/tv_amount_transfer_detail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="5dp"
+        android:textSize="32dp"
+        android:layout_below="@+id/tv_leave_transfer_detail"/>
+
+</RelativeLayout>

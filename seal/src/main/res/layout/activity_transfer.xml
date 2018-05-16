@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal"
+        android:layout_marginTop="60dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:background="@drawable/baojia_transfer_input_bg">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_gravity="center_vertical"
+            android:text="@string/baojia_money_hint"
+            android:textColor="#0d0c0c"/>
+
+        <EditText
+            android:id="@+id/et_money_transfer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:background="@null"
+            android:layout_marginRight="5dp"
+            android:inputType="number"
+            android:layout_marginLeft="8dp"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:gravity="right|center_vertical"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:background="@drawable/baojia_transfer_input_bg">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="10dp"
+            android:textColor="#0d0c0c"
+            android:text="@string/baojia_transfer_leaving_tip"/>
+
+        <EditText
+            android:id="@+id/et_leaving_transfer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="right|center_vertical"
+            android:background="@null"
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="8dp"
+            android:hint="@string/baojia_transfer_leave_default"/>
+
+    </LinearLayout>
+
+
+    <TextView
+        android:id="@+id/tv_money_remainder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="28sp"
+        android:layout_marginTop="50dp"
+        android:layout_gravity="center_horizontal"
+        android:text="0"
+        android:textColor="#e12f14"/>
+
+    <Button
+        android:id="@+id/btn_sure_transfer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="40dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:background="@drawable/transfer_sure_btn_bg"
+        android:textColor="#fff"
+        android:text="@string/baojia_sure_transfer"/>
+
+</LinearLayout>

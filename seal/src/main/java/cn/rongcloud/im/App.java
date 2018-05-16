@@ -23,6 +23,7 @@ import cn.rongcloud.contactcard.IContactCardClickListener;
 import cn.rongcloud.contactcard.IContactCardInfoProvider;
 import cn.rongcloud.contactcard.message.ContactMessage;
 import cn.rongcloud.im.db.Friend;
+import cn.rongcloud.im.message.plugins.TransferExtensionModule;
 import cn.rongcloud.im.message.TestMessage;
 import cn.rongcloud.im.message.provider.ContactNotificationMessageProvider;
 import cn.rongcloud.im.message.provider.TestMessageProvider;
@@ -168,6 +169,8 @@ public class App extends MultiDexApplication {
                 }
             }));
             RongExtensionManager.getInstance().registerExtensionModule(new RecognizeExtensionModule());
+
+            RongExtensionManager.getInstance().registerExtensionModule(new TransferExtensionModule());
         }
     }
 
@@ -197,5 +200,4 @@ public class App extends MultiDexApplication {
         }
         return null;
     }
-
 }

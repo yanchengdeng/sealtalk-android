@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import org.apache.http.entity.StringEntity;
 
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.request.CompleteInfoRequest;
@@ -14,9 +15,14 @@ import cn.rongcloud.im.server.response.CompleteInfoResponse;
 import cn.rongcloud.im.server.response.GetCircleResponse;
 import cn.rongcloud.im.server.response.GetFriendResponse;
 import cn.rongcloud.im.server.response.GetLoginStatusResponse;
+import cn.rongcloud.im.server.response.GetMineAmountResponse;
+import cn.rongcloud.im.server.response.GetQiNiuTokenResponse;
 import cn.rongcloud.im.server.response.GetRelationFriendResponse;
 import cn.rongcloud.im.server.response.ModifyNameResponse;
+import cn.rongcloud.im.server.response.ModifyPortraitResponse;
+import cn.rongcloud.im.server.response.PublishCircleResponse;
 import cn.rongcloud.im.server.response.SearchContactResponse;
+import cn.rongcloud.im.server.response.TransferResponse;
 import cn.rongcloud.im.server.response.getAddFriendResponse;
 import io.rong.common.RLog;
 
@@ -219,6 +225,120 @@ public class BaojiaAction extends BaseAction {
         GetCircleResponse response = null;
         if (!TextUtils.isEmpty(responseStr)){
             response = jsonToBean(responseStr, GetCircleResponse.class);
+        }
+
+        return response;
+    }
+
+    /**
+     * 我的金额
+     * @param syncName
+     * @return
+     * @throws HttpException
+     */
+    public GetMineAmountResponse getAmount(String syncName) throws HttpException {
+        String url = String.format(BASE_URL + "/account/balance?username=%s", syncName);
+        RLog.v("getAmount", url);
+        String responseStr = httpManager.get(url);
+        RLog.v("getAmount", responseStr);
+        GetMineAmountResponse response = null;
+        if (!TextUtils.isEmpty(responseStr)){
+            response = jsonToBean(responseStr, GetMineAmountResponse.class);
+        }
+
+        return response;
+    }
+
+    /**
+     * 转账
+     * @param targetSyncname
+     * @param money
+     * @param syncName
+     * @return
+     * @throws HttpException
+     */
+    public TransferResponse transfer(String targetSyncname, double money, String syncName) throws HttpException {
+        String url = String.format(BASE_URL + "/account/transfer?acceptor=%s&balance=%f&username=%s", targetSyncname, money, syncName);
+        RLog.v("transfer", url);
+        String responseStr = httpManager.get(url);
+        RLog.v("transfer", responseStr);
+        TransferResponse response = null;
+        if (!TextUtils.isEmpty(responseStr)){
+            response = jsonToBean(responseStr, TransferResponse.class);
+        }
+
+        return response;
+    }
+
+    /**
+     * 获取七牛上传token
+     * @param type
+     * @param syncName
+     * @return
+     * @throws HttpException
+     */
+    public GetQiNiuTokenResponse getQiNiuToken(int type, String syncName) throws HttpException {
+        String url = null;
+        if (type == GetQiNiuTokenResponse.PORTRAIT_TYPE){
+            url = String.format(BASE_URL + "/qiniu/accessToken?tokenType=%s&username=%s", "PORTRAIT", syncName);
+        }else {
+            url = String.format(BASE_URL + "/qiniu/accessToken?tokenType=%s&username=%s", "CIRCLE", syncName);
+        }
+
+        RLog.v("GetQiNiuTokenResponse", url);
+        String responseStr = httpManager.post(url);
+        GetQiNiuTokenResponse response = null;
+        if (!TextUtils.isEmpty(responseStr)){
+            response = jsonToBean(responseStr, GetQiNiuTokenResponse.class);
+        }
+
+        return response;
+    }
+
+    /**
+     * 修改头像
+     * @param syncName
+     * @param imageUrl
+     * @return
+     * @throws HttpException
+     */
+    public ModifyPortraitResponse modifyPortrait(String syncName, String imageUrl) throws HttpException {
+        String url = String.format(BASE_URL + "/user/qiniu/portrait/%s?imagePath=%s", syncName, imageUrl);
+        RLog.v("modifyPortrait", url);
+        String responseStr = httpManager.post(url);
+        RLog.v("modifyPortrait", responseStr);
+        ModifyPortraitResponse response = null;
+        if (!TextUtils.isEmpty(responseStr)){
+            response = jsonToBean(responseStr, ModifyPortraitResponse.class);
+        }
+
+        return response;
+    }
+
+    /**
+     * 发布朋友圈
+     * @param content
+     * @param syncName
+     * @param urlList
+     * @return
+     * @throws HttpException
+     */
+    public PublishCircleResponse publishCircle(String content, String syncName, List<String> urlList) throws HttpException {
+        String url = String.format(BASE_URL + "/circle/qiniu/publish?content=%s&username=%s", content, syncName);
+        RLog.v("publishCircle", url);
+        StringEntity entity = null;
+        try {
+            entity = new StringEntity(BeanTojson(urlList), ENCODING);
+            entity.setContentType(CONTENT_TYPE);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        String responseStr = httpManager.post(mContext, url, entity, CONTENT_TYPE);
+        RLog.v("publishCircle", responseStr);
+        PublishCircleResponse response = null;
+        if (!TextUtils.isEmpty(responseStr)){
+            response = jsonToBean(responseStr, PublishCircleResponse.class);
         }
 
         return response;

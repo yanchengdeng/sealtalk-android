@@ -129,6 +129,7 @@ public class ConversationActivity extends BaseActivity implements View.OnClickLi
 
         setActionBarTitle(mConversationType, mTargetId);
 
+
         if (mConversationType.equals(Conversation.ConversationType.GROUP)) {
             mRightButton.setBackground(getResources().getDrawable(R.drawable.icon2_menu));
         } else if (mConversationType.equals(Conversation.ConversationType.PRIVATE)

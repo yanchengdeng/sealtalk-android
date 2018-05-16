@@ -221,6 +221,14 @@
         <activity android:name="cn.rongcloud.im.ui.activity.PublishActivity"
             android:screenOrientation="portrait"/>
 
+        <!-- 转账-->
+        <activity android:name="cn.rongcloud.im.ui.activity.TransferActivity"
+            android:screenOrientation="portrait"/>
+
+        <!-- 转账详情-->
+        <activity android:name="cn.rongcloud.im.ui.activity.TransferDetailActivity"
+            android:screenOrientation="portrait"/>
+
         <!--公众-->
         <activity
             android:name="cn.rongcloud.im.ui.activity.PublicServiceInfoActivity"

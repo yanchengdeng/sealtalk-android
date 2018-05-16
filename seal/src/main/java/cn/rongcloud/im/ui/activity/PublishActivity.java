@@ -19,24 +19,31 @@ import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.dbcapp.club.R;
+import com.qiniu.android.http.ResponseInfo;
+import com.qiniu.android.storage.UpCompletionHandler;
+import com.qiniu.android.storage.UploadManager;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
-import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import cn.rongcloud.im.SealConst;
+import cn.rongcloud.im.server.BaojiaAction;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.network.http.HttpException;
+import cn.rongcloud.im.server.response.GetQiNiuTokenResponse;
 import cn.rongcloud.im.server.response.PublishCircleResponse;
 import cn.rongcloud.im.server.utils.NLog;
 import cn.rongcloud.im.server.utils.NToast;
@@ -55,6 +62,7 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
     public static final int REQUEST_CODE_ASK_PERMISSIONS = 101;
 
     private static final int PUBLISH_CIRCLE = 88;
+    private static final int GET_QI_NIU_TOKEN = 101;
 
     private BottomMenuDialog dialog;
     private PhotoUtils photoUtils;
@@ -65,19 +73,26 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
 
     private String mUploadPath;
     private String mTakePath;
-    private UpLoadImgManager mUploadManager;
     private SharedPreferences mSp;
     private List<File> mFiles = new ArrayList<>();
     private String mPublishContent;
+    private UploadManager mUploadManager;
+    private BaojiaAction mAction;
+    private String mSyncName;
+    private String mToken;
 
     private List<Uri> mSelectUriList = new ArrayList<>();
+    private List<String> mImageUrlList = new ArrayList<>();
+
+    private int mIndex = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_publish);
-        mUploadManager = new UpLoadImgManager();
         mSp = getSharedPreferences("config", MODE_PRIVATE);
+        mSyncName = mSp.getString(SealConst.BAOJIA_USER_SYNCNAME, "");
+        mAction = new BaojiaAction(this);
 
         initView();
     }
@@ -91,7 +106,6 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
         mHeadRightText.setText(R.string.baojia_publish_submit);
 
         mBtnSelect.setOnClickListener(this);
-        mIvImage.setOnClickListener(this);
         mHeadRightText.setOnClickListener(this);
         setPortraitChangeListener();
     }
@@ -172,23 +186,34 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
 
     @Override
     public Object doInBackground(int requestCode, String id) throws HttpException {
-        String syncName = mSp.getString(SealConst.BAOJIA_USER_SYNCNAME, "");
-        Map<String, String> params = new HashMap<>();
-        try {
-            String content = URLEncoder.encode(mPublishContent, "utf-8");
-            return mUploadManager.uploadForm(params, "fileArr", mFiles,
-                    String.format("http://api.baojia.co/circle/publish?content=%s&username=%s", content, syncName));
-        } catch (IOException e) {
-            e.printStackTrace();
+        switch (requestCode){
+            case GET_QI_NIU_TOKEN:
+                return mAction.getQiNiuToken(GetQiNiuTokenResponse.CIRCLE_TYPE, mSyncName);
+            case PUBLISH_CIRCLE:
+                try {
+                    String content = URLEncoder.encode(mPublishContent, "utf-8");
+                    return mAction.publishCircle(content, mSyncName, mImageUrlList);
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+            default:
+                return null;
         }
-
-
-        return null;
     }
 
     @Override
     public void onSuccess(int requestCode, Object result) {
         switch (requestCode){
+            case GET_QI_NIU_TOKEN:
+                GetQiNiuTokenResponse qiNiuTokenResponse = (GetQiNiuTokenResponse) result;
+                LoadDialog.dismiss(mContext);
+                if (qiNiuTokenResponse.getCode() == 100000){
+                    mToken = qiNiuTokenResponse.getData().getToken();
+                    uploadImage(mToken, mFiles.get(mIndex));
+                }else {
+                    NToast.shortToast(this, qiNiuTokenResponse.getMessage());
+                }
+                break;
             case PUBLISH_CIRCLE:
                 PublishCircleResponse response = (PublishCircleResponse) result;
                 LoadDialog.dismiss(mContext);
@@ -219,7 +244,6 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.btn_add_photo_publish: //选择照片
-            case R.id.iv_photo_publish: //选择照片
                 showPhotoDialog();
                 break;
             case R.id.text_right: //确定
@@ -229,7 +253,7 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
                     return;
                 }
                 LoadDialog.show(mContext);
-                request(PUBLISH_CIRCLE);
+                request(GET_QI_NIU_TOKEN);
                 break;
             default:
                 break;
@@ -305,5 +329,37 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
             cursor.close();
         }
         return path;
+    }
+
+    public void uploadImage(String imageToken, File imageFile) {
+
+        if (this.mUploadManager == null) {
+            this.mUploadManager = new UploadManager();
+        }
+        this.mUploadManager.put(imageFile, null, imageToken, new UpCompletionHandler() {
+
+            @Override
+            public void complete(String s, ResponseInfo responseInfo, JSONObject jsonObject) {
+                if (responseInfo.isOK()) {
+                    try {
+                        String key = (String) jsonObject.get("key");
+                        String imageurl = "http://" + getString(R.string.baojia_qiniu_domain) + "/" + key;
+                        Log.e("uploadImage", imageurl);
+                        mImageUrlList.add(imageurl);
+                        mIndex ++;
+                        if (mImageUrlList.size() == mFiles.size()){
+                            request(PUBLISH_CIRCLE);
+                        }else {
+                            uploadImage(mToken, mFiles.get(mIndex));
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }else {
+                    NToast.shortToast(mContext, getString(R.string.upload_portrait_failed));
+                    LoadDialog.dismiss(mContext);
+                }
+            }
+        }, null);
     }
 }

@@ -189,4 +189,28 @@ public class CommonUtils {
         Date date = new Date(time);
         return dateFormat.format(date);
     }
+
+    /**
+     * 字符转double
+     * @param content
+     * @param defaultValue
+     * @return
+     */
+    public static double string2Double(String content, double defaultValue){
+        try {
+            double result = Double.parseDouble(content);
+            return result;
+        }catch (NumberFormatException e){
+            e.printStackTrace();
+            return defaultValue;
+        }
+    }
+
+    /**
+     * 化为两位小数
+     * @return
+     */
+    public static String twoDecimalFormat(double number){
+        return String.format("%.2f", number);
+    }
 }

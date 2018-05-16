@@ -386,4 +386,16 @@
     <string name="baojia_publish_submit">确定</string>
     <string name="baojia_discussion_group">创建讨论组</string>
     <string name="baojia_create_discusstion_title">%s的讨论组</string>
+    <string name="baojia_transfer_title">转账</string>
+    <string name="bj_title">宝+</string>
+    <string name="baojia_transfer_leaving_hint">留言</string>
+    <string name="baojia_sure_transfer">确认</string>
+    <string name="baojia_money_hint">金额</string>
+    <string name="baojia_transfer_leaving_tip">留言</string>
+    <string name="baojia_transfer_zero_money">金额不能为空或为0</string>
+    <string name="baojia_transfer_amount">¥ %s</string>
+    <string name="baojia_transfer_leave_default">恭喜发财，大吉大利！</string>
+    <string name="baojia_transfer_detail_title">转账详情</string>
+    <string name="baojia_transfer_max_limit">不能超过余额！</string>
+    <string name="baojia_qiniu_domain">7vztps.com1.z0.glb.clouddn.com</string>
 </resources>
