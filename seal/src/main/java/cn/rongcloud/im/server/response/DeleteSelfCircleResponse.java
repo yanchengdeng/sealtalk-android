@@ -1,22 +1,14 @@
 package cn.rongcloud.im.server.response;
 
 /**
- * Created by star1209 on 2018/5/15.
+ * Created by star1209 on 2018/5/17.
  */
 
-public class GetMineAmountResponse {
+public class DeleteSelfCircleResponse {
 
-    private double data;
     private String message;
     private int code;
-
-    public double getData() {
-        return data;
-    }
-
-    public void setData(double data) {
-        this.data = data;
-    }
+    private ResultEntity data;
 
     public String getMessage() {
         return message;
@@ -32,5 +24,17 @@ public class GetMineAmountResponse {
 
     public void setCode(int code) {
         this.code = code;
+    }
+
+    public ResultEntity getData() {
+        return data;
+    }
+
+    public void setData(ResultEntity data) {
+        this.data = data;
+    }
+
+    public static class ResultEntity{
+
     }
 }

@@ -44,6 +44,7 @@ public class GetCircleResponse {
         private String portrait;
         private String userName;
         private long publishTime;
+        private String syncName;
 
         public long getId() {
             return id;
@@ -99,6 +100,14 @@ public class GetCircleResponse {
 
         public void setPublishTime(long publishTime) {
             this.publishTime = publishTime;
+        }
+
+        public String getSyncName() {
+            return syncName;
+        }
+
+        public void setSyncName(String syncName) {
+            this.syncName = syncName;
         }
     }
 }

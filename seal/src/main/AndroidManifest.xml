@@ -241,6 +241,10 @@
         <activity android:name="cn.rongcloud.im.ui.activity.RechargeWebActivity"
             android:screenOrientation="portrait"/>
 
+        <!-- 收到的币-->
+        <activity android:name="cn.rongcloud.im.ui.activity.TransferHistoryActivity"
+            android:screenOrientation="portrait"/>
+
         <!--公众-->
         <activity
             android:name="cn.rongcloud.im.ui.activity.PublicServiceInfoActivity"
@@ -424,7 +428,7 @@
         <!-- 高德地图-->
         <meta-data
             android:name="com.amap.api.v2.apikey"
-            android:value="55505885d4cadfdddbe9faf19ee4fdb9" />
+            android:value="9726f49e80e7e963412de35da43dbcb3" />
 
 
         <meta-data

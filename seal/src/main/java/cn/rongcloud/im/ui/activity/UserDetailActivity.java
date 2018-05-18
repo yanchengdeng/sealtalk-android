@@ -481,6 +481,18 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
                         SealUserInfoManager.getInstance().deleteFriend(mFriend);
                         NToast.shortToast(this, "删除成功！");
                         BroadcastManager.getInstance(this).sendBroadcast(SealAppContext.UPDATE_FRIEND);
+                        RongIM.getInstance().removeConversation(Conversation.ConversationType.PRIVATE,
+                                mFriend.getUserId(), new RongIMClient.ResultCallback<Boolean>() {
+                            @Override
+                            public void onSuccess(Boolean aBoolean) {
+
+                            }
+
+                            @Override
+                            public void onError(RongIMClient.ErrorCode errorCode) {
+                                NToast.shortToast(UserDetailActivity.this, "code: " + errorCode.getMessage());
+                            }
+                        });
                         finish();
                     }else {
                         NToast.shortToast(this, deleteResponse.getMessage());

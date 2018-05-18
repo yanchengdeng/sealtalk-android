@@ -21,10 +21,12 @@ import cn.rongcloud.im.db.Friend;
 import cn.rongcloud.im.db.GroupMember;
 import cn.rongcloud.im.db.Groups;
 import cn.rongcloud.im.message.module.SealExtensionModule;
+import cn.rongcloud.im.message.plugins.TransferMessage;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.pinyin.CharacterParser;
 import cn.rongcloud.im.server.response.ContactNotificationMessageData;
 import cn.rongcloud.im.server.utils.NLog;
+import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.ui.activity.MainActivity;
 import cn.rongcloud.im.ui.activity.NewFriendListActivity;
 import cn.rongcloud.im.ui.activity.UserDetailActivity;
@@ -263,6 +265,18 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
                                 null, null,
                                 CharacterParser.getInstance().getSpelling(contactNotificationMessage.getExtra()),
                                 null));
+                //删除会话
+                RongIM.getInstance().removeConversation(Conversation.ConversationType.PRIVATE,
+                        contactNotificationMessage.getSourceUserId(), new RongIMClient.ResultCallback<Boolean>() {
+                            @Override
+                            public void onSuccess(Boolean aBoolean) {
+
+                            }
+
+                            @Override
+                            public void onError(RongIMClient.ErrorCode errorCode) {
+                            }
+                        });
                 BroadcastManager.getInstance(mContext).sendBroadcast(UPDATE_FRIEND);
             }
             /*// 发广播通知更新好友列表
@@ -357,6 +371,9 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
         }else if (messageContent instanceof DiscussionNotificationMessage){
             DiscussionNotificationMessage discussionMessage = (DiscussionNotificationMessage) messageContent;
             RLog.v("discussionMessage", discussionMessage.getExtension());
+            return false;
+        }else if (messageContent instanceof TransferMessage){
+            TransferMessage transferMessage = (TransferMessage) messageContent;
             return false;
         }
         return false;

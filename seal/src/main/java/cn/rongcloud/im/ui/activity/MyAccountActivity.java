@@ -42,6 +42,7 @@ import cn.rongcloud.im.server.utils.photo.PhotoUtils;
 import cn.rongcloud.im.server.widget.BottomMenuDialog;
 import cn.rongcloud.im.server.widget.LoadDialog;
 import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
+import cn.rongcloud.im.utils.PermissionUtils;
 import cn.rongcloud.im.utils.UpLoadImgManager;
 import io.rong.imageloader.core.ImageLoader;
 import io.rong.imkit.RongIM;
@@ -49,6 +50,12 @@ import io.rong.imlib.model.UserInfo;
 
 
 public class MyAccountActivity extends BaseActivity implements View.OnClickListener {
+
+    public static final String[] PERMISSIONS = {
+            Manifest.permission.CAMERA,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
 
     private static final int UP_LOAD_PORTRAIT = 8;
     private static final int GET_QI_NIU_TOKEN = 128;
@@ -220,28 +227,24 @@ public class MyAccountActivity extends BaseActivity implements View.OnClickListe
                 if (dialog != null && dialog.isShowing()) {
                     dialog.dismiss();
                 }
-                if (Build.VERSION.SDK_INT >= 23) {
 
-                    int checkPermission = checkSelfPermission(Manifest.permission.CAMERA);
-                    if (checkPermission != PackageManager.PERMISSION_GRANTED) {
-                        if (shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
-                            requestPermissions(new String[]{Manifest.permission.CAMERA}, REQUEST_CODE_ASK_PERMISSIONS);
-                        } else {
-                            new AlertDialog.Builder(mContext)
-                                    .setMessage("您需要在设置里打开相机权限。")
-                                    .setPositiveButton("确认", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            requestPermissions(new String[]{Manifest.permission.CAMERA}, REQUEST_CODE_ASK_PERMISSIONS);
-                                        }
-                                    })
-                                    .setNegativeButton("取消", null)
-                                    .create().show();
-                        }
-                        return;
-                    }
-                }
-                photoUtils.takePicture(MyAccountActivity.this);
+                PermissionUtils.requestPermissions(MyAccountActivity.this, REQUEST_CODE_ASK_PERMISSIONS, PERMISSIONS,
+                        new PermissionUtils.OnPermissionListener() {
+                            @Override
+                            public void onPermissionGranted() {
+                                photoUtils.takePicture(MyAccountActivity.this);
+                            }
+
+                            @Override
+                            public void onPermissionDenied(String[] deniedPermissions) {
+                                NToast.shortToast(MyAccountActivity.this, "权限已被拒绝");
+                            }
+                        }, new PermissionUtils.RationaleHandler() {
+                            @Override
+                            protected void showRationale() {
+                                NToast.shortToast(MyAccountActivity.this, "权限未打开");
+                            }
+                        });
             }
         });
         dialog.setMiddleListener(new View.OnClickListener() {
@@ -250,7 +253,25 @@ public class MyAccountActivity extends BaseActivity implements View.OnClickListe
                 if (dialog != null && dialog.isShowing()) {
                     dialog.dismiss();
                 }
-                photoUtils.selectPicture(MyAccountActivity.this);
+
+                PermissionUtils.requestPermissions(MyAccountActivity.this, REQUEST_CODE_ASK_PERMISSIONS, PERMISSIONS,
+                        new PermissionUtils.OnPermissionListener() {
+                            @Override
+                            public void onPermissionGranted() {
+                                photoUtils.selectPicture(MyAccountActivity.this);
+                            }
+
+                            @Override
+                            public void onPermissionDenied(String[] deniedPermissions) {
+                                NToast.shortToast(MyAccountActivity.this, "权限已被拒绝");
+                            }
+                        }, new PermissionUtils.RationaleHandler() {
+                            @Override
+                            protected void showRationale() {
+                                NToast.shortToast(MyAccountActivity.this, "权限未打开");
+                            }
+                        });
+
             }
         });
         dialog.show();

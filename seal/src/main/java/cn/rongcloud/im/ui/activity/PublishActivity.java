@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 import android.util.Log;
@@ -50,6 +51,7 @@ import cn.rongcloud.im.server.utils.photo.PhotoUtils;
 import cn.rongcloud.im.server.widget.BottomMenuDialog;
 import cn.rongcloud.im.server.widget.LoadDialog;
 import cn.rongcloud.im.utils.CommonUtils;
+import cn.rongcloud.im.utils.PermissionUtils;
 import cn.rongcloud.im.utils.UpLoadImgManager;
 
 /**
@@ -60,8 +62,14 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
 
     public static final int REQUEST_CODE_ASK_PERMISSIONS = 101;
 
+    public static final String[] PERMISSIONS = {
+            Manifest.permission.CAMERA,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
+
     private static final int PUBLISH_CIRCLE = 88;
-    private static final int GET_QI_NIU_TOKEN = 101;
+    private static final int GET_QI_NIU_TOKEN = 102;
 
     private BottomMenuDialog dialog;
     private PhotoUtils photoUtils;
@@ -123,30 +131,26 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
                 if (dialog != null && dialog.isShowing()) {
                     dialog.dismiss();
                 }
-                if (Build.VERSION.SDK_INT >= 23) {
 
-                    int checkPermission = checkSelfPermission(Manifest.permission.CAMERA);
-                    if (checkPermission != PackageManager.PERMISSION_GRANTED) {
-                        if (shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
-                            requestPermissions(new String[]{Manifest.permission.CAMERA}, REQUEST_CODE_ASK_PERMISSIONS);
-                        } else {
-                            new AlertDialog.Builder(mContext)
-                                    .setMessage("您需要在设置里打开相机权限。")
-                                    .setPositiveButton("确认", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            requestPermissions(new String[]{Manifest.permission.CAMERA}, REQUEST_CODE_ASK_PERMISSIONS);
-                                        }
-                                    })
-                                    .setNegativeButton("取消", null)
-                                    .create().show();
-                        }
-                        return;
-                    }
-                }
+                PermissionUtils.requestPermissions(PublishActivity.this, REQUEST_CODE_ASK_PERMISSIONS, PERMISSIONS,
+                        new PermissionUtils.OnPermissionListener() {
+                            @Override
+                            public void onPermissionGranted() {
+                                mTakePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath() + CommonUtils.dateToString("yyyyMMddHHmmss") + ".jpg";
+                                photoUtils.takePhoto(PublishActivity.this, mTakePath);
+                            }
 
-                mTakePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath() + CommonUtils.dateToString("yyyyMMddHHmmss") + ".jpg";
-                photoUtils.takePhoto(PublishActivity.this, mTakePath);
+                            @Override
+                            public void onPermissionDenied(String[] deniedPermissions) {
+                                NToast.shortToast(PublishActivity.this, "权限已被拒绝");
+                            }
+                        }, new PermissionUtils.RationaleHandler() {
+                            @Override
+                            protected void showRationale() {
+                                NToast.shortToast(PublishActivity.this, "权限未打开");
+                            }
+                        });
+
             }
         });
         dialog.setMiddleListener(new View.OnClickListener() {
@@ -155,10 +159,33 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
                 if (dialog != null && dialog.isShowing()) {
                     dialog.dismiss();
                 }
-                photoUtils.selectPicture(PublishActivity.this);
+
+                PermissionUtils.requestPermissions(PublishActivity.this, REQUEST_CODE_ASK_PERMISSIONS, PERMISSIONS,
+                        new PermissionUtils.OnPermissionListener() {
+                            @Override
+                            public void onPermissionGranted() {
+                                photoUtils.selectPicture(PublishActivity.this);
+                            }
+
+                            @Override
+                            public void onPermissionDenied(String[] deniedPermissions) {
+                                NToast.shortToast(PublishActivity.this, "权限已被拒绝");
+                            }
+                        }, new PermissionUtils.RationaleHandler() {
+                            @Override
+                            protected void showRationale() {
+                                NToast.shortToast(PublishActivity.this, "权限未打开");
+                            }
+                        });
             }
         });
         dialog.show();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        PermissionUtils.onRequestPermissionsResult(this, REQUEST_CODE_ASK_PERMISSIONS, PERMISSIONS);
     }
 
     private void setPortraitChangeListener() {
@@ -203,11 +230,11 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
         switch (requestCode){
             case GET_QI_NIU_TOKEN:
                 GetQiNiuTokenResponse qiNiuTokenResponse = (GetQiNiuTokenResponse) result;
-                LoadDialog.dismiss(mContext);
                 if (qiNiuTokenResponse.getCode() == 100000){
                     mToken = qiNiuTokenResponse.getData().getToken();
                     uploadImage(mToken, mFiles.get(mIndex));
                 }else {
+                    LoadDialog.dismiss(mContext);
                     NToast.shortToast(this, qiNiuTokenResponse.getMessage());
                 }
                 break;
@@ -218,6 +245,7 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
                     NLog.i("PublishActivity","publish circle success!");
                     NToast.shortToast(this, "发布成功！");
                     BroadcastManager.getInstance(this).sendBroadcast(SealConst.BAOJIA_PUBLISH_CIRCLE);
+                    mFiles.clear();
                     finish();
                 }else {
                     if (response != null){
@@ -249,7 +277,13 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
                     NToast.shortToast(this, "图片或内容不可为空");
                     return;
                 }
+
                 LoadDialog.show(mContext);
+                if (mFiles.size() == 0){
+                    request(PUBLISH_CIRCLE);
+                    return;
+                }
+
                 request(GET_QI_NIU_TOKEN);
                 break;
             default:
@@ -344,16 +378,19 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
                         Log.e("uploadImage", imageurl);
                         mImageUrlList.add(imageurl);
                         mIndex ++;
-                        if (mImageUrlList.size() == mFiles.size()){
+                        if (mImageUrlList.size() >= mFiles.size()){
                             request(PUBLISH_CIRCLE);
                         }else {
                             uploadImage(mToken, mFiles.get(mIndex));
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
+                        LoadDialog.dismiss(mContext);
                     }
                 }else {
                     NToast.shortToast(mContext, getString(R.string.upload_portrait_failed));
+//                    NToast.shortToast(mContext, "code:" + responseInfo.statusCode +
+//                    "==" + "error" + responseInfo.error);
                     LoadDialog.dismiss(mContext);
                 }
             }

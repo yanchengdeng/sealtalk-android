@@ -13,6 +13,7 @@ import cn.rongcloud.im.server.request.CompleteInfoRequest;
 import cn.rongcloud.im.server.response.AgreeFriendResponse;
 import cn.rongcloud.im.server.response.CompleteInfoResponse;
 import cn.rongcloud.im.server.response.DeleteContactResponse;
+import cn.rongcloud.im.server.response.DeleteSelfCircleResponse;
 import cn.rongcloud.im.server.response.GetCircleResponse;
 import cn.rongcloud.im.server.response.GetFriendResponse;
 import cn.rongcloud.im.server.response.GetLoginStatusResponse;
@@ -21,6 +22,8 @@ import cn.rongcloud.im.server.response.GetPlatformAmmountResponse;
 import cn.rongcloud.im.server.response.GetQiNiuTokenResponse;
 import cn.rongcloud.im.server.response.GetRechargeStatusResponse;
 import cn.rongcloud.im.server.response.GetRelationFriendResponse;
+import cn.rongcloud.im.server.response.GetTransferAggregationResponse;
+import cn.rongcloud.im.server.response.GetTransferHistoryResponse;
 import cn.rongcloud.im.server.response.ModifyNameResponse;
 import cn.rongcloud.im.server.response.ModifyPortraitResponse;
 import cn.rongcloud.im.server.response.PublishCircleResponse;
@@ -342,8 +345,7 @@ public class BaojiaAction extends BaseAction {
         String responseStr = httpManager.post(mContext, url, entity, CONTENT_TYPE);
         RLog.v("publishCircle", responseStr);
         PublishCircleResponse response = null;
-        if (!TextUtils.isEmpty(
-                responseStr)){
+        if (!TextUtils.isEmpty(responseStr)){
             response = jsonToBean(responseStr, PublishCircleResponse.class);
         }
 
@@ -409,6 +411,66 @@ public class BaojiaAction extends BaseAction {
         if (!TextUtils.isEmpty(
                 responseStr)){
             response = jsonToBean(responseStr, DeleteContactResponse.class);
+        }
+
+        return response;
+    }
+
+    /**
+     * 转账历史
+     * @param syncName
+     * @param requestTime
+     * @return
+     * @throws HttpException
+     */
+    public GetTransferHistoryResponse getTransferHistory(String syncName, long requestTime) throws HttpException {
+        String url = String.format(BASE_URL + "/redpackage/accept?pageSize=%d&startTime=%d&username=%s", 20, requestTime, syncName);
+        RLog.v("getTransferHistory", url);
+        String responseStr = httpManager.get(url);
+        RLog.v("getTransferHistory", responseStr);
+        GetTransferHistoryResponse response = null;
+        if (!TextUtils.isEmpty(
+                responseStr)){
+            response = jsonToBean(responseStr, GetTransferHistoryResponse.class);
+        }
+
+        return response;
+    }
+
+    /**
+     * 转账统计
+     * @param syncName
+     * @return
+     * @throws HttpException
+     */
+    public GetTransferAggregationResponse getTransferAggregation(String syncName) throws HttpException {
+        String url = String.format(BASE_URL + "/redpackage/aggregation?username=%s", syncName);
+        RLog.v("getTransferAggregation", url);
+        String responseStr = httpManager.get(url);
+        RLog.v("getTransferAggregation", responseStr);
+        GetTransferAggregationResponse response = null;
+        if (!TextUtils.isEmpty(responseStr)){
+            response = jsonToBean(responseStr, GetTransferAggregationResponse.class);
+        }
+
+        return response;
+    }
+
+    /**
+     * 删除朋友圈
+     * @param syncName
+     * @param id
+     * @return
+     * @throws HttpException
+     */
+    public DeleteSelfCircleResponse deleteSelfCircle(String syncName, long id) throws HttpException {
+        String url = String.format(BASE_URL + "/circle/delete?circle=%d&username=%s", id, syncName);
+        RLog.v("deleteSelfCircle", url);
+        String responseStr = httpManager.post(url);
+        RLog.v("deleteSelfCircle", responseStr);
+        DeleteSelfCircleResponse response = null;
+        if (!TextUtils.isEmpty(responseStr)){
+            response = jsonToBean(responseStr, DeleteSelfCircleResponse.class);
         }
 
         return response;

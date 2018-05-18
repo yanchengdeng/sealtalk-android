@@ -5,10 +5,11 @@
     android:layout_height="wrap_content">
 
     <LinearLayout
+        android:id="@+id/ll_transfer_item_bg"
         android:layout_width="220dp"
         android:layout_height="100dp"
         android:orientation="vertical"
-        android:background="@drawable/baojia_transfer_msg_item">
+        android:background="@drawable/baojia_transfer_msg_item_send">
 
         <TextView
             android:id="@+id/tv_transfer_leave"

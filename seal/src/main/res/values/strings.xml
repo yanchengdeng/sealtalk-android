@@ -393,7 +393,7 @@
     <string name="baojia_money_hint">金额</string>
     <string name="baojia_transfer_leaving_tip">留言</string>
     <string name="baojia_transfer_zero_money">金额不能为空或为0</string>
-    <string name="baojia_transfer_amount">¥ %s</string>
+    <string name="baojia_transfer_amount">%s 币</string>
     <string name="baojia_transfer_leave_default">恭喜发财，大吉大利！</string>
     <string name="baojia_transfer_detail_title">转账详情</string>
     <string name="baojia_transfer_max_limit">不能超过余额！</string>
@@ -414,4 +414,11 @@
     <string name="baojia_delete_contact">删除联系人</string>
     <string name="baojia_delete_contact_cancel">取消</string>
     <string name="baojia_delete_contact_sure">确定</string>
+    <string name="baojia_amount_transfer_receive_tip">共收到</string>
+    <string name="baojia_transfer_count_tip">收到红包</string>
+    <string name="baojia_max_count_tip">手气最佳</string>
+    <string name="baojia_transfer_history_title">收到的币</string>
+    <string name="baojia_transfer_history_amount">%s 币</string>
+    <string name="baojia_circle_delete">删除</string>
+    <string name="baojia_delete_circle_success">删除成功！</string>
 </resources>

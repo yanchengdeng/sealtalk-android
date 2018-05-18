@@ -29,6 +29,7 @@ import cn.rongcloud.im.ui.activity.AccountSettingActivity;
 import cn.rongcloud.im.ui.activity.MineWalletActivity;
 import cn.rongcloud.im.ui.activity.MyAccountActivity;
 import cn.rongcloud.im.ui.activity.QRCodeActivity;
+import cn.rongcloud.im.ui.activity.TransferHistoryActivity;
 import io.rong.imageloader.core.ImageLoader;
 import io.rong.imlib.model.UserInfo;
 
@@ -47,6 +48,7 @@ public class MineFragment extends Fragment implements View.OnClickListener {
     private RelativeLayout mLayoutSettings;
     private LinearLayout mLayoutMineInfo;
     private RelativeLayout mLayoutWallet;
+    private RelativeLayout mLayoutReceive;
 
     @Nullable
     @Override
@@ -76,11 +78,13 @@ public class MineFragment extends Fragment implements View.OnClickListener {
         mLayoutSettings = mView.findViewById(R.id.rl_mine_settings);
         mLayoutMineInfo = mView.findViewById(R.id.start_user_profile);
         mLayoutWallet = mView.findViewById(R.id.rl_mine_wallet);
+        mLayoutReceive = mView.findViewById(R.id.rl_receive_money);
 
         mLayoutQrcode.setOnClickListener(this);
         mLayoutSettings.setOnClickListener(this);
         mLayoutMineInfo.setOnClickListener(this);
         mLayoutWallet.setOnClickListener(this);
+        mLayoutReceive.setOnClickListener(this);
     }
 
     @Override
@@ -88,6 +92,9 @@ public class MineFragment extends Fragment implements View.OnClickListener {
         switch (v.getId()){
             case R.id.rl_mine_qrcode://二维码
                 gotoQrCode();
+                break;
+            case R.id.rl_receive_money://收到的币
+                gotoReceiveHistory();
                 break;
             case R.id.rl_mine_wallet://钱包
                 gotoWallet();
@@ -102,6 +109,10 @@ public class MineFragment extends Fragment implements View.OnClickListener {
                 break;
         }
     }
+
+    private void gotoReceiveHistory() {
+        Intent intent = new Intent(getContext(), TransferHistoryActivity.class);
+        startActivity(intent);    }
 
     private void gotoWallet() {
         Intent intent = new Intent(getContext(), MineWalletActivity.class);

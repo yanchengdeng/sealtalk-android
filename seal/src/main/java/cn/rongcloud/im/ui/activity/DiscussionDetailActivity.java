@@ -156,7 +156,22 @@ public class DiscussionDetailActivity extends BaseActivity implements CompoundBu
         mTvDiscussionName.setText(mDiscussion.getName());
         ids = mDiscussion.getMemberIdList();
         if (ids != null) {
-            request(FIND_USER_INFO);
+//            request(FIND_USER_INFO);
+            for (String id : ids) {
+                memberList.add(new UserInfo(id, "", Uri.parse("")));
+            }
+            String loginId = getSharedPreferences("config", MODE_PRIVATE).getString(SealConst.SEALTALK_LOGIN_ID, "");
+            if (loginId.equals(createId)) {
+                isCreated = true;
+            }
+            if (memberList != null && memberList.size() > 1) {
+                if (adapter == null) {
+                    adapter = new GridAdapter(mContext, memberList);
+                    mGridView.setAdapter(adapter);
+                } else {
+                    adapter.updateListView(memberList);
+                }
+            }
         }
     }
 

@@ -122,7 +122,6 @@ public class MineWalletActivity extends BaseActivity {
         switch (requestCode){
             case REQUEST_AMMOUNT:
                 GetMineAmountResponse amountResponse = (GetMineAmountResponse) result;
-                mAction.setSSl();
                 request(REQUEST_PLATFORM);
                 if (amountResponse.getCode() == 100000){
                     mMineAmmount = amountResponse.getData();

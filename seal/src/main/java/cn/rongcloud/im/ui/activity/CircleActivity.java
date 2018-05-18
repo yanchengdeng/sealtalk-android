@@ -1,7 +1,9 @@
 package cn.rongcloud.im.ui.activity;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -19,7 +21,10 @@ import java.util.List;
 import cn.rongcloud.im.SealConst;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.network.http.HttpException;
+import cn.rongcloud.im.server.response.DeleteSelfCircleResponse;
 import cn.rongcloud.im.server.response.GetCircleResponse;
+import cn.rongcloud.im.server.utils.NToast;
+import cn.rongcloud.im.server.widget.LoadDialog;
 import cn.rongcloud.im.ui.adapter.CircleAdapter;
 import cn.rongcloud.im.ui.widget.AutoLoadListView;
 
@@ -29,7 +34,8 @@ import cn.rongcloud.im.ui.widget.AutoLoadListView;
 
 public class CircleActivity extends BaseActivity implements View.OnClickListener {
 
-    private static int GET_CIRCLE = 55;
+    private static final int GET_CIRCLE = 55;
+    private static final int DELETE_CIRCLE = 33;
 
     private SwipeRefreshLayout mRefreshLayout;
     private AutoLoadListView mLvCircle;
@@ -39,6 +45,7 @@ public class CircleActivity extends BaseActivity implements View.OnClickListener
     private boolean mIsComplete;
     private String mSyncName;
     private long mRequestTime;
+    private long mDeleteId = -1;
 
     private Paint mPaint;
 
@@ -77,7 +84,7 @@ public class CircleActivity extends BaseActivity implements View.OnClickListener
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mLvCircle.setLayoutManager(layoutManager);
-        mCirCleAdapter = new CircleAdapter();
+        mCirCleAdapter = new CircleAdapter(mSyncName);
         mLvCircle.setAdapter(mCirCleAdapter);
         mLvCircle.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
@@ -99,6 +106,30 @@ public class CircleActivity extends BaseActivity implements View.OnClickListener
             @Override
             public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
                 super.getItemOffsets(outRect, view, parent, state);
+            }
+        });
+
+        mCirCleAdapter.setOnDeleteListener(new CircleAdapter.OnDeleteListener() {
+            @Override
+            public void onDelete(long id) {
+                mDeleteId = id;
+                AlertDialog.Builder builder = new AlertDialog.Builder(CircleActivity.this);
+                builder.setMessage("确定要删除吗？");
+                builder.setPositiveButton(R.string.baojia_delete_contact_sure, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        LoadDialog.show(CircleActivity.this);
+                        request(DELETE_CIRCLE);
+                    }
+                });
+                builder.setNegativeButton(R.string.baojia_delete_contact_cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+
+                builder.create().show();
             }
         });
 
@@ -130,35 +161,59 @@ public class CircleActivity extends BaseActivity implements View.OnClickListener
 
     @Override
     public Object doInBackground(int requestCode, String id) throws HttpException {
-        return mAction.getCircle(mSyncName, mRequestTime);
+        switch (requestCode){
+            case GET_CIRCLE:
+                return mAction.getCircle(mSyncName, mRequestTime);
+            case DELETE_CIRCLE:
+                return mAction.deleteSelfCircle(mSyncName, mDeleteId);
+        }
+        return null;
     }
 
     @Override
     public void onSuccess(int requestCode, Object result) {
-        GetCircleResponse response = (GetCircleResponse) result;
-        if (response.getCode() == 100000){
-            List<GetCircleResponse.ResultEntity> datas = response.getData();
-            //如果是刷新状态下
-            if (mRequestTime == 0){
-                mRefreshLayout.setRefreshing(false);
-            }
-            mLvCircle.completeLoad();
-            mIsRefreshing = false;
+        switch (requestCode){
+            case GET_CIRCLE:
+                LoadDialog.dismiss(this);
+                GetCircleResponse response = (GetCircleResponse) result;
+                if (response.getCode() == 100000){
+                    List<GetCircleResponse.ResultEntity> datas = response.getData();
+                    //如果是刷新状态下
+                    if (mRequestTime == 0){
+                        mRefreshLayout.setRefreshing(false);
+                    }
+                    mLvCircle.completeLoad();
+                    mIsRefreshing = false;
 
-            mCirCleAdapter.addData(datas, mRequestTime == 0);
-            if (datas != null && datas.size() > 0){
-                mRequestTime = datas.get(datas.size() - 1).getPublishTime();
-            }
-            if (datas.size() <
-                    20){
-                mIsComplete = true;
-            }
+                    mCirCleAdapter.addData(datas, mRequestTime == 0);
+                    if (datas != null && datas.size() > 0){
+                        mRequestTime = datas.get(datas.size() - 1).getPublishTime();
+                    }
+                    if (datas.size() < 20){
+                        mIsComplete = true;
+                    }
+                }
+                break;
+            case DELETE_CIRCLE:
+                mDeleteId = -1;
+                DeleteSelfCircleResponse deleteResponse = (DeleteSelfCircleResponse) result;
+                if (deleteResponse.getCode() == 100000){
+                    mRequestTime = 0;
+                    mIsComplete = false;
+                    request(GET_CIRCLE);
+                    NToast.shortToast(this, R.string.baojia_delete_circle_success);
+                }else {
+                    NToast.shortToast(this, deleteResponse.getMessage());
+                }
+                break;
         }
+
     }
 
     @Override
     public void onFailure(int requestCode, int state, Object result) {
         super.onFailure(requestCode, state, result);
+        LoadDialog.dismiss(this);
     }
 
     @Override

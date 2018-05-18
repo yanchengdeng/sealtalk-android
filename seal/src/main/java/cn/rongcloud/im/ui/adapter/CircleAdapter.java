@@ -27,6 +27,16 @@ import io.rong.imageloader.core.ImageLoader;
 public class CircleAdapter extends RecyclerView.Adapter {
 
     private List<GetCircleResponse.ResultEntity> mDatas = new ArrayList<>();
+    private String mSyncName;
+    private OnDeleteListener mOnDeleteListener;
+
+    public CircleAdapter(String mSyncName) {
+        this.mSyncName = mSyncName;
+    }
+
+    public void setOnDeleteListener(OnDeleteListener listener){
+        mOnDeleteListener = listener;
+    }
 
     public void addData(List<GetCircleResponse.ResultEntity> datas, boolean isEmpty){
         if (datas == null){
@@ -51,7 +61,7 @@ public class CircleAdapter extends RecyclerView.Adapter {
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         CircleHolder circleHolder = (CircleHolder) holder;
-        GetCircleResponse.ResultEntity data = mDatas.get(position);
+        final GetCircleResponse.ResultEntity data = mDatas.get(position);
         ImageLoader.getInstance().displayImage(data.getPortrait(), circleHolder.ivPortrait, App.getOptions());
         circleHolder.tvContent.setText(data.getContent());
         circleHolder.tvTime.setText(CommonUtils.longToDate(data.getPublishTime(), "yyyy-MM-dd HH:mm"));
@@ -62,6 +72,21 @@ public class CircleAdapter extends RecyclerView.Adapter {
             circleHolder.lvPhotos.setVisibility(View.VISIBLE);
             circleHolder.adapter.setData(data.getCircleImagePath());
         }
+
+        if (data.getSyncName().equals(mSyncName)){
+            circleHolder.tvDelete.setVisibility(View.VISIBLE);
+        }else {
+            circleHolder.tvDelete.setVisibility(View.GONE);
+        }
+
+        circleHolder.tvDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mOnDeleteListener != null){
+                    mOnDeleteListener.onDelete(data.getId());
+                }
+            }
+        });
     }
 
     @Override
@@ -77,6 +102,7 @@ public class CircleAdapter extends RecyclerView.Adapter {
         private TextView tvTime;
         private CirclePhotoAdapter adapter;
         private TextView tvName;
+        private TextView tvDelete;
 
         public CircleHolder(View itemView) {
             super(itemView);
@@ -87,6 +113,7 @@ public class CircleAdapter extends RecyclerView.Adapter {
             lvPhotos = itemView.findViewById(R.id.lv_photo_circle);
             tvTime = itemView.findViewById(R.id.tv_time_circle);
             tvName = itemView.findViewById(R.id.tv_username_circle);
+            tvDelete = itemView.findViewById(R.id.tv_delete_circle);
 
             GridLayoutManager manager = new GridLayoutManager(context, 3);
             lvPhotos.setLayoutManager(manager);
@@ -96,5 +123,9 @@ public class CircleAdapter extends RecyclerView.Adapter {
                     itemView.getContext().getResources().getDimensionPixelOffset(R.dimen.baojia_circle_photo_decoration),
                     true));
         }
+    }
+
+    public interface OnDeleteListener{
+        void onDelete(long id);
     }
 }

@@ -16,7 +16,7 @@ import io.rong.imlib.model.MessageContent;
  * Created by star1209 on 2018/5/15.
  */
 
-@MessageTag(value = "RC:TransferMsg", flag = MessageTag.ISCOUNTED | MessageTag.ISPERSISTED)
+@MessageTag(value = "RCD:RedPackageMsg", flag = MessageTag.ISCOUNTED | MessageTag.ISPERSISTED)
 public class TransferMessage extends MessageContent {
 
     private static final String TAG = "TransferMessage";
@@ -26,6 +26,7 @@ public class TransferMessage extends MessageContent {
     private String syncName;
     private String leaveWord;
     private String portrait;
+    private String extra;
 
     public TransferMessage(double money, String userName, String syncName, String leaveWord, String portrait){
         this.money = money;
@@ -33,6 +34,18 @@ public class TransferMessage extends MessageContent {
         this.syncName = syncName;
         this.leaveWord = leaveWord;
         this.portrait = portrait;
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("portraitUri", portrait);
+            jsonObject.put("money", money);
+            jsonObject.put("userId", syncName);
+            jsonObject.put("name", userName);
+            jsonObject.put("content", leaveWord);
+            extra = jsonObject.toString();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     public TransferMessage(Parcel in) {
@@ -41,6 +54,7 @@ public class TransferMessage extends MessageContent {
         syncName = in.readString();
         leaveWord = in.readString();
         portrait = in.readString();
+        extra = in.readString();
     }
 
     public TransferMessage(byte[] data) {
@@ -64,6 +78,8 @@ public class TransferMessage extends MessageContent {
                 setLeaveWord(jsonObj.optString("leaveWord"));
             if (jsonObj.has("portrait"))
                 setPortrait(jsonObj.optString("portrait"));
+            if (jsonObj.has("extra"))
+                setExtra(jsonObj.optString("extra"));
             if (jsonObj.has("user"))
                 setUserInfo(parseJsonToUserInfo(jsonObj.getJSONObject("user")));
         } catch (JSONException e) {
@@ -81,6 +97,7 @@ public class TransferMessage extends MessageContent {
             jsonObject.put("money", getMoney());
             jsonObject.put("leaveWord", getLeaveWord());
             jsonObject.put("portrait", getPortrait());
+            jsonObject.put("extra", getExtra());
             if (getJSONUserInfo() != null)
                 jsonObject.putOpt("user", getJSONUserInfo());
         } catch (Exception e) {
@@ -107,6 +124,7 @@ public class TransferMessage extends MessageContent {
         dest.writeString(syncName);
         dest.writeString(leaveWord);
         dest.writeString(portrait);
+        dest.writeString(extra);
     }
 
     public static final Creator<TransferMessage> CREATOR = new Creator<TransferMessage>() {
@@ -159,5 +177,13 @@ public class TransferMessage extends MessageContent {
 
     public void setPortrait(String portrait) {
         this.portrait = portrait;
+    }
+
+    public String getExtra() {
+        return extra;
+    }
+
+    public void setExtra(String extra) {
+        this.extra = extra;
     }
 }
