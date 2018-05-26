@@ -7,11 +7,11 @@ package cn.rongcloud.im.server.request;
 public class CompleteInfoRequest {
 
     private String userName;
-    private String userPhone;
+    private String syncName;
 
     public CompleteInfoRequest(String userName, String userPhone) {
         this.userName = userName;
-        this.userPhone = userPhone;
+        this.syncName = userPhone;
     }
 
     public String getUserName() {
@@ -22,11 +22,11 @@ public class CompleteInfoRequest {
         this.userName = userName;
     }
 
-    public String getUserPhone() {
-        return userPhone;
+    public String getSyncName() {
+        return syncName;
     }
 
-    public void setUserPhone(String userPhone) {
-        this.userPhone = userPhone;
+    public void setSyncName(String syncName) {
+        this.syncName = syncName;
     }
 }

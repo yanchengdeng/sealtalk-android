@@ -1,46 +1,67 @@
 package cn.rongcloud.im;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
+import android.graphics.Color;
+import android.media.Image;
 import android.net.Uri;
+import android.speech.tts.Voice;
+import android.text.ClipboardManager;
+import android.text.Selection;
+import android.text.Spannable;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.alibaba.fastjson.JSONException;
+import com.dbcapp.club.R;
+import com.huawei.android.hms.agent.push.EnableReceiveNormalMsgApi;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.Executor;
 
+import cn.rongcloud.contactcard.activities.ContactListActivity;
 import cn.rongcloud.im.db.Friend;
 import cn.rongcloud.im.db.GroupMember;
 import cn.rongcloud.im.db.Groups;
+import cn.rongcloud.im.message.TestMessage;
 import cn.rongcloud.im.message.module.SealExtensionModule;
 import cn.rongcloud.im.message.plugins.TransferMessage;
+import cn.rongcloud.im.message.provider.TestMessageProvider;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.pinyin.CharacterParser;
 import cn.rongcloud.im.server.response.ContactNotificationMessageData;
 import cn.rongcloud.im.server.utils.NLog;
-import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.ui.activity.MainActivity;
 import cn.rongcloud.im.ui.activity.NewFriendListActivity;
+import cn.rongcloud.im.ui.activity.SelectFriendsActivity;
 import cn.rongcloud.im.ui.activity.UserDetailActivity;
 import cn.rongcloud.im.ui.activity.loginWebActivity;
+import cn.rongcloud.im.ui.widget.CommonPopupWindow;
 import io.rong.calllib.RongCallClient;
 import io.rong.calllib.RongCallSession;
 import io.rong.common.RLog;
 import io.rong.imkit.DefaultExtensionModule;
 import io.rong.imkit.IExtensionModule;
+import io.rong.imkit.RongContext;
 import io.rong.imkit.RongExtensionManager;
 import io.rong.imkit.RongIM;
 import io.rong.imkit.model.GroupNotificationMessageData;
 import io.rong.imkit.model.GroupUserInfo;
 import io.rong.imkit.model.UIConversation;
+import io.rong.imkit.utilities.OptionsPopupDialog;
+import io.rong.imkit.widget.AutoLinkTextView;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.Group;
@@ -51,6 +72,8 @@ import io.rong.message.ContactNotificationMessage;
 import io.rong.message.DiscussionNotificationMessage;
 import io.rong.message.GroupNotificationMessage;
 import io.rong.message.ImageMessage;
+import io.rong.message.TextMessage;
+import io.rong.message.VoiceMessage;
 
 /**
  * 融云相关监听 事件集合类
@@ -65,7 +88,7 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
         RongIM.LocationProvider,
         RongIMClient.ConnectionStatusListener,
         RongIM.ConversationBehaviorListener,
-        RongIM.IGroupMembersProvider {
+        RongIM.IGroupMembersProvider{
 
     private static final int CLICK_CONVERSATION_USER_PORTRAIT = 1;
 
@@ -85,12 +108,30 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
 
     private static ArrayList<Activity> mActivities;
 
+    private boolean deleteAfterReadFlag = false;
+
     public SealAppContext(Context mContext) {
         this.mContext = mContext;
         initListener();
         mActivities = new ArrayList<>();
         SealUserInfoManager.init(mContext);
     }
+
+    public void setDeleteAfterReadFlag(boolean deleteAfterReadFlag) {
+        this.deleteAfterReadFlag = deleteAfterReadFlag;
+    }
+
+    public boolean isDeleteAfterReadFlag() {
+        return deleteAfterReadFlag;
+    }
+
+//    public void setNormalReadReceipt(){
+//        RongIMClient.getInstance().setReadReceiptListener(null);
+//    }
+//
+//    public void setDeleteReadReceipt(){
+//        RongIMClient.getInstance().setReadReceiptListener(this);
+//    }
 
     /**
      * 初始化 RongCloud.
@@ -107,6 +148,7 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
                 }
             }
         }
+
 
     }
 
@@ -146,6 +188,10 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
                 quit(false);
             }
         });
+
+//        RongIMClient.getInstance().setReadReceiptListener(this);
+//        RongIM.getInstance().setSendMessageListener(this);
+//        RongIMClient.getInstance().sendReadReceiptMessage();
     }
 
     private void setReadReceiptConversationType() {
@@ -278,6 +324,7 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
                             }
                         });
                 BroadcastManager.getInstance(mContext).sendBroadcast(UPDATE_FRIEND);
+                BroadcastManager.getInstance(mContext).sendBroadcast(SealConst.BAOJIA_DELELTE_CONTACT);
             }
             /*// 发广播通知更新好友列表
             BroadcastManager.getInstance(mContext).sendBroadcast(UPDATE_RED_DOT);
@@ -365,10 +412,43 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
                 e.printStackTrace();
             }
             return false;
-        } else if (messageContent instanceof ImageMessage) {
-            //ImageMessage imageMessage = (ImageMessage) messageContent;
-            return false;
-        }else if (messageContent instanceof DiscussionNotificationMessage){
+        }else if(message.getContent() instanceof TextMessage){
+            TextMessage textMessage = (TextMessage) message.getContent();
+            if ("delete".equals(textMessage.getExtra())){
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("id", message.getMessageId());
+                    jsonObject.put("targetId", message.getTargetId());
+                } catch (org.json.JSONException e) {
+                    e.printStackTrace();
+                }
+                BroadcastManager.getInstance(mContext).sendBroadcast(SealConst.BAOJIA_DELETE_AFTER_READ, jsonObject.toString());
+            }
+        }else if (message.getContent() instanceof ImageMessage){
+            ImageMessage imageMessage = (ImageMessage) message.getContent();
+            if ("delete".equals(imageMessage.getExtra())){
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("id", message.getMessageId());
+                    jsonObject.put("targetId", message.getTargetId());
+                } catch (org.json.JSONException e) {
+                    e.printStackTrace();
+                }
+                BroadcastManager.getInstance(mContext).sendBroadcast(SealConst.BAOJIA_DELETE_AFTER_READ, jsonObject);
+            }
+        }else if (message.getContent() instanceof VoiceMessage){
+            VoiceMessage voiceMessage = (VoiceMessage) message.getContent();
+            if ("delete".equals(voiceMessage.getExtra())){
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("id", message.getMessageId());
+                    jsonObject.put("targetId", message.getTargetId());
+                } catch (org.json.JSONException e) {
+                    e.printStackTrace();
+                }
+                BroadcastManager.getInstance(mContext).sendBroadcast(SealConst.BAOJIA_DELETE_AFTER_READ, jsonObject);
+            }
+        } else if (messageContent instanceof DiscussionNotificationMessage){
             DiscussionNotificationMessage discussionMessage = (DiscussionNotificationMessage) messageContent;
             RLog.v("discussionMessage", discussionMessage.getExtension());
             return false;
@@ -491,8 +571,114 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
     }
 
     @Override
-    public boolean onMessageLongClick(Context context, View view, Message message) {
-        return false;
+    public boolean onMessageLongClick(Context context, final View view, final Message message) {
+        String[] items;
+
+        long deltaTime = RongIM.getInstance().getDeltaTime();
+        long normalTime = System.currentTimeMillis() - deltaTime;
+        boolean enableMessageRecall = false;
+        int messageRecallInterval = -1;
+        boolean hasSent = (!message.getSentStatus().equals(Message.SentStatus.SENDING)) && (!message.getSentStatus().equals(Message.SentStatus.FAILED));
+
+        try {
+            enableMessageRecall = RongContext.getInstance().getResources().getBoolean(io.rong.imkit.R.bool.rc_enable_message_recall);
+            messageRecallInterval = RongContext.getInstance().getResources().getInteger(io.rong.imkit.R.integer.rc_message_recall_interval);
+        } catch (Resources.NotFoundException e) {
+            e.printStackTrace();
+        }
+
+        if (message.getContent() instanceof TextMessage){
+            if (hasSent
+                    && enableMessageRecall
+                    && (normalTime - message.getSentTime()) <= messageRecallInterval * 1000
+                    && message.getSenderUserId().equals(RongIM.getInstance().getCurrentUserId())
+                    && !message.getConversationType().equals(Conversation.ConversationType.CUSTOMER_SERVICE)
+                    && !message.getConversationType().equals(Conversation.ConversationType.APP_PUBLIC_SERVICE)
+                    && !message.getConversationType().equals(Conversation.ConversationType.PUBLIC_SERVICE)
+                    && !message.getConversationType().equals(Conversation.ConversationType.SYSTEM)
+                    && !message.getConversationType().equals(Conversation.ConversationType.CHATROOM)) {
+                items = new String[]{context.getString(R.string.baojia_delete), context.getString(R.string.baojia_copy), context.getString(R.string.baojia_relay), context.getString(R.string.baojia_recall)};
+            }else {
+                items = new String[]{context.getString(R.string.baojia_delete), context.getString(R.string.baojia_copy), context.getString(R.string.baojia_relay)};
+            }
+
+            OptionsPopupDialog.newInstance(view.getContext(), items).setOptionsPopupDialogListener(new OptionsPopupDialog.OnOptionsItemClickedListener() {
+                @Override
+                public void onOptionsItemClicked(int which) {
+                    if (which == 0) {
+                        RongIM.getInstance().deleteMessages(new int[] {message.getMessageId()}, null);
+                    } else if (which == 1) {
+                        @SuppressWarnings("deprecation")
+                        ClipboardManager clipboard = (ClipboardManager) view.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                        clipboard.setText(((TextMessage) message.getContent()).getContent());
+                    }else if(which == 2) {
+                        //转发
+                        relay(message);
+                    }else if (which == 3) {
+
+                        RongIM.getInstance().recallMessage(message, "撤回了一条消息");
+                    }
+                }
+            }).show();
+
+            //动作
+        }else if (message.getContent() instanceof ImageMessage){
+            if (hasSent
+                    && enableMessageRecall
+                    && (normalTime - message.getSentTime()) <= messageRecallInterval * 1000
+                    && message.getSenderUserId().equals(RongIM.getInstance().getCurrentUserId())
+                    && !message.getConversationType().equals(Conversation.ConversationType.CUSTOMER_SERVICE)
+                    && !message.getConversationType().equals(Conversation.ConversationType.APP_PUBLIC_SERVICE)
+                    && !message.getConversationType().equals(Conversation.ConversationType.PUBLIC_SERVICE)
+                    && !message.getConversationType().equals(Conversation.ConversationType.SYSTEM)
+                    && !message.getConversationType().equals(Conversation.ConversationType.CHATROOM)) {
+                items = new String[]{context.getString(R.string.baojia_delete), context.getString(R.string.baojia_relay), context.getString(R.string.baojia_recall)};
+            }else {
+                items = new String[]{context.getString(R.string.baojia_delete), context.getString(R.string.baojia_relay)};
+            }
+
+            OptionsPopupDialog.newInstance(view.getContext(), items).setOptionsPopupDialogListener(new OptionsPopupDialog.OnOptionsItemClickedListener() {
+                @Override
+                public void onOptionsItemClicked(int which) {
+                    if (which == 0) {
+                        RongIM.getInstance().deleteMessages(new int[] {message.getMessageId()}, null);
+                    } else if(which == 1) {
+                        //转发
+                        relay(message);
+                    }else if (which == 2) {
+                        RongIM.getInstance().recallMessage(message, "撤回了一条消息");
+                    }
+                }
+            }).show();
+            //动作
+        }else {
+            if (hasSent
+                    && enableMessageRecall
+                    && (normalTime - message.getSentTime()) <= messageRecallInterval * 1000
+                    && message.getSenderUserId().equals(RongIM.getInstance().getCurrentUserId())
+                    && !message.getConversationType().equals(Conversation.ConversationType.CUSTOMER_SERVICE)
+                    && !message.getConversationType().equals(Conversation.ConversationType.APP_PUBLIC_SERVICE)
+                    && !message.getConversationType().equals(Conversation.ConversationType.PUBLIC_SERVICE)
+                    && !message.getConversationType().equals(Conversation.ConversationType.SYSTEM)
+                    && !message.getConversationType().equals(Conversation.ConversationType.CHATROOM)) {
+                items = new String[]{context.getString(R.string.baojia_delete), context.getString(R.string.baojia_recall)};
+            }else {
+                items = new String[]{context.getString(R.string.baojia_delete)};
+            }
+
+            OptionsPopupDialog.newInstance(view.getContext(), items).setOptionsPopupDialogListener(new OptionsPopupDialog.OnOptionsItemClickedListener() {
+                @Override
+                public void onOptionsItemClicked(int which) {
+                    if (which == 0) {
+                        RongIM.getInstance().deleteMessages(new int[] {message.getMessageId()}, null);
+                    }else if (which == 1) {
+                        RongIM.getInstance().recallMessage(message, "撤回了一条消息");
+                    }
+                }
+            }).show();
+        }
+
+        return true;
     }
 
 
@@ -660,4 +846,103 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
             RongCallClient.getInstance().hangUpCall(session.getCallId());
         }
     }
+
+    private void relay(Message message){
+
+//        Intent intent = new Intent(mContext, ContactListActivity.class);
+        Intent intent = new Intent(mContext, SelectFriendsActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra("relay", true);
+        intent.putExtra("relay_message", message);
+        mContext.startActivity(intent);
+//        RongIM.getInstance().getConversationList(new RongIMClient.ResultCallback<List<Conversation>>() {
+//            @Override
+//            public void onSuccess(List<Conversation> conversations) {
+//
+//            }
+//
+//            @Override
+//            public void onError(RongIMClient.ErrorCode errorCode) {
+//
+//            }
+//        });
+    }
+
+//    @Override
+//    public void onReadReceiptReceived(final Message message) {
+//        RLog.v("onReadReceiptReceived", message.getExtra());
+//        RongIMClient.getInstance().getHistoryMessages(Conversation.ConversationType.PRIVATE,
+//                message.getTargetId(), -1, 100, new RongIMClient.ResultCallback<List<Message>>() {
+//                    @Override
+//                    public void onSuccess(List<Message> messages) {
+//                        List<Integer> ids = new ArrayList<>();
+//                        for (Message msg: messages){
+//                            if (msg.getContent() instanceof TextMessage){
+//                                TextMessage textMessage = (TextMessage) msg.getContent();
+//                                if ("delete".equals(textMessage.getExtra())){
+//                                    ids.add(msg.getMessageId());
+//                                }
+//                            }else if (msg.getContent() instanceof ImageMessage){
+//                                ImageMessage imageMessage = (ImageMessage) msg.getContent();
+//                                if ("delete".equals(imageMessage.getExtra())){
+//                                    ids.add(msg.getMessageId());
+//                                }
+//                            } else if (msg.getContent() instanceof VoiceMessage) {
+//                                VoiceMessage voiceMessage = (VoiceMessage) msg.getContent();
+//                                if ("delete".equals(voiceMessage.getExtra())){
+//                                    ids.add(msg.getMessageId());
+//                                }
+//                            }
+//                        }
+//
+//                        if (ids.size() == 0){
+//                            return;
+//                        }
+//
+//                        int[] messageIds = new int[ids.size()];
+//                        for (int i = 0; i < ids.size(); i ++){
+//                            messageIds[i] = ids.get(i);
+//                        }
+//                        RongIM.getInstance().deleteMessages(messageIds,
+//                                new RongIMClient.ResultCallback<Boolean>() {
+//                            @Override
+//                            public void onSuccess(Boolean aBoolean) {
+//                                new Thread(new Runnable() {
+//                                    @Override
+//                                    public void run() {
+//                                        try {
+//                                            Thread.sleep(5000);
+//                                            RongIMClient.getInstance().sendReadReceiptMessage(Conversation.ConversationType.PRIVATE,
+//                                                    message.getTargetId(), message.getReceivedTime());
+//                                        } catch (InterruptedException e) {
+//                                            e.printStackTrace();
+//                                        }
+//                                    }
+//                                }).start();
+//                            }
+//
+//                            @Override
+//                            public void onError(RongIMClient.ErrorCode errorCode) {
+//
+//                            }
+//                        });
+//                    }
+//
+//                    @Override
+//                    public void onError(RongIMClient.ErrorCode errorCode) {
+//
+//                    }
+//                });
+//
+//    }
+//
+//    @Override
+//    public void onMessageReceiptRequest(Conversation.ConversationType conversationType, String s, String s1) {
+//        RLog.v("onReadReceiptReceived", s);
+//    }
+//
+//    @Override
+//    public void onMessageReceiptResponse(Conversation.ConversationType conversationType, String s, String s1, HashMap<String, Long> hashMap) {
+//        RLog.v("onReadReceiptReceived", s);
+//    }
 }

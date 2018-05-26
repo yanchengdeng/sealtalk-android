@@ -28,6 +28,7 @@ import cn.rongcloud.im.db.Friend;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.response.GetUserInfosResponse;
+import cn.rongcloud.im.server.response.SearchContactResponse;
 import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.server.utils.OperationRong;
 import cn.rongcloud.im.server.widget.DialogWithYesOrNoUtils;
@@ -37,6 +38,7 @@ import cn.rongcloud.im.ui.widget.DemoGridView;
 import cn.rongcloud.im.ui.widget.switchbutton.SwitchButton;
 import io.rong.imageloader.core.ImageLoader;
 import io.rong.imkit.RongIM;
+import io.rong.imkit.userInfoCache.RongUserInfoManager;
 import io.rong.imkit.utilities.PromptPopupDialog;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
@@ -51,6 +53,7 @@ import io.rong.imlib.model.UserInfo;
 public class DiscussionDetailActivity extends BaseActivity implements CompoundButton.OnCheckedChangeListener, View.OnClickListener {
 
     private static final int FIND_USER_INFO = 10;
+    private static final int GET_USER_INFO = 22;
 
     private static final int UPDATE_DISCUSS_NAME = 55;
 
@@ -64,6 +67,7 @@ public class DiscussionDetailActivity extends BaseActivity implements CompoundBu
     private boolean isCreated;
     private SwitchButton discussionTop, discussionNof;
     private List<String> ids;
+    private List<String> mUnknowIds = new ArrayList<>();
 
     private TextView mTvDiscussionName;
     private LinearLayout mLayoutDiscussName;
@@ -77,7 +81,7 @@ public class DiscussionDetailActivity extends BaseActivity implements CompoundBu
         if (TextUtils.isEmpty(targetId)) {
             return;
         }
-        LoadDialog.show(this);
+
         initView();
         RongIM.getInstance().getDiscussion(targetId, new RongIMClient.ResultCallback<Discussion>() {
             @Override
@@ -156,20 +160,31 @@ public class DiscussionDetailActivity extends BaseActivity implements CompoundBu
         mTvDiscussionName.setText(mDiscussion.getName());
         ids = mDiscussion.getMemberIdList();
         if (ids != null) {
-//            request(FIND_USER_INFO);
             for (String id : ids) {
-                memberList.add(new UserInfo(id, "", Uri.parse("")));
+                UserInfo userInfo = RongUserInfoManager.getInstance().getUserInfo((id));
+                if (userInfo == null){
+                    mUnknowIds.add(id);
+//                    userInfo = new UserInfo(id, "", Uri.parse(""));
+                }else {
+                    memberList.add(userInfo);
+                }
             }
-            String loginId = getSharedPreferences("config", MODE_PRIVATE).getString(SealConst.SEALTALK_LOGIN_ID, "");
-            if (loginId.equals(createId)) {
-                isCreated = true;
-            }
-            if (memberList != null && memberList.size() > 1) {
-                if (adapter == null) {
-                    adapter = new GridAdapter(mContext, memberList);
-                    mGridView.setAdapter(adapter);
-                } else {
-                    adapter.updateListView(memberList);
+
+            if (mUnknowIds.size() > 0){
+                LoadDialog.show(this);
+                request(GET_USER_INFO);
+            }else {
+                String loginId = getSharedPreferences("config", MODE_PRIVATE).getString(SealConst.SEALTALK_LOGIN_ID, "");
+                if (loginId.equals(createId)) {
+                    isCreated = true;
+                }
+                if (memberList != null && memberList.size() > 1) {
+                    if (adapter == null) {
+                        adapter = new GridAdapter(mContext, memberList);
+                        mGridView.setAdapter(adapter);
+                    } else {
+                        adapter.updateListView(memberList);
+                    }
                 }
             }
         }
@@ -453,6 +468,8 @@ public class DiscussionDetailActivity extends BaseActivity implements CompoundBu
         switch (requestCode) {
             case FIND_USER_INFO:
                 return action.getUserInfos(ids);
+            case GET_USER_INFO:
+                return mAction.searchContact(mUnknowIds.get(0));
         }
         return super.doInBackground(requestCode, id);
     }
@@ -483,12 +500,45 @@ public class DiscussionDetailActivity extends BaseActivity implements CompoundBu
                     LoadDialog.dismiss(mContext);
                 }
                 break;
+            case GET_USER_INFO:
+                SearchContactResponse contactResponse = (SearchContactResponse) result;
+                if (contactResponse.getCode() == 100000){
+                    SearchContactResponse.ResultEntity entity = contactResponse.getData();
+                    UserInfo userInfo = new UserInfo(entity.getSyncName(), entity.getUserName(), Uri.parse(entity.getPortrait()));
+                    memberList.add(userInfo);
+                }else {
+                    UserInfo userInfo = new UserInfo(mUnknowIds.get(0), "", Uri.parse(""));
+                    memberList.add(userInfo);
+                }
+
+                mUnknowIds.remove(0);
+
+                if (mUnknowIds.size() == 0){
+                    LoadDialog.dismiss(this);
+                    String loginId = getSharedPreferences("config", MODE_PRIVATE).getString(SealConst.SEALTALK_LOGIN_ID, "");
+                    if (loginId.equals(createId)) {
+                        isCreated = true;
+                    }
+                    if (memberList != null && memberList.size() > 1) {
+                        if (adapter == null) {
+                            adapter = new GridAdapter(mContext, memberList);
+                            mGridView.setAdapter(adapter);
+                        } else {
+                            adapter.updateListView(memberList);
+                        }
+                    }
+                }else {
+                    request(GET_USER_INFO);
+                }
+
+                adapter.notifyDataSetChanged();
+                break;
         }
     }
 
     @Override
     public void onFailure(int requestCode, int state, Object result) {
-        LoadDialog.dismiss(mContext);
+        super.onFailure(requestCode, state, result);
+        LoadDialog.dismiss(this);
     }
-
 }

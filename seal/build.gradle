@@ -71,5 +71,6 @@ dependencies {
     compile 'com.huawei.android.hms:push:2.5.3.305'
     compile project(path: ':IMLib')
     compile 'com.google.code.gson:gson:2.2.4'
+    compile 'com.bm.photoview:library:1.4.1'
 }
 apply plugin: 'com.google.gms.google-services'

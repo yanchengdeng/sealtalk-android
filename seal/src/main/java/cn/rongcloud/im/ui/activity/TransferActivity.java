@@ -76,12 +76,12 @@ public class TransferActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 String moneyContent = mEtMoney.getText().toString().trim();
-                if (TextUtils.isEmpty(moneyContent)){
+                mTransferMoney = CommonUtils.string2Double(moneyContent, 0);
+                if (TextUtils.isEmpty(moneyContent) || mTransferMoney <= 0){
                     NToast.shortToast(TransferActivity.this, R.string.baojia_transfer_zero_money);
                     return;
                 }
 
-                mTransferMoney = CommonUtils.string2Double(moneyContent, 0);
                 if (mMineAmount < mTransferMoney){
                     NToast.shortToast(TransferActivity.this, R.string.baojia_transfer_max_limit);
                     return;

@@ -41,6 +41,7 @@ public class MineWalletActivity extends BaseActivity {
     private double mMineAmmount;
     private double mPlatformAmmount;
     private double mRechargeAmmount;
+    private String mLoginName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +88,7 @@ public class MineWalletActivity extends BaseActivity {
     private void gotoRecharge() {
         Intent intent = new Intent(this, RechargeWebActivity.class);
         intent.putExtra("recharge_ammount", mRechargeAmmount);
+        intent.putExtra("login_name", mLoginName);
         startActivityForResult(intent, REQUEST_RECHARGE);
     }
 
@@ -135,9 +137,10 @@ public class MineWalletActivity extends BaseActivity {
                 LoadDialog.dismiss(this);
                 GetPlatformAmmountResponse platformResponse = (GetPlatformAmmountResponse) result;
                 if (platformResponse.getCode() == 100000){
-                    mPlatformAmmount = CommonUtils.string2Double(platformResponse.getData(), 0);
+                    mLoginName = platformResponse.getData().getLoginName();
+                    mPlatformAmmount = platformResponse.getData().getBalance();
                     mTvPlatformAmmout.setText(String.format(getString(R.string.baojia_mine_wallet_ammount),
-                            CommonUtils.twoDecimalFormat(CommonUtils.string2Double(platformResponse.getData(), 0))));
+                            CommonUtils.twoDecimalFormat(platformResponse.getData().getBalance())));
                 }else {
                     NToast.shortToast(this, platformResponse.getMessage());
                 }

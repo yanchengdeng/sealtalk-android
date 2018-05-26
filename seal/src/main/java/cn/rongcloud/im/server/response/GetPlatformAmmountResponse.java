@@ -7,7 +7,7 @@ package cn.rongcloud.im.server.response;
 public class GetPlatformAmmountResponse {
 
     private String message;
-    private String data;
+    private ResultEntity data;
     private int code;
 
     public String getMessage() {
@@ -18,11 +18,11 @@ public class GetPlatformAmmountResponse {
         this.message = message;
     }
 
-    public String getData() {
+    public ResultEntity getData() {
         return data;
     }
 
-    public void setData(String data) {
+    public void setData(ResultEntity data) {
         this.data = data;
     }
 
@@ -32,5 +32,26 @@ public class GetPlatformAmmountResponse {
 
     public void setCode(int code) {
         this.code = code;
+    }
+
+    public static class ResultEntity{
+        private double balance;
+        private String loginName;
+
+        public double getBalance() {
+            return balance;
+        }
+
+        public void setBalance(double balance) {
+            this.balance = balance;
+        }
+
+        public String getLoginName() {
+            return loginName;
+        }
+
+        public void setLoginName(String loginName) {
+            this.loginName = loginName;
+        }
     }
 }

@@ -23,8 +23,9 @@ import cn.rongcloud.contactcard.IContactCardClickListener;
 import cn.rongcloud.contactcard.IContactCardInfoProvider;
 import cn.rongcloud.contactcard.message.ContactMessage;
 import cn.rongcloud.im.db.Friend;
-import cn.rongcloud.im.message.plugins.TransferExtensionModule;
 import cn.rongcloud.im.message.TestMessage;
+import cn.rongcloud.im.message.plugins.DeleteAfterReadExtensionModule;
+import cn.rongcloud.im.message.plugins.TransferExtensionModule;
 import cn.rongcloud.im.message.provider.ContactNotificationMessageProvider;
 import cn.rongcloud.im.message.provider.TestMessageProvider;
 import cn.rongcloud.im.server.pinyin.CharacterParser;
@@ -41,6 +42,8 @@ import io.rong.imkit.RongExtensionManager;
 import io.rong.imkit.RongIM;
 import io.rong.imkit.widget.provider.RealTimeLocationMessageProvider;
 import io.rong.imlib.ipc.RongExceptionHandler;
+import io.rong.imlib.model.Conversation;
+import io.rong.imlib.model.Message;
 import io.rong.imlib.model.UserInfo;
 import io.rong.push.RongPushClient;
 import io.rong.push.common.RongException;
@@ -111,6 +114,13 @@ public class App extends MultiDexApplication {
 
             openSealDBIfHasCachedToken();
 
+            Conversation.ConversationType[] types = new Conversation.ConversationType[] {
+                    Conversation.ConversationType.PRIVATE,
+                    Conversation.ConversationType.GROUP,
+                    Conversation.ConversationType.DISCUSSION
+            };
+            RongIM.getInstance().setReadReceiptConversationTypeList(types);
+
             options = new DisplayImageOptions.Builder()
                     .showImageForEmptyUri(R.drawable.de_default_portrait)
                     .showImageOnFail(R.drawable.de_default_portrait)
@@ -120,57 +130,10 @@ public class App extends MultiDexApplication {
                     .cacheOnDisk(true)
                     .build();
 
-            //RongExtensionManager.getInstance().registerExtensionModule(new PTTExtensionModule(this, true, 1000 * 60));
-            RongExtensionManager.getInstance().registerExtensionModule(new ContactCardExtensionModule(new IContactCardInfoProvider() {
-                @Override
-                public void getContactAllInfoProvider(final IContactCardInfoCallback contactInfoCallback) {
-                    SealUserInfoManager.getInstance().getFriends(new SealUserInfoManager.ResultCallback<List<Friend>>() {
-                        @Override
-                        public void onSuccess(List<Friend> friendList) {
-                            contactInfoCallback.getContactCardInfoCallback(friendList);
-                        }
-
-                        @Override
-                        public void onError(String errString) {
-                            contactInfoCallback.getContactCardInfoCallback(null);
-                        }
-                    });
-                }
-
-                @Override
-                public void getContactAppointedInfoProvider(String userId, String name, String portrait, final IContactCardInfoCallback contactInfoCallback) {
-                    SealUserInfoManager.getInstance().getFriendByID(userId, new SealUserInfoManager.ResultCallback<Friend>() {
-                        @Override
-                        public void onSuccess(Friend friend) {
-                            List<UserInfo> list = new ArrayList<>();
-                            list.add(friend);
-                            contactInfoCallback.getContactCardInfoCallback(list);
-                        }
-
-                        @Override
-                        public void onError(String errString) {
-                            contactInfoCallback.getContactCardInfoCallback(null);
-                        }
-                    });
-                }
-
-            }, new IContactCardClickListener() {
-                @Override
-                public void onContactCardClick(View view, ContactMessage content) {
-                    Intent intent = new Intent(view.getContext(), UserDetailActivity.class);
-                    Friend friend = SealUserInfoManager.getInstance().getFriendByID(content.getId());
-                    if (friend == null) {
-                        UserInfo userInfo = new UserInfo(content.getId(), content.getName(),
-                                Uri.parse(TextUtils.isEmpty(content.getImgUrl()) ? RongGenerate.generateDefaultAvatar(content.getName(), content.getId()) : content.getImgUrl()));
-                        friend = CharacterParser.getInstance().generateFriendFromUserInfo(userInfo);
-                    }
-                    intent.putExtra("friend", friend);
-                    view.getContext().startActivity(intent);
-                }
-            }));
             RongExtensionManager.getInstance().registerExtensionModule(new RecognizeExtensionModule());
 
             RongExtensionManager.getInstance().registerExtensionModule(new TransferExtensionModule());
+            RongExtensionManager.getInstance().registerExtensionModule(new DeleteAfterReadExtensionModule());
         }
     }
 

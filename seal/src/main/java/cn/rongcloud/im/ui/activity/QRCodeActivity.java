@@ -7,6 +7,7 @@ import android.widget.ImageView;
 
 import com.dbcapp.club.R;
 
+import cn.rongcloud.im.SealConst;
 import cn.rongcloud.im.server.utils.QRUtils;
 
 /**
@@ -31,7 +32,8 @@ public class QRCodeActivity extends BaseActivity {
     private void setQRCode() {
         int width = getResources().getDisplayMetrics().widthPixels - 120;
         int height = width;
-        Bitmap qrCodeBitmap = QRUtils.createQRImage("ddd", width, height);
+        String username = getSharedPreferences("config", MODE_PRIVATE).getString(SealConst.SEALTALK_LOGIN_NAME, "");
+        Bitmap qrCodeBitmap = QRUtils.createQRImage(username, width, height);
         mIvQrCode.setImageBitmap(qrCodeBitmap);
     }
 }

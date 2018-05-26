@@ -10,27 +10,35 @@
         android:gravity="left|top"
         android:layout_weight="1"/>
 
-    <LinearLayout
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/lv_add_image"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="horizontal"
-        android:padding="10dp">
+        android:layout_weight="2" />
 
-        <Button
-            android:id="@+id/btn_add_photo_publish"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="+"
-            android:textSize="40dp"
-            android:background="@drawable/baojia_publish_add_photo_bg"/>
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="0dp"-->
+        <!--android:layout_weight="1"-->
+        <!--android:orientation="horizontal"-->
+        <!--android:padding="10dp">-->
 
-        <ImageView
-            android:id="@+id/iv_photo_publish"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:visibility="gone"/>
 
-    </LinearLayout>
+
+        <!--<Button-->
+            <!--android:id="@+id/btn_add_photo_publish"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="+"-->
+            <!--android:textSize="40dp"-->
+            <!--android:background="@drawable/baojia_publish_add_photo_bg"/>-->
+
+        <!--<ImageView-->
+            <!--android:id="@+id/iv_photo_publish"-->
+            <!--android:layout_width="100dp"-->
+            <!--android:layout_height="100dp"-->
+            <!--android:visibility="gone"/>-->
+
+    <!--</LinearLayout>-->
 
 </LinearLayout>

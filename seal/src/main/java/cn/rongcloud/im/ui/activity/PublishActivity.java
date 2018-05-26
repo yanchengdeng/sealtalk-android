@@ -2,15 +2,10 @@ package cn.rongcloud.im.ui.activity;
 
 import android.Manifest;
 import android.annotation.TargetApi;
-import android.app.AlertDialog;
 import android.content.ContentUris;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,12 +14,12 @@ import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 
 import com.dbcapp.club.R;
 import com.qiniu.android.http.ResponseInfo;
@@ -50,6 +45,8 @@ import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.server.utils.photo.PhotoUtils;
 import cn.rongcloud.im.server.widget.BottomMenuDialog;
 import cn.rongcloud.im.server.widget.LoadDialog;
+import cn.rongcloud.im.ui.adapter.PublishImageAdapter;
+import cn.rongcloud.im.ui.widget.linkpreview.GridItemDecoration;
 import cn.rongcloud.im.utils.CommonUtils;
 import cn.rongcloud.im.utils.PermissionUtils;
 import cn.rongcloud.im.utils.UpLoadImgManager;
@@ -74,9 +71,9 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
     private BottomMenuDialog dialog;
     private PhotoUtils photoUtils;
     private UpLoadImgManager mUpLoadImgManager;
-    private Button mBtnSelect;
-    private ImageView mIvImage;
     private EditText mEtContent;
+    private RecyclerView mLvAddImage;
+    private PublishImageAdapter mPublishImageAdapter;
 
     private String mUploadPath;
     private String mTakePath;
@@ -105,14 +102,27 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
     private void initView() {
         setTitle(R.string.bapjia_publish_title);
         mHeadRightText.setVisibility(View.VISIBLE);
-        mBtnSelect = findViewById(R.id.btn_add_photo_publish);
-        mIvImage = findViewById(R.id.iv_photo_publish);
         mEtContent = findViewById(R.id.et_content_publish);
+        mLvAddImage = findViewById(R.id.lv_add_image);
         mHeadRightText.setText(R.string.baojia_publish_submit);
 
-        mBtnSelect.setOnClickListener(this);
         mHeadRightText.setOnClickListener(this);
         setPortraitChangeListener();
+
+        GridLayoutManager manager = new GridLayoutManager(this, 3);
+        mLvAddImage.setLayoutManager(manager);
+        mPublishImageAdapter = new PublishImageAdapter();
+        mLvAddImage.setAdapter(mPublishImageAdapter);
+        mPublishImageAdapter.setOnAddImageListener(new PublishImageAdapter.OnAddImageListener() {
+            @Override
+            public void onAddImage() {
+                showPhotoDialog();
+            }
+        });
+
+        mLvAddImage.addItemDecoration(new GridItemDecoration(3,
+                getResources().getDimensionPixelOffset(R.dimen.baojia_publish_decoration),
+                true));
     }
 
     /**
@@ -268,9 +278,6 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
     @Override
     public void onClick(View v) {
         switch (v.getId()){
-            case R.id.btn_add_photo_publish: //选择照片
-                showPhotoDialog();
-                break;
             case R.id.text_right: //确定
                 mPublishContent = mEtContent.getText().toString().trim();
                 if (TextUtils.isEmpty(mPublishContent) && mFiles.size() == 0){
@@ -296,16 +303,12 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
         switch (requestCode) {
             case PhotoUtils.INTENT_TAKE:
                 if (!TextUtils.isEmpty(mTakePath)) {
-                    mBtnSelect.setVisibility(View.GONE);
-                    mIvImage.setVisibility(View.VISIBLE);
                     displayImage(mTakePath);
                 }
                 break;
             case PhotoUtils.INTENT_SELECT:
                 if (data != null && data.getData() != null){
                     Uri uri = data.getData();
-                    mBtnSelect.setVisibility(View.GONE);
-                    mIvImage.setVisibility(View.VISIBLE);
                     handleImageOnKitkat(data.getData());
                 }
                 break;
@@ -339,12 +342,8 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
     }
 
     private void displayImage(String imagePath) {
-        if (imagePath != null) {
-            Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
-            mIvImage.setImageBitmap(bitmap);
-            mUploadPath = imagePath;
-            mFiles.add(new File(imagePath));
-        }
+        mFiles.add(new File(imagePath));
+        mPublishImageAdapter.addData(imagePath);
     }
 
     private String getImagePath(Uri uri, String selection) {

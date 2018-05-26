@@ -594,6 +594,7 @@ public class ConversationActivity extends BaseActivity implements View.OnClickLi
         //CallKit end 3
 
         RongIMClient.setTypingStatusListener(null);
+        SealAppContext.getInstance().setDeleteAfterReadFlag(false);
         SealAppContext.getInstance().popActivity(this);
         super.onDestroy();
     }

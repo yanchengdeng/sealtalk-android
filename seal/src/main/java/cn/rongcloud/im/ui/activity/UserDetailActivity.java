@@ -14,15 +14,19 @@ import android.os.Message;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bm.library.Info;
+import com.bm.library.PhotoView;
 import com.dbcapp.club.R;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import cn.rongcloud.im.App;
@@ -42,15 +46,11 @@ import cn.rongcloud.im.server.utils.RongGenerate;
 import cn.rongcloud.im.server.widget.DialogWithYesOrNoUtils;
 import cn.rongcloud.im.server.widget.LoadDialog;
 import cn.rongcloud.im.ui.widget.SinglePopWindow;
-
-//CallKit start 1
 import io.rong.callkit.RongCallAction;
 import io.rong.callkit.RongVoIPIntent;
 import io.rong.calllib.RongCallClient;
 import io.rong.calllib.RongCallCommon;
 import io.rong.calllib.RongCallSession;
-//CallKit end 1
-
 import io.rong.imageloader.core.ImageLoader;
 import io.rong.imkit.RongIM;
 import io.rong.imlib.IRongCallback;
@@ -58,6 +58,9 @@ import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.UserInfo;
 import io.rong.imlib.model.UserOnlineStatusInfo;
+
+//CallKit start 1
+//CallKit end 1
 
 /**
  * Created by tiankui on 16/11/2.
@@ -76,6 +79,8 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
     private LinearLayout mChatButtonGroupLinearLayout;
     private Button mAddFriendButton;
     private LinearLayout mNoteNameLinearLayout;
+    private PhotoView mIvShow;
+    private FrameLayout mLayoutImagebg;
 
     private static final int ADD_FRIEND = 10086;
     private static final int SYN_USER_INFO = 10087;
@@ -112,9 +117,14 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
         mChatButtonGroupLinearLayout = (LinearLayout) findViewById(R.id.ac_ll_chat_button_group);
         mAddFriendButton = (Button) findViewById(R.id.ac_bt_add_friend);
         mNoteNameLinearLayout = (LinearLayout) findViewById(R.id.ac_ll_note_name);
+        mIvShow = findViewById(R.id.iv_image_show);
+        mLayoutImagebg = findViewById(R.id.fl_image_bg);
+        mIvShow.enable();
 
         mAddFriendButton.setOnClickListener(this);
         mUserPhone.setOnClickListener(this);
+        mUserPortrait.setOnClickListener(this);
+        mIvShow.setOnClickListener(this);
     }
 
     private void initData() {
@@ -136,6 +146,8 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
             }
             String portraitUri = SealUserInfoManager.getInstance().getPortraitUri(mFriend);
             ImageLoader.getInstance().displayImage(portraitUri, mUserPortrait, App.getOptions());
+            ImageLoader.getInstance().displayImage(portraitUri, mIvShow, App.getOptions());
+            mUserPhone.setText(String.format(getString(R.string.baojia_mine_user_syncname), mFriend.getUserId()));
         }
         if (getSharedPreferences("config", MODE_PRIVATE).getBoolean("isDebug", false)) {
             RongIMClient.getInstance().getUserOnlineStatus(mFriend.getUserId(), new IRongCallback.IGetUserOnlineStatusCallback() {
@@ -331,16 +343,21 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
                     }
                 });
                 break;
-            case R.id.contact_phone:
-                if (!TextUtils.isEmpty(mPhoneString)) {
-                    Uri telUri = Uri.parse("tel:"+mPhoneString);
-                    Intent intent = new Intent(Intent.ACTION_DIAL, telUri);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                }
+//            case R.id.contact_phone:
+//                if (!TextUtils.isEmpty(mPhoneString)) {
+//                    Uri telUri = Uri.parse("tel:"+mPhoneString);
+//                    Intent intent = new Intent(Intent.ACTION_DIAL, telUri);
+//                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                    startActivity(intent);
+//                }
+//                break;
+            case R.id.ac_iv_user_portrait: //点击头像
+                mLayoutImagebg.setVisibility(View.VISIBLE);
+                break;
+            case R.id.iv_image_show: //点击头像
+                mLayoutImagebg.setVisibility(View.GONE);
                 break;
         }
-
     }
 
     @Override
@@ -493,13 +510,18 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
                                 NToast.shortToast(UserDetailActivity.this, "code: " + errorCode.getMessage());
                             }
                         });
-                        finish();
+//                        finish();
+                        gotoMain();
                     }else {
                         NToast.shortToast(this, deleteResponse.getMessage());
                     }
                     break;
             }
         }
+    }
+
+    private void gotoMain() {
+        startActivity(new Intent(this, MainActivity.class));
     }
 
     private boolean hasNickNameChanged(String nickName) {
@@ -551,7 +573,12 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
         if (mType == CLICK_CONVERSATION_USER_PORTRAIT) {
             SealAppContext.getInstance().popActivity(this);
         }
-        super.onBackPressed();
+        if (mLayoutImagebg.getVisibility() == View.VISIBLE){
+            mLayoutImagebg.setVisibility(View.GONE);
+            return;
+        }else {
+            super.onBackPressed();
+        }
     }
 
     @Override

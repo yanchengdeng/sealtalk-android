@@ -15,6 +15,7 @@ import cn.rongcloud.im.server.response.CompleteInfoResponse;
 import cn.rongcloud.im.server.response.DeleteContactResponse;
 import cn.rongcloud.im.server.response.DeleteSelfCircleResponse;
 import cn.rongcloud.im.server.response.GetCircleResponse;
+import cn.rongcloud.im.server.response.GetCustomerListResponse;
 import cn.rongcloud.im.server.response.GetFriendResponse;
 import cn.rongcloud.im.server.response.GetLoginStatusResponse;
 import cn.rongcloud.im.server.response.GetMineAmountResponse;
@@ -75,15 +76,14 @@ public class BaojiaAction extends BaseAction {
     /**
      * 用户补充资料
      * @param name
-     * @param phone
      * @return
      */
-    public CompleteInfoResponse completeInfo(String syncName, String name, String phone) throws HttpException {
-        String url = String.format(BASE_URL + "/user/register/%s", syncName);
+    public CompleteInfoResponse completeInfo(String loginName, String syncName, String name) throws HttpException {
+        String url = String.format(BASE_URL + "/user/register/%s", loginName);
         RLog.v("CompleteInfoResponse", url);
         StringEntity entity = null;
         try {
-            entity = new StringEntity(BeanTojson(new CompleteInfoRequest(name, phone)), ENCODING);
+            entity = new StringEntity(BeanTojson(new CompleteInfoRequest(name, syncName)), ENCODING);
             entity.setContentType(CONTENT_TYPE);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
@@ -377,12 +377,12 @@ public class BaojiaAction extends BaseAction {
      * 充值轮询结果
      * @param recharge
      * @param transId
-     * @param syncName
+     * @param loginName
      * @return
      * @throws HttpException
      */
-    public GetRechargeStatusResponse getRechargeStatus(double recharge, String transId, String syncName) throws HttpException {
-        String url = String.format(BASE_URL + "/password/check?amount=%f&transId=%s&username=%s", recharge, transId, syncName);
+    public GetRechargeStatusResponse getRechargeStatus(double recharge, String transId, String loginName) throws HttpException {
+        String url = String.format(BASE_URL + "/password/check?amount=%f&transId=%s&username=%s", recharge, transId, loginName);
         RLog.v("getRechargeStatus", url);
         String responseStr = httpManager.post(url);
         RLog.v("getRechargeStatus", responseStr);
@@ -471,6 +471,26 @@ public class BaojiaAction extends BaseAction {
         DeleteSelfCircleResponse response = null;
         if (!TextUtils.isEmpty(responseStr)){
             response = jsonToBean(responseStr, DeleteSelfCircleResponse.class);
+        }
+
+        return response;
+    }
+
+    /**
+     * 客服列表
+     * @param pageSize
+     * @param requestTime
+     * @return
+     * @throws HttpException
+     */
+    public GetCustomerListResponse getCustomerList(int pageSize, long requestTime) throws HttpException {
+        String url = String.format(BASE_URL + "/customer/list?pageSize=%d&startTime=%d", pageSize, requestTime);
+        RLog.v("getCustomerList", url);
+        String responseStr = httpManager.get(url);
+        RLog.v("getCustomerList", responseStr);
+        GetCustomerListResponse response = null;
+        if (!TextUtils.isEmpty(responseStr)){
+            response = jsonToBean(responseStr, GetCustomerListResponse.class);
         }
 
         return response;

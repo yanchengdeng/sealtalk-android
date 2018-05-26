@@ -46,7 +46,7 @@ public class CommonUtils {
      * @param context
      * @return
      */
-    public static int getScreenWidth(Activity context) {
+    public static int getScreenWidth(Context context) {
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         int width = wm.getDefaultDisplay().getWidth();
         return width;

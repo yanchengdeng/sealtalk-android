@@ -50,17 +50,22 @@ public class PrivateChatDetailActivity extends BaseActivity implements View.OnCl
     private SwitchButton messageTop, messageNotification;
     private SelectableRoundedImageView mImageView;
     private TextView friendName;
+    private TextView mTvFriendId;
     private LinearLayout mSearchChattingRecordsLinearLayout;
 
     private Conversation.ConversationType mConversationType;
     private String fromConversationId;
     private SealSearchConversationResult mResult;
 
+    private SharedPreferences mSp;
+    private String mSyncName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fr_friend_detail);
+        mSp = getSharedPreferences("config", MODE_PRIVATE);
+        mSyncName = mSp.getString(SealConst.BAOJIA_USER_SYNCNAME, "");
         setTitle(R.string.user_details);
         initView();
         fromConversationId = getIntent().getStringExtra("TargetId");
@@ -78,6 +83,10 @@ public class PrivateChatDetailActivity extends BaseActivity implements View.OnCl
         if (mUserInfo != null) {
             initData();
             getState(mUserInfo.getUserId());
+        }else if ((mSyncName).equals(fromConversationId)){
+            friendName.setText(mSp.getString(SealConst.SEALTALK_LOGIN_NAME, ""));
+            mTvFriendId.setText(String.format(getString(R.string.baojia_mine_user_syncname), mSyncName));
+            ImageLoader.getInstance().displayImage(mSp.getString(SealConst.SEALTALK_LOGING_PORTRAIT, ""), mImageView, App.getOptions());
         }
     }
 
@@ -92,16 +101,21 @@ public class PrivateChatDetailActivity extends BaseActivity implements View.OnCl
             } else {
                 friendName.setText(mUserInfo.getName());
             }
-        }
 
+            mTvFriendId.setText(String.format(getString(R.string.baojia_mine_user_syncname), mUserInfo.getUserId()));
+        }
     }
 
     private void initView() {
         LinearLayout cleanMessage = (LinearLayout) findViewById(R.id.clean_friend);
         mImageView = (SelectableRoundedImageView) findViewById(R.id.friend_header);
+        mTvFriendId = findViewById(R.id.friend_id);
         mImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (mUserInfo == null){
+                    return;
+                }
                 Intent intent = new Intent(PrivateChatDetailActivity.this, UserDetailActivity.class);
                 Friend friend = CharacterParser.getInstance().generateFriendFromUserInfo(mUserInfo);
                 intent.putExtra("friend", friend);

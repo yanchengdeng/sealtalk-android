@@ -18,6 +18,7 @@ import cn.rongcloud.im.SealConst;
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.response.GetRechargeStatusResponse;
 import cn.rongcloud.im.server.utils.MD5;
+import cn.rongcloud.im.server.utils.NToast;
 import io.rong.common.RLog;
 
 /**
@@ -37,6 +38,7 @@ public class RechargeWebActivity extends BaseActivity {
 
     private WebView mWebView;
     private double mRechargeAmmount;
+    private String mLoginName;
 
     private Handler mHandler = new Handler(){
         @Override
@@ -52,6 +54,7 @@ public class RechargeWebActivity extends BaseActivity {
 
         mSp = getSharedPreferences("config", MODE_PRIVATE);
         mSyncName = mSp.getString(SealConst.BAOJIA_USER_SYNCNAME, "");
+        mLoginName = getIntent().getStringExtra("login_name");
         mTransId = UUID.randomUUID().toString();
         mRechargeAmmount = getIntent().getDoubleExtra("recharge_ammount", 0);
         initView();
@@ -70,8 +73,8 @@ public class RechargeWebActivity extends BaseActivity {
     private void loadWebUrl(){
         //获取transid并存储
         mTransId = UUID.randomUUID().toString();
-        String url = String.format(mUrl, mSyncName, mTransId,
-                MD5.encrypt(mSyncName + mTransId + SealConst.BAOJIA_SECRET).toLowerCase());
+        String url = String.format(mUrl, mLoginName, mTransId,
+                MD5.encrypt(mLoginName + mTransId + SealConst.BAOJIA_SECRET).toLowerCase());
         RLog.v("RechargeWebActivity", url);
         mWebView.loadUrl(url);
     }

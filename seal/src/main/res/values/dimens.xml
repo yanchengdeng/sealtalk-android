@@ -14,4 +14,7 @@
     <dimen name="baojia_circle_container_paddingleft">10dp</dimen>
     <dimen name="baojia_circle_container_paddingright">20dp</dimen>
     <dimen name="baojia_circle_portrait_size">45dp</dimen>
+    <dimen name="baojia_publish_decoration">10dp</dimen>
+    <dimen name="baojia_customer_item_height">52dp</dimen>
+    <dimen name="baojia_customer_item_padding">5dp</dimen>
 </resources>

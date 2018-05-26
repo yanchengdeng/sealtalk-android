@@ -47,7 +47,10 @@ import io.rong.common.RLog;
 import io.rong.imageloader.core.ImageLoader;
 import io.rong.imkit.RongIM;
 import io.rong.imkit.userInfoCache.RongUserInfoManager;
+import io.rong.imlib.IRongCallback;
 import io.rong.imlib.RongIMClient;
+import io.rong.imlib.model.Conversation;
+import io.rong.imlib.model.Message;
 import io.rong.imlib.model.UserInfo;
 
 /**
@@ -101,6 +104,9 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
 
     private String mCurrentUsername;
 
+    private boolean mIsRelay;
+    private Message mRelayMessage;
+
     @Override
     @SuppressWarnings("unchecked")
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,6 +125,8 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
         groupId = getIntent().getStringExtra("GroupId");
         isAddGroupMember = getIntent().getBooleanExtra("isAddGroupMember", false);
         isDeleteGroupMember = getIntent().getBooleanExtra("isDeleteGroupMember", false);
+        mIsRelay = getIntent().getBooleanExtra("relay", false);
+        mRelayMessage = getIntent().getParcelableExtra("relay_message");
         if (isAddGroupMember || isDeleteGroupMember) {
             initGroupMemberList();
         }
@@ -776,7 +784,45 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
                             NToast.shortToast(mContext, "请至少邀请一位好友创建群组");
                             mHeadRightText.setClickable(true);
                         }
-                    } else {
+                    }else if (mIsRelay){
+                        for (int i = 0; i < sourceDataList.size(); i++) {
+                            if (mCBFlag.get(i)) {
+                                if (mRelayMessage == null){
+                                    NToast.shortToast(SelectFriendsActivity.this, R.string.baojia_relay_empty);
+                                    return;
+                                }
+                                RongIM.getInstance().sendMessage(Message.obtain(sourceDataList.get(i).getUserId(), Conversation.ConversationType.PRIVATE,
+                                        mRelayMessage.getContent()), "转发", null,
+                                        new IRongCallback.ISendMediaMessageCallback() {
+                                            @Override
+                                            public void onProgress(Message message, int i) {
+
+                                            }
+
+                                            @Override
+                                            public void onCanceled(Message message) {
+
+                                            }
+
+                                            @Override
+                                            public void onAttached(Message message) {
+
+                                            }
+
+                                            @Override
+                                            public void onSuccess(Message message) {
+                                                NToast.shortToast(SelectFriendsActivity.this, R.string.baojia_relay_success);
+                                                finish();
+                                            }
+
+                                            @Override
+                                            public void onError(Message message, RongIMClient.ErrorCode errorCode) {
+
+                                            }
+                                        });
+                            }
+                        }
+                    }else {
 
                         if (startDisList != null && startDisList.size() == 1) {
                             RongIM.getInstance().startPrivateChat(mContext, startDisList.get(0),

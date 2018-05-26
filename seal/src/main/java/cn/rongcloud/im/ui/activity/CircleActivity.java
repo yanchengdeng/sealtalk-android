@@ -13,9 +13,11 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.FrameLayout;
 
 import com.dbcapp.club.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import cn.rongcloud.im.SealConst;
@@ -27,6 +29,8 @@ import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.server.widget.LoadDialog;
 import cn.rongcloud.im.ui.adapter.CircleAdapter;
 import cn.rongcloud.im.ui.widget.AutoLoadListView;
+import cn.rongcloud.im.ui.widget.touchgallery.GalleryWidget.GalleryViewPager;
+import cn.rongcloud.im.ui.widget.touchgallery.GalleryWidget.UrlPagerAdapter;
 
 /**
  * Created by star1209 on 2018/5/13.
@@ -46,6 +50,10 @@ public class CircleActivity extends BaseActivity implements View.OnClickListener
     private String mSyncName;
     private long mRequestTime;
     private long mDeleteId = -1;
+    private GalleryViewPager mGalleryViewPager;
+    private FrameLayout mLayoutBg;
+    private List<String> mUrls = new ArrayList<>();
+    private UrlPagerAdapter mUrlPagerAdapter;
 
     private Paint mPaint;
 
@@ -77,10 +85,23 @@ public class CircleActivity extends BaseActivity implements View.OnClickListener
     private void initView() {
         mLvCircle = findViewById(R.id.lv_circle);
         mRefreshLayout = findViewById(R.id.swipe_layout);
+        mGalleryViewPager = findViewById(R.id.gallery_image);
+        mLayoutBg = findViewById(R.id.fl_image_bg);
+        mUrlPagerAdapter = new UrlPagerAdapter(this, mUrls);
+        mGalleryViewPager.setOffscreenPageLimit(3);
+        mGalleryViewPager.setAdapter(mUrlPagerAdapter);
 
         mHeadRightText.setVisibility(View.VISIBLE);
         mHeadRightText.setText(R.string.baojia_circle_publish);
         mHeadRightText.setOnClickListener(this);
+        mGalleryViewPager.setOnItemClickListener(new GalleryViewPager.OnItemClickListener() {
+            @Override
+            public void onItemClicked(View view, int position) {
+                if (mLayoutBg.getVisibility() == View.VISIBLE){
+                    mLayoutBg.setVisibility(View.GONE);
+                }
+            }
+        });
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mLvCircle.setLayoutManager(layoutManager);
@@ -130,6 +151,18 @@ public class CircleActivity extends BaseActivity implements View.OnClickListener
                 });
 
                 builder.create().show();
+            }
+        });
+
+        mCirCleAdapter.setOnImageClickListener(new CircleAdapter.OnImageClickListener() {
+            @Override
+            public void onImageClick(List<String> urls, int position) {
+                if (urls != null){
+                    UrlPagerAdapter adapter = new UrlPagerAdapter(CircleActivity.this, urls);
+                    mGalleryViewPager.setAdapter(adapter);
+                    mGalleryViewPager.setCurrentItem(position);
+                    mLayoutBg.setVisibility(View.VISIBLE);
+                }
             }
         });
 
@@ -224,6 +257,15 @@ public class CircleActivity extends BaseActivity implements View.OnClickListener
                 break;
             default:
                 break;
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mLayoutBg.getVisibility() == View.VISIBLE){
+            mLayoutBg.setVisibility(View.GONE);
+        }else {
+            super.onBackPressed();
         }
     }
 

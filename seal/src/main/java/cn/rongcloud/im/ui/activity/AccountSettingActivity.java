@@ -39,7 +39,7 @@ public class AccountSettingActivity extends BaseActivity implements View.OnClick
     }
 
     private void initViews() {
-        RelativeLayout mPassword = (RelativeLayout) findViewById(R.id.ac_set_change_pswd);
+//        RelativeLayout mPassword = (RelativeLayout) findViewById(R.id.ac_set_change_pswd);
         RelativeLayout mPrivacy = (RelativeLayout) findViewById(R.id.ac_set_privacy);
         RelativeLayout mNewMessage = (RelativeLayout) findViewById(R.id.ac_set_new_message);
         RelativeLayout mClean = (RelativeLayout) findViewById(R.id.ac_set_clean);
@@ -98,7 +98,7 @@ public class AccountSettingActivity extends BaseActivity implements View.OnClick
             }
         });
 
-        mPassword.setOnClickListener(this);
+//        mPassword.setOnClickListener(this);
         mPrivacy.setOnClickListener(this);
         mNewMessage.setOnClickListener(this);
         mClean.setOnClickListener(this);
@@ -108,9 +108,9 @@ public class AccountSettingActivity extends BaseActivity implements View.OnClick
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.ac_set_change_pswd:
-                startActivity(new Intent(this, UpdatePasswordActivity.class));
-                break;
+//            case R.id.ac_set_change_pswd:
+//                startActivity(new Intent(this, UpdatePasswordActivity.class));
+//                break;
             case R.id.ac_set_privacy:
                 startActivity(new Intent(this, PrivacyActivity.class));
                 break;

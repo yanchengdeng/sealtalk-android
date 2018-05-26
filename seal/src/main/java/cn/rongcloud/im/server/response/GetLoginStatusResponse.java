@@ -48,6 +48,7 @@ public class GetLoginStatusResponse {
         private int status;
         private String imToken;
         private String portrait;
+        private String loginName;
 
         public String getPortrait() {
             return portrait;
@@ -111,6 +112,14 @@ public class GetLoginStatusResponse {
 
         public void setStatus(int status) {
             this.status = status;
+        }
+
+        public String getLoginName() {
+            return loginName;
+        }
+
+        public void setLoginName(String loginName) {
+            this.loginName = loginName;
         }
     }
 }

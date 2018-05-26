@@ -26,12 +26,14 @@ import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
 import cn.rongcloud.im.ui.activity.AccountSettingActivity;
+import cn.rongcloud.im.ui.activity.CollectionActivity;
 import cn.rongcloud.im.ui.activity.MineWalletActivity;
 import cn.rongcloud.im.ui.activity.MyAccountActivity;
 import cn.rongcloud.im.ui.activity.QRCodeActivity;
 import cn.rongcloud.im.ui.activity.TransferHistoryActivity;
 import io.rong.imageloader.core.ImageLoader;
 import io.rong.imlib.model.UserInfo;
+import io.rong.message.TextMessage;
 
 /**
  * Created by AMing on 16/6/21.
@@ -44,11 +46,12 @@ public class MineFragment extends Fragment implements View.OnClickListener {
 
     private SelectableRoundedImageView imageView;
     private TextView mTvName;
-    private RelativeLayout mLayoutQrcode;
+    private TextView mTvSyncName;
     private RelativeLayout mLayoutSettings;
     private LinearLayout mLayoutMineInfo;
     private RelativeLayout mLayoutWallet;
     private RelativeLayout mLayoutReceive;
+    private RelativeLayout mLayoutCollections;
 
     @Nullable
     @Override
@@ -74,30 +77,31 @@ public class MineFragment extends Fragment implements View.OnClickListener {
     private void initViews(View mView) {
         imageView = (SelectableRoundedImageView) mView.findViewById(R.id.mine_header);
         mTvName = mView.findViewById(R.id.mine_name);
-        mLayoutQrcode = mView.findViewById(R.id.rl_mine_qrcode);
+        mTvSyncName = mView.findViewById(R.id.tv_user_syncname);
         mLayoutSettings = mView.findViewById(R.id.rl_mine_settings);
         mLayoutMineInfo = mView.findViewById(R.id.start_user_profile);
         mLayoutWallet = mView.findViewById(R.id.rl_mine_wallet);
         mLayoutReceive = mView.findViewById(R.id.rl_receive_money);
+        mLayoutCollections = mView.findViewById(R.id.rl_mine_collections);
 
-        mLayoutQrcode.setOnClickListener(this);
         mLayoutSettings.setOnClickListener(this);
         mLayoutMineInfo.setOnClickListener(this);
         mLayoutWallet.setOnClickListener(this);
         mLayoutReceive.setOnClickListener(this);
+        mLayoutCollections.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()){
-            case R.id.rl_mine_qrcode://二维码
-                gotoQrCode();
-                break;
             case R.id.rl_receive_money://收到的币
                 gotoReceiveHistory();
                 break;
             case R.id.rl_mine_wallet://钱包
                 gotoWallet();
+                break;
+            case R.id.rl_mine_collections://收藏
+                gotoCollections();
                 break;
             case R.id.rl_mine_settings: //设置
                 startActivity(new Intent(getActivity(), AccountSettingActivity.class));
@@ -110,18 +114,18 @@ public class MineFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    private void gotoReceiveHistory() {
-        Intent intent = new Intent(getContext(), TransferHistoryActivity.class);
-        startActivity(intent);    }
-
-    private void gotoWallet() {
-        Intent intent = new Intent(getContext(), MineWalletActivity.class);
+    private void gotoCollections() {
+        Intent intent = new Intent(getContext(), CollectionActivity.class);
         startActivity(intent);
     }
 
-    //跳转二维码
-    private void gotoQrCode() {
-        Intent intent = new Intent(getContext(), QRCodeActivity.class);
+    private void gotoReceiveHistory() {
+        Intent intent = new Intent(getContext(), TransferHistoryActivity.class);
+        startActivity(intent);
+    }
+
+    private void gotoWallet() {
+        Intent intent = new Intent(getContext(), MineWalletActivity.class);
         startActivity(intent);
     }
 
@@ -134,6 +138,8 @@ public class MineFragment extends Fragment implements View.OnClickListener {
         String userId = sp.getString(SealConst.SEALTALK_LOGIN_ID, "");
         String username = sp.getString(SealConst.SEALTALK_LOGIN_NAME, "");
         String userPortrait = sp.getString(SealConst.SEALTALK_LOGING_PORTRAIT, "");
+        String syncname = sp.getString(SealConst.BAOJIA_USER_SYNCNAME, "");
+        mTvSyncName.setText(String.format(getString(R.string.baojia_mine_user_syncname), syncname));
         mTvName.setText(username);
         if (!TextUtils.isEmpty(userId)) {
             String portraitUri = SealUserInfoManager.getInstance().getPortraitUri

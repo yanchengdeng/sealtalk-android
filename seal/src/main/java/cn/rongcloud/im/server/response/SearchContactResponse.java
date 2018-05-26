@@ -41,6 +41,7 @@ public class SearchContactResponse {
         private String password;
         private String syncName;
         private String imToken;
+        private String portrait;
         private int status;
 
         public long getId() {
@@ -97,6 +98,14 @@ public class SearchContactResponse {
 
         public void setStatus(int status) {
             this.status = status;
+        }
+
+        public String getPortrait() {
+            return portrait;
+        }
+
+        public void setPortrait(String portrait) {
+            this.portrait = portrait;
         }
     }
 }

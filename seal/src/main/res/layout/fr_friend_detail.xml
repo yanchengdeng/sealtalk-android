@@ -26,17 +26,34 @@
             app:sriv_right_bottom_corner_radius="3dip"
             app:sriv_right_top_corner_radius="3dip" />
 
-        <TextView
-            android:id="@+id/friend_name"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="14dp"
-            android:layout_marginRight="20dp"
-            android:layout_weight="1"
-            android:maxLines="1"
-            android:textColor="@color/group_list_black_textview"
-            android:textSize="16sp" />
+            android:layout_gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/friend_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="14dp"
+                android:layout_marginRight="20dp"
+                android:maxLines="1"
+                android:textColor="@color/group_list_black_textview"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/friend_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="14dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="3dp"
+                android:maxLines="1"
+                android:textColor="@color/group_list_black_textview"
+                android:textSize="16sp" />
+
+        </LinearLayout>
 
 
     </LinearLayout>

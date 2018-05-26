@@ -122,6 +122,7 @@ public class loginWebActivity extends BaseActivity {
                     if (response.getData().getStatus() == NOT_COMPLETE_STATUS){
                         mUserData = response.getData();
                         editor.putString(SealConst.BAOJIA_USER_SYNCNAME, mUserData.getSyncName()).commit();
+                        editor.putString(SealConst.BAOJIA_LOGIN_NAME, mUserData.getLoginName()).commit();
                         gotoComplete(((GetLoginStatusResponse) result).getData());
                     }else {
                         mUserData = response.getData();

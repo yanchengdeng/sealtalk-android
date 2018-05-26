@@ -27,17 +27,35 @@
             app:sriv_right_bottom_corner_radius="3dip"
             app:sriv_right_top_corner_radius="3dip" />
 
-        <TextView
-            android:id="@+id/mine_name"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="14dp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="@string/seal_mine_fragment_user_portrait"
-            android:textColor="@color/text_color"
-            android:textSize="16sp" />
+            android:orientation="vertical"
+            android:layout_gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/mine_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="14dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@string/seal_mine_fragment_user_portrait"
+                android:textColor="@color/text_color"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tv_user_syncname"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:layout_marginTop="3dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:layout_marginLeft="14dp"
+                android:textColor="@color/text_color"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -81,7 +99,7 @@
         android:background="#dfdfdd" />
 
     <RelativeLayout
-        android:id="@+id/my_wallet"
+        android:id="@+id/rl_mine_collections"
         android:layout_width="match_parent"
         android:layout_height="45.5dp"
         android:background="@drawable/btn_list_item_bg"
@@ -201,48 +219,6 @@
     </LinearLayout>
 
     <RelativeLayout
-        android:id="@+id/rl_mine_qrcode"
-        android:layout_width="match_parent"
-        android:layout_height="45.5dp"
-        android:background="@drawable/btn_list_item_bg"
-        android:clickable="true">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="14dp"
-            android:drawablePadding="14sp"
-            android:gravity="center"
-            android:text="@string/baojia_mine_qrcode"
-            android:textColor="@color/text_color"
-            android:textSize="16sp" />
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_centerVertical="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="15dp"
-            android:src="@drawable/baojia_mine_right_arrow"/>
-
-    </RelativeLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="#fff">
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0.25dp"
-            android:layout_marginLeft="14dp"
-            android:layout_marginRight="14dp"
-            android:background="#dfdfdd" />
-    </LinearLayout>
-
-    <RelativeLayout
         android:id="@+id/rl_mine_wallet"
         android:layout_width="match_parent"
         android:layout_height="45.5dp"
@@ -256,6 +232,7 @@
             android:layout_marginLeft="14dp"
             android:drawablePadding="14sp"
             android:gravity="center"
+            android:drawableLeft="@drawable/baojia_mine_money"
             android:text="@string/baojia_mine_wallet"
             android:textColor="@color/text_color"
             android:textSize="16sp" />

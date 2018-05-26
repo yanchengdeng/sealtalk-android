@@ -63,6 +63,7 @@ public class MyAccountActivity extends BaseActivity implements View.OnClickListe
     private SharedPreferences.Editor editor;
     private SelectableRoundedImageView mImageView;
     private TextView mName;
+    private RelativeLayout mLayoutQrcode;
     private PhotoUtils photoUtils;
     private BottomMenuDialog dialog;
     private Uri selectUri;
@@ -89,6 +90,7 @@ public class MyAccountActivity extends BaseActivity implements View.OnClickListe
         RelativeLayout nameItem = (RelativeLayout) findViewById(R.id.rl_my_username);
         mImageView = (SelectableRoundedImageView) findViewById(R.id.img_my_portrait);
         mName = (TextView) findViewById(R.id.tv_my_username);
+        mLayoutQrcode = findViewById(R.id.rl_mine_qrcode);
         portraitItem.setOnClickListener(this);
         nameItem.setOnClickListener(this);
         String cacheName = sp.getString(SealConst.SEALTALK_LOGIN_NAME, "");
@@ -111,6 +113,8 @@ public class MyAccountActivity extends BaseActivity implements View.OnClickListe
                 mName.setText(sp.getString(SealConst.SEALTALK_LOGIN_NAME, ""));
             }
         });
+
+        mLayoutQrcode.setOnClickListener(this);
     }
 
     private void setPortraitChangeListener() {
@@ -149,9 +153,17 @@ public class MyAccountActivity extends BaseActivity implements View.OnClickListe
             case R.id.rl_my_username:
                 startActivity(new Intent(this, UpdateNameActivity.class));
                 break;
+            case R.id.rl_mine_qrcode://二维码
+                gotoQrCode();
+                break;
         }
     }
 
+    //跳转二维码
+    private void gotoQrCode() {
+        Intent intent = new Intent(this, QRCodeActivity.class);
+        startActivity(intent);
+    }
 
     @Override
     public Object doInBackground(int requestCode, String id) throws HttpException {

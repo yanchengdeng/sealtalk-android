@@ -31,6 +31,7 @@ import io.rong.imlib.model.UserInfo;
 
 public class CompleteInfoActivity extends BaseActivity implements View.OnClickListener {
 
+    private static final String REG = "^[a-zA-Z0-9]{8,15}$";
     private static final int COMPLETE_INFO = 2;
 
     private static final String TEMP_PSW = "syncname"; //todo 暂时固定密码
@@ -43,10 +44,11 @@ public class CompleteInfoActivity extends BaseActivity implements View.OnClickLi
     private SharedPreferences.Editor editor;
 
     private String mNickName;
-    private String mPhoneNumber;
+//    private String mPhoneNumber;
     private String connectResultId;
     private String mSyncName;
     private CompleteInfoResponse.ResultEntity mUserData;
+    private String mLoginName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +57,8 @@ public class CompleteInfoActivity extends BaseActivity implements View.OnClickLi
 
         sp = getSharedPreferences("config", MODE_PRIVATE);
         editor = sp.edit();
-        mSyncName = sp.getString(SealConst.BAOJIA_USER_SYNCNAME, "");
+//        mSyncName = sp.getString(SealConst.BAOJIA_USER_SYNCNAME, "");
+        mLoginName = sp.getString(SealConst.BAOJIA_LOGIN_NAME, "");
         setTitle(R.string.baojia_complete_title, false);
         initView();
     }
@@ -81,15 +84,20 @@ public class CompleteInfoActivity extends BaseActivity implements View.OnClickLi
 
     private void completeInfo() {
         mNickName = mEtName.getText().toString().trim();
-        mPhoneNumber = mEtPhone.getText().toString().trim();
+        mSyncName = mEtPhone.getText().toString().trim();
 
         if (TextUtils.isEmpty(mNickName)){
             NToast.shortToast(this, "昵称不能为空！");
             return;
         }
 
-        if (TextUtils.isEmpty(mPhoneNumber)){
-            NToast.shortToast(this, "号码不能为空！");
+        if (TextUtils.isEmpty(mSyncName)){
+            NToast.shortToast(this, "所填ID不能为空！");
+            return;
+        }
+
+        if (!mSyncName.matches(REG)){
+            NToast.shortToast(this, R.string.baojia_input_id_hint);
             return;
         }
 
@@ -101,7 +109,7 @@ public class CompleteInfoActivity extends BaseActivity implements View.OnClickLi
     public Object doInBackground(int requestCode, String id) throws HttpException {
         switch (requestCode){
             case COMPLETE_INFO:
-                return mAction.completeInfo(mSyncName, mNickName,  mPhoneNumber);
+                return mAction.completeInfo(mLoginName, mSyncName, mNickName);
             default:
                 break;
         }
@@ -113,6 +121,7 @@ public class CompleteInfoActivity extends BaseActivity implements View.OnClickLi
     public void onSuccess(int requestCode, Object result) {
         switch (requestCode){
             case COMPLETE_INFO:
+                LoadDialog.dismiss(this);
                 CompleteInfoResponse response = (CompleteInfoResponse) result;
                 RLog.v("CompleteInfoActivity", "code:" + response.getCode());
                 if (response.getCode() == 100000){
@@ -142,6 +151,8 @@ public class CompleteInfoActivity extends BaseActivity implements View.OnClickLi
                             NLog.e("connect", "onError errorcode:" + errorCode.getValue());
                         }
                     });
+                }else {
+                    NToast.shortToast(this, response.getMessage());
                 }
                 break;
             default:
@@ -173,11 +184,13 @@ public class CompleteInfoActivity extends BaseActivity implements View.OnClickLi
             LoadDialog.dismiss(mContext);
             NToast.shortToast(mContext, getString(R.string.network_not_available));
             return;
+        }else {
+            NToast.shortToast(mContext, "code: " + state);
         }
     }
 
     private void gotoMain() {
-        editor.putString(SealConst.SEALTALK_LOGING_PHONE, mPhoneNumber);
+//        editor.putString(SealConst.SEALTALK_LOGING_PHONE, mPhoneNumber);
         editor.putString(SealConst.SEALTALK_LOGING_PASSWORD, TEMP_PSW);
         editor.commit();
         LoadDialog.dismiss(this);

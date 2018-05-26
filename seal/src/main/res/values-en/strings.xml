@@ -353,7 +353,7 @@
     <string name="baojia_discover_circle">圈圈</string>
     <string name="baojia_discover_software">小程序</string>
     <string name="baojia_complete_name">请输入姓名（昵称）</string>
-    <string name="baojia_complete_phone">请输入手机号码</string>
+    <string name="baojia_complete_phone">Bao+ ID</string>
     <string name="baojia_complete">完成</string>
     <string name="baojia_complete_title">注册</string>
     <string name="baojia_software_title">小程序</string>

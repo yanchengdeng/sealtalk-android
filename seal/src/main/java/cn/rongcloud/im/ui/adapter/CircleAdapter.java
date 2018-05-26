@@ -29,6 +29,7 @@ public class CircleAdapter extends RecyclerView.Adapter {
     private List<GetCircleResponse.ResultEntity> mDatas = new ArrayList<>();
     private String mSyncName;
     private OnDeleteListener mOnDeleteListener;
+    private OnImageClickListener mOnImageClickListener;
 
     public CircleAdapter(String mSyncName) {
         this.mSyncName = mSyncName;
@@ -36,6 +37,10 @@ public class CircleAdapter extends RecyclerView.Adapter {
 
     public void setOnDeleteListener(OnDeleteListener listener){
         mOnDeleteListener = listener;
+    }
+
+    public void setOnImageClickListener(OnImageClickListener listener){
+        mOnImageClickListener = listener;
     }
 
     public void addData(List<GetCircleResponse.ResultEntity> datas, boolean isEmpty){
@@ -87,6 +92,13 @@ public class CircleAdapter extends RecyclerView.Adapter {
                 }
             }
         });
+
+        circleHolder.adapter.setOnImageClickListener(new CirclePhotoAdapter.OnImageClickListener() {
+            @Override
+            public void onImageClick(int index) {
+                mOnImageClickListener.onImageClick(data.getCircleImagePath(), index);
+            }
+        });
     }
 
     @Override
@@ -127,5 +139,9 @@ public class CircleAdapter extends RecyclerView.Adapter {
 
     public interface OnDeleteListener{
         void onDelete(long id);
+    }
+
+    public interface OnImageClickListener{
+        void onImageClick(List<String> urls, int position);
     }
 }

@@ -219,7 +219,8 @@
 
         <!-- 发布-->
         <activity android:name="cn.rongcloud.im.ui.activity.PublishActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan|stateHidden" />
 
         <!-- 转账-->
         <activity android:name="cn.rongcloud.im.ui.activity.TransferActivity"
@@ -243,6 +244,10 @@
 
         <!-- 收到的币-->
         <activity android:name="cn.rongcloud.im.ui.activity.TransferHistoryActivity"
+            android:screenOrientation="portrait"/>
+
+        <!-- 收到的币-->
+        <activity android:name="cn.rongcloud.im.ui.activity.CollectionActivity"
             android:screenOrientation="portrait"/>
 
         <!--公众-->

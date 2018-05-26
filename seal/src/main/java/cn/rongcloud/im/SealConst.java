@@ -23,4 +23,7 @@ public class SealConst {
     public static final String BAOJIA_USER_SYNCNAME = "user_syncname";
     public static final String BAOJIA_PUBLISH_CIRCLE = "baojia_publish_circle";
     public static final String BAOJIA_UPDATE_DISCUSS_NAME = "baojia_update_discuss_name";
+    public static final String BAOJIA_DELETE_AFTER_READ = "BAOJIA_DELETE_AFTER_READ";
+    public static final String BAOJIA_LOGIN_NAME = "BAOJIA_LOGIN_NAME";
+    public static final String BAOJIA_DELELTE_CONTACT = "BAOJIA_DELELTE_CONTACT";
 }

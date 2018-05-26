@@ -371,7 +371,7 @@
     <string name="baojia_discover_circle">圈圈</string>
     <string name="baojia_discover_software">小程序</string>
     <string name="baojia_complete_name">请输入姓名（昵称）</string>
-    <string name="baojia_complete_phone">请输入手机号码</string>
+    <string name="baojia_complete_phone">宝+ ID</string>
     <string name="baojia_complete">完成</string>
     <string name="baojia_complete_title">注册</string>
     <string name="baojia_software_title">小程序</string>
@@ -399,8 +399,8 @@
     <string name="baojia_transfer_max_limit">不能超过余额！</string>
     <string name="baojia_qiniu_domain">7vztps.com1.z0.glb.clouddn.com</string>
     <string name="baojia_mine_wallet">我的钱包</string>
-    <string name="baojia_amount_remained">账户余额</string>
-    <string name="baojia_platform_remained">平台余额</string>
+    <string name="baojia_amount_remained">代币</string>
+    <string name="baojia_platform_remained">bwallet</string>
     <string name="baojia_recharge">充值</string>
     <string name="baojia_mine_ammount_title">我的钱包</string>
     <string name="baojia_mine_wallet_ammount" >%s 币</string>
@@ -408,7 +408,7 @@
     <string name="baojia_update_discuss_name_success">修改成功！</string>
     <string name="baojia_update_discuss_name_fail">修改讨论组名失败！</string>
     <string name="baojia_recharge_web_title">充值</string>
-    <string name="baojia_recharge_max_limit">充值金额不能超过你的平台余额。</string>
+    <string name="baojia_recharge_max_limit">充值金额不能超过你的bwallet余额。</string>
     <string name="baojia_recharge_suceess">充值成功！</string>
     <string name="baojia_recharge_min_limit">充值金额必须大于0！</string>
     <string name="baojia_delete_contact">删除联系人</string>
@@ -421,4 +421,17 @@
     <string name="baojia_transfer_history_amount">%s 币</string>
     <string name="baojia_circle_delete">删除</string>
     <string name="baojia_delete_circle_success">删除成功！</string>
+    <string name="baojia_delete_after_delete_title">阅后即焚</string>
+    <string name="baojia_delete_after_read">当前消息是阅后即焚状态</string>
+    <string name="baojia_undelete_after_read">当前消息是正常状态</string>
+    <string name="baojia_copy">复制</string>
+    <string name="baojia_recall">撤回</string>
+    <string name="baojia_delete">删除</string>
+    <string name="baojia_relay">转发</string>
+    <string name="baojia_relay_success">已转发！</string>
+    <string name="baojia_relay_empty">无转发内容！</string>
+    <string name="baojia_mine_user_syncname">宝+ID： %s</string>
+    <string name="baojia_collections_title">收藏</string>
+    <string name="baojia_delete_by_contact">您已被对方删除好友！</string>
+    <string name="baojia_input_id_hint">输入6~18位字母或数字</string>
 </resources>
