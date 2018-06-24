@@ -39,14 +39,30 @@
                 android:background="@color/rc_divider_line"
                 android:visibility="gone"/>
 
-            <ImageView
-                android:id="@+id/rc_voice_toggle"
+            <FrameLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
                 android:layout_marginLeft="6dp"
                 android:layout_marginRight="6dp"
-                android:src="@drawable/rc_voice_toggle_selector"/>
+                >
+
+                <ImageView
+                    android:id="@+id/rc_voice_toggle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+
+                    android:src="@drawable/rc_voice_toggle_selector"/>
+
+                <ImageView
+                    android:id="@+id/rc_voice_toggle1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/rc_voice_toggle_selector"
+                    android:visibility="gone"/>
+
+            </FrameLayout>
         </LinearLayout>
 
         <!-- 文本，表情输入容器，通过控制“语音”，容器中填充不同的内容 -->
@@ -55,9 +71,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:paddingTop="3dp"
+            android:gravity="center_vertical"
             android:paddingBottom="3dp"
-            android:gravity="center_vertical"/>
+            android:paddingTop="3dp"/>
 
         <!-- 扩展栏 “+号” 布局-->
         <LinearLayout

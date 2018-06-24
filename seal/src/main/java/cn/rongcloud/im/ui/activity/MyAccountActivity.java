@@ -3,15 +3,11 @@ package cn.rongcloud.im.ui.activity;
 
 import android.Manifest;
 import android.annotation.TargetApi;
-import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -254,7 +250,8 @@ public class MyAccountActivity extends BaseActivity implements View.OnClickListe
                         }, new PermissionUtils.RationaleHandler() {
                             @Override
                             protected void showRationale() {
-                                NToast.shortToast(MyAccountActivity.this, "权限未打开");
+                                requestPermissionsAgain();
+//                                NToast.shortToast(MyAccountActivity.this, "权限未打开");
                             }
                         });
             }
@@ -280,7 +277,8 @@ public class MyAccountActivity extends BaseActivity implements View.OnClickListe
                         }, new PermissionUtils.RationaleHandler() {
                             @Override
                             protected void showRationale() {
-                                NToast.shortToast(MyAccountActivity.this, "权限未打开");
+//                                NToast.shortToast(MyAccountActivity.this, "权限未打开");
+                                requestPermissionsAgain();
                             }
                         });
 

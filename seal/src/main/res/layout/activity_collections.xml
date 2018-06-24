@@ -1,8 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
+        <cn.rongcloud.im.ui.widget.AutoLoadListView
+            android:id="@+id/lv_circle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
 
-</LinearLayout>
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+    <FrameLayout
+        android:id="@+id/fl_image_bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:background="#000">
+
+        <cn.rongcloud.im.ui.widget.touchgallery.GalleryWidget.GalleryViewPager
+            android:id="@+id/gallery_image"
+            android:layout_gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        </cn.rongcloud.im.ui.widget.touchgallery.GalleryWidget.GalleryViewPager>
+
+    </FrameLayout>
+
+</RelativeLayout>

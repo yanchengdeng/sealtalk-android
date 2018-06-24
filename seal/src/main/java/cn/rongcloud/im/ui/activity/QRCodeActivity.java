@@ -5,10 +5,15 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.alibaba.fastjson.JSON;
 import com.dbcapp.club.R;
 
 import cn.rongcloud.im.SealConst;
+import cn.rongcloud.im.model.QRCodeBean;
 import cn.rongcloud.im.server.utils.QRUtils;
+import cn.rongcloud.im.utils.JsonUtils;
+
+import static android.R.attr.width;
 
 /**
  * Created by star1209 on 2018/5/6.
@@ -30,10 +35,15 @@ public class QRCodeActivity extends BaseActivity {
     }
 
     private void setQRCode() {
+        QRCodeBean bean = new QRCodeBean();
+        bean.setType(0);
         int width = getResources().getDisplayMetrics().widthPixels - 120;
         int height = width;
         String username = getSharedPreferences("config", MODE_PRIVATE).getString(SealConst.SEALTALK_LOGIN_NAME, "");
-        Bitmap qrCodeBitmap = QRUtils.createQRImage(username, width, height);
+        String userId = getSharedPreferences("config", MODE_PRIVATE).getString(SealConst.SEALTALK_LOGIN_ID, "");
+        bean.setUserId(userId);
+        String json = JsonUtils.toJson(bean);
+        Bitmap qrCodeBitmap = QRUtils.createQRImage("baojia:" + json, width, height);
         mIvQrCode.setImageBitmap(qrCodeBitmap);
     }
 }

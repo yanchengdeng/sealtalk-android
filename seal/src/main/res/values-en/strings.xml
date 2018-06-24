@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="scan">Scan</string>
     <string name="app_name">Bao+</string>
     <string name="add_contacts">Add Contacts</string>
     <string name="group_chat">Group Chat</string>
     <string name="private_chat">Private Chat</string>
+    <string name="private_scan">Private SCAN</string>
+    <string name="private_code">Private QRcode</string>
     <string name="network_not_available">network is not available</string>
     <string name="login_api_fail">login api fail</string>
     <string name="sync_userinfo_api_fail">sync userinfo api fail</string>

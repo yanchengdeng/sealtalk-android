@@ -4,7 +4,6 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
-
 import org.apache.http.entity.StringEntity;
 
 import java.io.UnsupportedEncodingException;
@@ -65,13 +64,13 @@ import cn.rongcloud.im.server.response.RestPasswordResponse;
 import cn.rongcloud.im.server.response.SendCodeResponse;
 import cn.rongcloud.im.server.response.SetFriendDisplayNameResponse;
 import cn.rongcloud.im.server.response.SetGroupDisplayNameResponse;
+import cn.rongcloud.im.server.response.SetGroupNameResponse;
 import cn.rongcloud.im.server.response.SetGroupPortraitResponse;
 import cn.rongcloud.im.server.response.SetNameResponse;
 import cn.rongcloud.im.server.response.SetPortraitResponse;
 import cn.rongcloud.im.server.response.SyncTotalDataResponse;
 import cn.rongcloud.im.server.response.UserRelationshipResponse;
 import cn.rongcloud.im.server.response.VerifyCodeResponse;
-import cn.rongcloud.im.server.response.SetGroupNameResponse;
 import cn.rongcloud.im.server.response.VersionResponse;
 import cn.rongcloud.im.server.utils.NLog;
 import cn.rongcloud.im.server.utils.json.JsonMananger;
@@ -763,6 +762,22 @@ public class SealAction extends BaseAction {
         return response;
     }
 
+//    /**
+    //     * 用户修改好友的备注名称
+    //     *
+    //     * @param friendId 好友Id
+    //     * @throws HttpException
+    //     */
+    //    public SetFriendDisplayNameResponse friendRemark(String friendId, String remarkName, String userName) throws HttpException {
+    //        String url = getURL("friend/remark/" + friendId + "/" + remarkName + "/" + userName);
+    //        String result = httpManager.get(mContext, url);;
+    //        SetFriendDisplayNameResponse response = null;
+    //        if (!TextUtils.isEmpty(result)) {
+    //            response = jsonToBean(result, SetFriendDisplayNameResponse.class);
+    //        }
+    //        return response;
+    //    }
+
     /**
      * 获取黑名单
      *
@@ -926,20 +941,21 @@ public class SealAction extends BaseAction {
         return response;
     }
 
-//    /**
-//     * 根据userId去服务器查询好友信息
-//     *
-//     * @throws HttpException
-//     */
-//    public GetFriendInfoByIDResponse getFriendInfoByID(String userid) throws HttpException {
-//        String url = getURL("friendship/" + userid + "/profile");
-//        String result = httpManager.get(url);
-//        GetFriendInfoByIDResponse response = null;
-//        if (!TextUtils.isEmpty(result)) {
-//            response = jsonToBean(result, GetFriendInfoByIDResponse.class);
-//        }
-//        return response;
-//    }
+
+    //    /**
+    //     * 根据userId去服务器查询好友信息
+    //     *
+    //     * @throws HttpException
+    //     */
+    //    public GetFriendInfoByIDResponse getFriendInfoByID(String userid) throws HttpException {
+    //        String url = getURL("friendship/" + userid + "/profile");
+    //        String result = httpManager.get(url);
+    //        GetFriendInfoByIDResponse response = null;
+    //        if (!TextUtils.isEmpty(result)) {
+    //            response = jsonToBean(result, GetFriendInfoByIDResponse.class);
+    //        }
+    //        return response;
+    //    }
     /**
      //     * 根据userId去服务器查询好友信息
      //     *

@@ -8,6 +8,7 @@ import android.text.SpannableString;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.util.Locale;
@@ -30,6 +31,7 @@ import static io.rong.calllib.RongCallCommon.CallDisconnectedReason.OTHER_DEVICE
 public class CallEndMessageItemProvider extends IContainerItemProvider.MessageProvider<CallSTerminateMessage> {
     private static class ViewHolder {
         AutoLinkTextView message;
+        ImageView delete_img;
     }
 
 
@@ -39,6 +41,7 @@ public class CallEndMessageItemProvider extends IContainerItemProvider.MessagePr
 
         ViewHolder holder = new ViewHolder();
         holder.message = (AutoLinkTextView) view.findViewById(android.R.id.text1);
+        holder.delete_img = (ImageView) view.findViewById(R.id.delete_im);
         view.setTag(holder);
         return view;
     }

@@ -52,4 +52,11 @@
     <color name="cs_evaluate_edittext_textcolor">#939dab</color>
 
     <color name="baojia_circle_decoration">#614f4e</color>
+
+
+    <color name="result_view">#b0000000</color>
+    <color name="viewfinder_mask">#60000000</color>
+    <color name="possible_result_points">#c0ffff00</color>
+    <color name="possible_blue">#0580FE</color>
+    <color name="province_line_border">#C7C7C7</color>
 </resources>

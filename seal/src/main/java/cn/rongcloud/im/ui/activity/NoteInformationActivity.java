@@ -2,7 +2,6 @@ package cn.rongcloud.im.ui.activity;
 
 import android.content.Intent;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -14,12 +13,15 @@ import android.widget.TextView;
 import com.dbcapp.club.R;
 
 import cn.rongcloud.im.SealAppContext;
+import cn.rongcloud.im.SealConst;
 import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.db.Friend;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.pinyin.CharacterParser;
 import cn.rongcloud.im.server.response.SetFriendDisplayNameResponse;
+import cn.rongcloud.im.server.utils.NLog;
+import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.server.widget.LoadDialog;
 import io.rong.imkit.RongIM;
 import io.rong.imlib.model.UserInfo;
@@ -36,6 +38,7 @@ public class NoteInformationActivity extends BaseActivity {
     private EditText mNoteEdit;
     private TextView mNoteSave;
     private static final int CLICK_CONTACT_FRAGMENT_FRIEND = 2;
+    private String userId = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +48,7 @@ public class NoteInformationActivity extends BaseActivity {
         mNoteEdit = (EditText) findViewById(R.id.notetext);
         mNoteSave = (TextView) findViewById(R.id.notesave);
         mFriend = getIntent().getParcelableExtra("friend");
+        userId = getSharedPreferences("config", MODE_PRIVATE).getString(SealConst.SEALTALK_LOGIN_ID, "");
         if (mFriend != null) {
             mNoteSave.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -95,31 +99,33 @@ public class NoteInformationActivity extends BaseActivity {
     @Override
     public Object doInBackground(int requestCode, String id) throws HttpException {
         if (requestCode == SET_DISPLAYNAME) {
-            return action.setFriendDisplayName(mFriend.getUserId(), mNoteEdit.getText().toString().trim());
+
+            return mAction.friendRemark(mFriend.getUserId(), mNoteEdit.getText().toString().trim(), userId);
         }
-        return super.doInBackground(requestCode, id);
+        return null;
     }
 
     @Override
     public void onSuccess(int requestCode, Object result) {
         if (result != null) {
             if (requestCode == SET_DISPLAYNAME) {
+                LoadDialog.dismiss(mContext);
                 SetFriendDisplayNameResponse response = (SetFriendDisplayNameResponse) result;
-                if (response.getCode() == 200) {
+                if (response.getCode() ==100000) {
                     String displayName = mNoteEdit.getText().toString();
-                    if(displayName != null){
+                    if (displayName != null) {
                         displayName = displayName.trim();
                     }
                     SealUserInfoManager.getInstance().addFriend(
-                        new Friend(mFriend.getUserId(),
-                                   mFriend.getName(),
-                                   mFriend.getPortraitUri(),
-                                   displayName,
-                                   null, null,
-                                   mFriend.getStatus(),
-                                   mFriend.getTimestamp(),
-                                   CharacterParser.getInstance().getSpelling(mFriend.getName()),
-                                   CharacterParser.getInstance().getSpelling(displayName)));
+                            new Friend(mFriend.getUserId(),
+                                    mFriend.getName(),
+                                    mFriend.getPortraitUri(),
+                                    displayName,
+                                    null, null,
+                                    mFriend.getStatus(),
+                                    mFriend.getTimestamp(),
+                                    CharacterParser.getInstance().getSpelling(mFriend.getName()),
+                                    CharacterParser.getInstance().getSpelling(displayName)));
                     if (TextUtils.isEmpty(displayName)) {
                         RongIM.getInstance().refreshUserInfoCache(new UserInfo(mFriend.getUserId(), mFriend.getName(), mFriend.getPortraitUri()));
                     } else {
@@ -142,6 +148,8 @@ public class NoteInformationActivity extends BaseActivity {
         if (requestCode == SET_DISPLAYNAME) {
             LoadDialog.dismiss(mContext);
         }
+        NToast.shortToast(NoteInformationActivity.this, result.toString());
+        NLog.e("ziji", result.toString());
         super.onFailure(requestCode, state, result);
     }
 

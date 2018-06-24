@@ -32,17 +32,24 @@ public class CustomerAdapter extends RecyclerView.Adapter {
         notifyDataSetChanged();
     }
 
+    public void addData(List<GetCustomerListResponse.ResultEntity> datas, boolean isEmpty){
+        if (datas == null){
+            return;
+        }
+
+        if (isEmpty){
+            mDatas = datas;
+            notifyDataSetChanged();
+        }else {
+            mDatas.addAll(datas);
+            notifyDataSetChanged();
+        }
+    }
+
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         mContext = parent.getContext();
         View view = LayoutInflater.from(mContext).inflate(R.layout.item_customer_list, parent, false);
-//        TextView textView = new TextView(mContext);
-//        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-//                mContext.getResources().getDimensionPixelOffset(R.dimen.baojia_customer_item_height));
-//        textView.setLayoutParams(params);
-//        textView.setGravity(Gravity.CENTER_VERTICAL);
-//        textView.setPadding(mContext.getResources().getDimensionPixelOffset(R.dimen.baojia_customer_item_padding),
-//                0, 0, 0);
         return new CustomerHolder(view);
     }
 

@@ -31,7 +31,7 @@ import io.rong.imlib.model.UserInfo;
 
 public class CompleteInfoActivity extends BaseActivity implements View.OnClickListener {
 
-    private static final String REG = "^[a-zA-Z0-9]{8,15}$";
+    private static final String REG = "^[a-zA-Z0-9]{6,18}$";
     private static final int COMPLETE_INFO = 2;
 
     private static final String TEMP_PSW = "syncname"; //todo 暂时固定密码

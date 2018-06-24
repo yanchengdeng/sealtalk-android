@@ -10,9 +10,14 @@ import android.text.SpannableString;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.dbcapp.club.R;
+
+import cn.rongcloud.im.SealAppContext;
 import cn.rongcloud.im.message.TestMessage;
+import cn.rongcloud.im.server.utils.NToast;
 import io.rong.imkit.RongContext;
 import io.rong.imkit.RongIM;
 import io.rong.imkit.RongKitIntent;
@@ -32,20 +37,22 @@ import io.rong.imlib.model.Message;
  */
 
 @ProviderTag(messageContent = TestMessage.class, showReadState = true)
-public class TestMessageProvider extends IContainerItemProvider.MessageProvider<TestMessage>{
+    public class TestMessageProvider extends IContainerItemProvider.MessageProvider<TestMessage> {
     private static final String TAG = "TestMessageItemProvider";
 
     private static class ViewHolder {
         AutoLinkTextView message;
         boolean longClick;
+//        ImageView delete_img;
     }
 
     @Override
     public View newView(Context context, ViewGroup group) {
-        View view = LayoutInflater.from(context).inflate(io.rong.imkit.R.layout.rc_item_text_message, null);
+        View view = LayoutInflater.from(context).inflate(R.layout.rc_item_text_message_ex, null);
 
         TestMessageProvider.ViewHolder holder = new TestMessageProvider.ViewHolder();
         holder.message = (AutoLinkTextView) view.findViewById(android.R.id.text1);
+//        holder.delete_img = (ImageView) view.findViewById(R.id.delete_im);
         view.setTag(holder);
         return view;
     }
@@ -109,9 +116,9 @@ public class TestMessageProvider extends IContainerItemProvider.MessageProvider<
                 && !message.getConversationType().equals(Conversation.ConversationType.PUBLIC_SERVICE)
                 && !message.getConversationType().equals(Conversation.ConversationType.SYSTEM)
                 && !message.getConversationType().equals(Conversation.ConversationType.CHATROOM)) {
-            items = new String[] {view.getContext().getResources().getString(io.rong.imkit.R.string.rc_dialog_item_message_copy), view.getContext().getResources().getString(io.rong.imkit.R.string.rc_dialog_item_message_delete), view.getContext().getResources().getString(io.rong.imkit.R.string.rc_dialog_item_message_recall)};
+            items = new String[]{view.getContext().getResources().getString(io.rong.imkit.R.string.rc_dialog_item_message_copy), view.getContext().getResources().getString(io.rong.imkit.R.string.rc_dialog_item_message_delete), view.getContext().getResources().getString(io.rong.imkit.R.string.rc_dialog_item_message_recall)};
         } else {
-            items = new String[] {view.getContext().getResources().getString(io.rong.imkit.R.string.rc_dialog_item_message_copy), view.getContext().getResources().getString(io.rong.imkit.R.string.rc_dialog_item_message_delete)};
+            items = new String[]{view.getContext().getResources().getString(io.rong.imkit.R.string.rc_dialog_item_message_copy), view.getContext().getResources().getString(io.rong.imkit.R.string.rc_dialog_item_message_delete)};
         }
 
         OptionsPopupDialog.newInstance(view.getContext(), items).setOptionsPopupDialogListener(new OptionsPopupDialog.OnOptionsItemClickedListener() {
@@ -122,7 +129,7 @@ public class TestMessageProvider extends IContainerItemProvider.MessageProvider<
                     ClipboardManager clipboard = (ClipboardManager) view.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
                     clipboard.setText(((TestMessage) content).getContent());
                 } else if (which == 1) {
-                    RongIM.getInstance().deleteMessages(new int[] {message.getMessageId()}, null);
+                    RongIM.getInstance().deleteMessages(new int[]{message.getMessageId()}, null);
                 } else if (which == 2) {
                     RongIM.getInstance().recallMessage(message.getMessage(), getPushContent(view.getContext(), message));
                 }
@@ -136,12 +143,21 @@ public class TestMessageProvider extends IContainerItemProvider.MessageProvider<
 
         if (data.getMessageDirection() == Message.MessageDirection.SEND) {
             holder.message.setBackgroundResource(io.rong.imkit.R.drawable.rc_ic_bubble_right);
+            //            holder.message.setBackgroundResource(io.rong.imkit.R.drawable.rc_ic_bubble_left);
+            //                holder.delete_img.setVisibility(View.VISIBLE);
+            //                holder.delete_img.setVisibility(View.GONE);
         } else {
             holder.message.setBackgroundResource(io.rong.imkit.R.drawable.rc_ic_bubble_left);
         }
 
         final AutoLinkTextView textView = holder.message;
         textView.setText(content.getContent());
+
+        holder.message.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+            }
+        });
 
         holder.message.setMovementMethod(new LinkTextViewMovementMethod(new ILinkClickListener() {
             @Override

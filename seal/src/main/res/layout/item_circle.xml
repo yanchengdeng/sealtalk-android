@@ -41,9 +41,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"/>
 
-        <LinearLayout
+        <RelativeLayout
             android:orientation="horizontal"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp">
 
@@ -51,7 +51,56 @@
                 android:id="@+id/tv_time_circle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/activity_horizontal_margin"
+                android:layout_alignParentLeft="true"
                 android:layout_gravity="center_vertical"/>
+
+
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:paddingTop="@dimen/activity_horizontal_margin"
+                >
+
+
+                <TextView
+                    android:id="@+id/tv_like"
+                    android:text="0"
+                    android:layout_width="wrap_content"
+                    android:drawablePadding="2dp"
+                    android:drawableLeft="@drawable/icon_like"
+                    android:padding="@dimen/activity_horizontal_margin"
+                    android:textColor="@color/black_textview"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"/>
+
+
+
+                <TextView
+                    android:id="@+id/tv_collect"
+                    android:text="0"
+                    android:layout_width="wrap_content"
+                    android:drawablePadding="2dp"
+                    android:textColor="@color/black_textview"
+                    android:drawableLeft="@drawable/icon_collect"
+                    android:padding="@dimen/activity_horizontal_margin"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"/>
+
+                <TextView
+                    android:id="@+id/tv_complain"
+                    android:layout_width="wrap_content"
+                    android:text="0"
+                    android:textColor="@color/black_textview"
+                    android:drawablePadding="2dp"
+                    android:drawableLeft="@drawable/icon_complain"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/activity_horizontal_margin"
+                    android:layout_gravity="center_vertical"/>
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/tv_delete_circle"
@@ -62,7 +111,11 @@
                 android:layout_marginLeft="15dp"
                 android:visibility="gone"/>
 
-        </LinearLayout>
+
+
+        </RelativeLayout>
+
+
 
     </LinearLayout>
 

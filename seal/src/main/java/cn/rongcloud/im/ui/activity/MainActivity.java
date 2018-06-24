@@ -1,5 +1,6 @@
 package cn.rongcloud.im.ui.activity;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -8,12 +9,12 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
-import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -26,8 +27,13 @@ import com.dbcapp.club.R;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.rongcloud.im.server.BaojiaAction;
 import cn.rongcloud.im.server.HomeWatcherReceiver;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
+import cn.rongcloud.im.server.network.async.AsyncTaskManager;
+import cn.rongcloud.im.server.network.async.OnDataListener;
+import cn.rongcloud.im.server.network.http.HttpException;
+import cn.rongcloud.im.server.response.UpdateVersionResponse;
 import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.server.widget.LoadDialog;
 import cn.rongcloud.im.ui.adapter.ConversationListAdapterEx;
@@ -36,6 +42,8 @@ import cn.rongcloud.im.ui.fragment.DiscoverFragment;
 import cn.rongcloud.im.ui.fragment.MineFragment;
 import cn.rongcloud.im.ui.widget.DragPointView;
 import cn.rongcloud.im.ui.widget.MorePopWindow;
+import cn.rongcloud.im.utils.PermissionUtils;
+import cn.rongcloud.im.utils.UpdateManager;
 import io.rong.common.RLog;
 import io.rong.imkit.RongContext;
 import io.rong.imkit.RongIM;
@@ -53,6 +61,7 @@ public class MainActivity extends FragmentActivity implements
         DragPointView.OnDragListencer,
         IUnReadMessageObserver {
 
+    private final static int VERSION_UPDATE = 38;
     public static ViewPager mViewPager;
     private List<Fragment> mFragment = new ArrayList<>();
     private ImageView moreImage, mImageChats, mImageContact, mImageFind, mImageMe, mMineRed;
@@ -66,18 +75,95 @@ public class MainActivity extends FragmentActivity implements
     private boolean isDebug;
     private Context mContext;
     private Conversation.ConversationType[] mConversationsTypes = null;
+    protected BaojiaAction mAction;
+    private AsyncTaskManager mAsyncTaskManager;
+    private UpdateManager updateManager;
+
+    public static final String[] PERMISSIONS = {
+            Manifest.permission.CAMERA,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mContext = this;
+        mAction = new BaojiaAction(mContext);
+        mAsyncTaskManager = AsyncTaskManager.getInstance(getApplicationContext());
         isDebug = getSharedPreferences("config", MODE_PRIVATE).getBoolean("isDebug", false);
+        boolean flag = getIntent().getBooleanExtra("flag", false);
         initViews();
         changeTextViewColor();
         changeSelectedTabState(0);
         initMainViewPager();
         registerHomeKeyReceiver(this);
+        if (flag) {
+            updateManager = new UpdateManager();
+            initVersion();
+
+        }
+
+    }
+
+    private void initVersion() {
+
+
+        request(VERSION_UPDATE);
+
+    }
+
+
+    public void request(int requestCode) {
+        if (mAsyncTaskManager != null) {
+            mAsyncTaskManager.request(requestCode, new OnDataListener() {
+                @Override
+                public Object doInBackground(int requestCode, String parameter) throws HttpException {
+                    switch (requestCode) {
+                        case VERSION_UPDATE:
+                            return mAction.appLatest();
+                    }
+                    return null;
+                }
+
+                @Override
+                public void onSuccess(int requestCode, Object result) {
+                    switch (requestCode) {
+                        case VERSION_UPDATE:
+                            UpdateVersionResponse response = (UpdateVersionResponse) result;
+                            if (response.getCode() == 100000) {
+                                updateManager.checkAppUpdate(MainActivity.this, response);
+                            } else {
+                                NToast.shortToast(MainActivity.this, response.getMessage());
+                            }
+                            break;
+                    }
+
+                }
+
+                @Override
+                public void onFailure(int requestCode, int state, Object result) {
+                    switch (state) {
+                        // 网络不可用给出提示
+                        case AsyncTaskManager.HTTP_NULL_CODE:
+                            NToast.shortToast(mContext, "当前网络不可用");
+                            break;
+
+                        // 网络有问题给出提示
+                        case AsyncTaskManager.HTTP_ERROR_CODE:
+                            NToast.shortToast(mContext, "网络问题请稍后重试");
+                            break;
+
+                        // 请求有问题给出提示
+                        case AsyncTaskManager.REQUEST_ERROR_CODE:
+                            // NToast.shortToast(mContext, R.string.common_request_error);
+                            break;
+                    }
+                }
+            });
+        }
     }
 
 
@@ -245,6 +331,7 @@ public class MainActivity extends FragmentActivity implements
 
     long firstClick = 0;
     long secondClick = 0;
+    MorePopWindow morePopWindow;
 
     @Override
     public void onClick(View v) {
@@ -279,8 +366,32 @@ public class MainActivity extends FragmentActivity implements
                 mMineRed.setVisibility(View.GONE);
                 break;
             case R.id.seal_more:
-                MorePopWindow morePopWindow = new MorePopWindow(MainActivity.this);
+                morePopWindow = new MorePopWindow(MainActivity.this);
                 morePopWindow.showPopupWindow(moreImage);
+
+                morePopWindow.setListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        PermissionUtils.requestPermissions(MainActivity.this, 101, PERMISSIONS,
+                                new PermissionUtils.OnPermissionListener() {
+                                    @Override
+                                    public void onPermissionGranted() {
+                                        startActivity(new Intent(MainActivity.this, MipcaActivityCapture.class));
+                                        morePopWindow.dismiss();
+                                    }
+
+                                    @Override
+                                    public void onPermissionDenied(String[] deniedPermissions) {
+                                    }
+
+
+                                }, new PermissionUtils.RationaleHandler() {
+                                    @Override
+                                    protected void showRationale() {
+                                    }
+                                });
+                    }
+                });
                 break;
             case R.id.ac_iv_search:
                 startActivity(new Intent(MainActivity.this, SealSearchActivity.class));
@@ -392,15 +503,19 @@ public class MainActivity extends FragmentActivity implements
         }
     }
 
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            moveTaskToBack(false);
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
+//    @Override
+//    public boolean onKeyDown(int keyCode, KeyEvent event) {
+//        if (keyCode == KeyEvent.KEYCODE_BACK) {
+//            moveTaskToBack(false);
+//            return true;
+//        }
+//        return super.onKeyDown(keyCode, event);
+//    }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
 
     private void hintKbTwo() {
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -451,6 +566,7 @@ public class MainActivity extends FragmentActivity implements
     }
 
     private HomeWatcherReceiver mHomeKeyReceiver = null;
+
     //如果遇见 Android 7.0 系统切换到后台回来无效的情况 把下面注册广播相关代码注释或者删除即可解决。下面广播重写 home 键是为了解决三星 note3 按 home 键花屏的一个问题
     private void registerHomeKeyReceiver(Context context) {
         if (mHomeKeyReceiver == null) {
@@ -463,4 +579,12 @@ public class MainActivity extends FragmentActivity implements
             }
         }
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        PermissionUtils.onRequestPermissionsResult(this, 101, PERMISSIONS);
+    }
+
+
 }

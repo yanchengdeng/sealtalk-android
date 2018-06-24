@@ -1,5 +1,6 @@
 package cn.rongcloud.im.ui.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,8 +17,10 @@ import java.util.List;
 
 import cn.rongcloud.im.App;
 import cn.rongcloud.im.server.response.GetCircleResponse;
+import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.ui.widget.linkpreview.GridItemDecoration;
 import cn.rongcloud.im.utils.CommonUtils;
+import cn.rongcloud.im.utils.PerfectClickListener;
 import io.rong.imageloader.core.ImageLoader;
 
 /**
@@ -30,9 +33,18 @@ public class CircleAdapter extends RecyclerView.Adapter {
     private String mSyncName;
     private OnDeleteListener mOnDeleteListener;
     private OnImageClickListener mOnImageClickListener;
+    private OnLikeClickListerner mOnLikeClickListener;//喜欢
+    private OnComplainClickListerner mOnComplainClickListener;//投诉
 
-    public CircleAdapter(String mSyncName) {
+    private OnCollectedClickListerner onCollectedClickListerner;//收藏
+    private Activity context;
+
+
+
+    public CircleAdapter(Activity context, String mSyncName) {
         this.mSyncName = mSyncName;
+        this.context = context;
+
     }
 
     public void setOnDeleteListener(OnDeleteListener listener){
@@ -41,6 +53,18 @@ public class CircleAdapter extends RecyclerView.Adapter {
 
     public void setOnImageClickListener(OnImageClickListener listener){
         mOnImageClickListener = listener;
+    }
+
+    public void setLikeClickListener(OnLikeClickListerner listener){
+        mOnLikeClickListener = listener;
+    }
+
+    public void setmOnComplainClickListener(OnComplainClickListerner listener){
+        mOnComplainClickListener = listener;
+    }
+
+    public void setOnCollectedClickListerner(OnCollectedClickListerner listener){
+        onCollectedClickListerner = listener;
     }
 
     public void addData(List<GetCircleResponse.ResultEntity> datas, boolean isEmpty){
@@ -57,6 +81,12 @@ public class CircleAdapter extends RecyclerView.Adapter {
         }
     }
 
+    public List<GetCircleResponse.ResultEntity>  getDatas(){
+        return mDatas;
+    }
+
+
+
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_circle, parent, false);
@@ -64,7 +94,7 @@ public class CircleAdapter extends RecyclerView.Adapter {
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         CircleHolder circleHolder = (CircleHolder) holder;
         final GetCircleResponse.ResultEntity data = mDatas.get(position);
         ImageLoader.getInstance().displayImage(data.getPortrait(), circleHolder.ivPortrait, App.getOptions());
@@ -84,9 +114,61 @@ public class CircleAdapter extends RecyclerView.Adapter {
             circleHolder.tvDelete.setVisibility(View.GONE);
         }
 
+        circleHolder.tvLike.setText(""+data.getLikeCount());
+        circleHolder.tvComplain.setText(""+data.getComplaintCount());
+        circleHolder.tvCollected.setText(""+data.getCollectCount());
+
+        circleHolder.tvLike.setOnClickListener(new PerfectClickListener() {
+            @Override
+            public void onNoDoubleClick(View view) {
+                if (getDatas().get(position).isLike()){
+                    if (context!=null) {
+                        NToast.shortToast(context, R.string.has_like_circle);
+                    }
+                    return;
+                }
+                if (mOnLikeClickListener!=null){
+                    mOnLikeClickListener.onLike(position);
+                }
+
+            }
+        });
+
+        circleHolder.tvComplain.setOnClickListener(new PerfectClickListener() {
+            @Override
+            public void onNoDoubleClick(View view) {
+                if (getDatas().get(position).isComplaint()){
+                    if (context!=null) {
+                        NToast.shortToast(context, R.string.has_complaint_circle);
+                    }
+                    return;
+                }
+                if (mOnComplainClickListener!=null){
+                    mOnComplainClickListener.onComplain(position);
+                }
+            }
+        });
+
+
+        circleHolder.tvCollected.setOnClickListener(new PerfectClickListener() {
+            @Override
+            protected void onNoDoubleClick(View v) {
+                if (getDatas().get(position).isCollect()){
+                    if (context!=null) {
+                        NToast.shortToast(context, R.string.has_collect_circle);
+                    }
+                    return;
+                }
+                if (onCollectedClickListerner!=null){
+                    onCollectedClickListerner.onColleced(position);
+                }
+            }
+        });
+
         circleHolder.tvDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 if (mOnDeleteListener != null){
                     mOnDeleteListener.onDelete(data.getId());
                 }
@@ -99,6 +181,13 @@ public class CircleAdapter extends RecyclerView.Adapter {
                 mOnImageClickListener.onImageClick(data.getCircleImagePath(), index);
             }
         });
+
+
+    }
+
+    //喜欢
+    private void doLike(int position) {
+
     }
 
     @Override
@@ -115,6 +204,7 @@ public class CircleAdapter extends RecyclerView.Adapter {
         private CirclePhotoAdapter adapter;
         private TextView tvName;
         private TextView tvDelete;
+        private TextView tvLike,tvComplain,tvCollected;
 
         public CircleHolder(View itemView) {
             super(itemView);
@@ -126,6 +216,9 @@ public class CircleAdapter extends RecyclerView.Adapter {
             tvTime = itemView.findViewById(R.id.tv_time_circle);
             tvName = itemView.findViewById(R.id.tv_username_circle);
             tvDelete = itemView.findViewById(R.id.tv_delete_circle);
+            tvLike = itemView.findViewById(R.id.tv_like);
+            tvComplain = itemView.findViewById(R.id.tv_complain);
+            tvCollected = itemView.findViewById(R.id.tv_collect);
 
             GridLayoutManager manager = new GridLayoutManager(context, 3);
             lvPhotos.setLayoutManager(manager);
@@ -139,6 +232,19 @@ public class CircleAdapter extends RecyclerView.Adapter {
 
     public interface OnDeleteListener{
         void onDelete(long id);
+    }
+
+
+    public interface OnLikeClickListerner{
+        void onLike(int id);
+    }
+
+    public interface OnComplainClickListerner{
+        void onComplain(int id);
+    }
+
+    public interface  OnCollectedClickListerner{
+        void onColleced(int id);
     }
 
     public interface OnImageClickListener{

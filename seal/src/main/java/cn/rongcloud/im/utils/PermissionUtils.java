@@ -1,5 +1,6 @@
 package cn.rongcloud.im.utils;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
@@ -54,6 +55,24 @@ public class PermissionUtils {
         requestPermissions(context, requestCode, permissions, listener, null);
     }
 
+    public static boolean isGrantExternalRW(Activity activity) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && activity.checkSelfPermission(
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+
+            activity.requestPermissions(new String[]{
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+            }, 1);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    ;
+
+
     @TargetApi(Build.VERSION_CODES.M)
     public static void requestPermissions(Context context, int requestCode
             , String[] permissions, OnPermissionListener listener, RationaleHandler handler) {
@@ -93,6 +112,7 @@ public class PermissionUtils {
         }
     }
 
+
     /**
      * 获取请求权限中需要授权的权限
      */
@@ -122,11 +142,13 @@ public class PermissionUtils {
      * 是否有权限需要说明提示
      */
     private static boolean shouldShowRequestPermissionRationale(final Context context, final String... deniedPermissions) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return false;
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
+            return false;
         boolean rationale;
         for (String permission : deniedPermissions) {
             rationale = ActivityCompat.shouldShowRequestPermissionRationale((Activity) context, permission);
-            if (rationale) return true;
+            if (rationale)
+                return true;
         }
         return false;
     }

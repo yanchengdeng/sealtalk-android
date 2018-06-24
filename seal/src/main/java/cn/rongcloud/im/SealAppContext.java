@@ -1,27 +1,19 @@
 package cn.rongcloud.im;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.graphics.Color;
-import android.media.Image;
 import android.net.Uri;
-import android.speech.tts.Voice;
 import android.text.ClipboardManager;
-import android.text.Selection;
-import android.text.Spannable;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.alibaba.fastjson.JSONException;
 import com.dbcapp.club.R;
-import com.huawei.android.hms.agent.push.EnableReceiveNormalMsgApi;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -29,16 +21,12 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.Executor;
 
-import cn.rongcloud.contactcard.activities.ContactListActivity;
 import cn.rongcloud.im.db.Friend;
 import cn.rongcloud.im.db.GroupMember;
 import cn.rongcloud.im.db.Groups;
-import cn.rongcloud.im.message.TestMessage;
 import cn.rongcloud.im.message.module.SealExtensionModule;
 import cn.rongcloud.im.message.plugins.TransferMessage;
-import cn.rongcloud.im.message.provider.TestMessageProvider;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.pinyin.CharacterParser;
 import cn.rongcloud.im.server.response.ContactNotificationMessageData;
@@ -48,7 +36,6 @@ import cn.rongcloud.im.ui.activity.NewFriendListActivity;
 import cn.rongcloud.im.ui.activity.SelectFriendsActivity;
 import cn.rongcloud.im.ui.activity.UserDetailActivity;
 import cn.rongcloud.im.ui.activity.loginWebActivity;
-import cn.rongcloud.im.ui.widget.CommonPopupWindow;
 import io.rong.calllib.RongCallClient;
 import io.rong.calllib.RongCallSession;
 import io.rong.common.RLog;
@@ -61,7 +48,6 @@ import io.rong.imkit.model.GroupNotificationMessageData;
 import io.rong.imkit.model.GroupUserInfo;
 import io.rong.imkit.model.UIConversation;
 import io.rong.imkit.utilities.OptionsPopupDialog;
-import io.rong.imkit.widget.AutoLinkTextView;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.Group;
@@ -82,13 +68,14 @@ import io.rong.message.VoiceMessage;
  */
 public class SealAppContext implements RongIM.ConversationListBehaviorListener,
         RongIMClient.OnReceiveMessageListener,
+        RongIMClient.ReadReceiptListener,
         RongIM.UserInfoProvider,
         RongIM.GroupInfoProvider,
         RongIM.GroupUserInfoProvider,
         RongIM.LocationProvider,
         RongIMClient.ConnectionStatusListener,
         RongIM.ConversationBehaviorListener,
-        RongIM.IGroupMembersProvider{
+        RongIM.IGroupMembersProvider {
 
     private static final int CLICK_CONVERSATION_USER_PORTRAIT = 1;
 
@@ -109,12 +96,21 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
     private static ArrayList<Activity> mActivities;
 
     private boolean deleteAfterReadFlag = false;
+    private int mTimer;
 
     public SealAppContext(Context mContext) {
         this.mContext = mContext;
         initListener();
         mActivities = new ArrayList<>();
         SealUserInfoManager.init(mContext);
+    }
+
+    public int getmTimer() {
+        return mTimer;
+    }
+
+    public void setmTimer(int mTimer) {
+        this.mTimer = mTimer;
     }
 
     public void setDeleteAfterReadFlag(boolean deleteAfterReadFlag) {
@@ -125,13 +121,13 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
         return deleteAfterReadFlag;
     }
 
-//    public void setNormalReadReceipt(){
-//        RongIMClient.getInstance().setReadReceiptListener(null);
-//    }
-//
-//    public void setDeleteReadReceipt(){
-//        RongIMClient.getInstance().setReadReceiptListener(this);
-//    }
+    //    public void setNormalReadReceipt(){
+    //        RongIMClient.getInstance().setReadReceiptListener(null);
+    //    }
+    //
+    //    public void setDeleteReadReceipt(){
+    //        RongIMClient.getInstance().setReadReceiptListener(this);
+    //    }
 
     /**
      * 初始化 RongCloud.
@@ -175,6 +171,7 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
         RongIM.setUserInfoProvider(this, true);
         RongIM.setGroupInfoProvider(this, true);
         RongIM.setLocationProvider(this);//设置地理位置提供者,不用位置的同学可以注掉此行代码
+        RongIM.setOnReceiveMessageListener(this);
         setInputProvider();
         //setUserInfoEngineListener();//移到SealUserInfoManager
         setReadReceiptConversationType();
@@ -189,10 +186,13 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
             }
         });
 
-//        RongIMClient.getInstance().setReadReceiptListener(this);
-//        RongIM.getInstance().setSendMessageListener(this);
-//        RongIMClient.getInstance().sendReadReceiptMessage();
+        //        RongIMClient.getInstance().setReadReceiptListener(this);
+        //        RongIM.getInstance().setSendMessageListener(this);
+        //        RongIMClient.getInstance().sendReadReceiptMessage();
+
+
     }
+
 
     private void setReadReceiptConversationType() {
         Conversation.ConversationType[] types = new Conversation.ConversationType[]{
@@ -207,6 +207,7 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
         RongIM.setOnReceiveMessageListener(this);
 
         List<IExtensionModule> moduleList = RongExtensionManager.getInstance().getExtensionModules();
+
         IExtensionModule defaultModule = null;
         if (moduleList != null) {
             for (IExtensionModule module : moduleList) {
@@ -217,6 +218,7 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
             }
             if (defaultModule != null) {
                 RongExtensionManager.getInstance().unregisterExtensionModule(defaultModule);
+                //TODO  言诚   SealExtensionModule  该类里可以做到 自定义模板
                 RongExtensionManager.getInstance().registerExtensionModule(new SealExtensionModule());
             }
         }
@@ -302,7 +304,7 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
                 }
                 BroadcastManager.getInstance(mContext).sendBroadcast(UPDATE_FRIEND);
                 BroadcastManager.getInstance(mContext).sendBroadcast(UPDATE_RED_DOT);
-            }else if (contactNotificationMessage.getOperation().equals("relieveRequest")){
+            } else if (contactNotificationMessage.getOperation().equals("relieveRequest")) {
                 //删除了好友
                 SealUserInfoManager.getInstance().deleteFriend(
                         new Friend(contactNotificationMessage.getSourceUserId(),
@@ -412,47 +414,56 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
                 e.printStackTrace();
             }
             return false;
-        }else if(message.getContent() instanceof TextMessage){
+        } else if (message.getContent() instanceof TextMessage) {
             TextMessage textMessage = (TextMessage) message.getContent();
-            if ("delete".equals(textMessage.getExtra())){
-                JSONObject jsonObject = new JSONObject();
-                try {
-                    jsonObject.put("id", message.getMessageId());
-                    jsonObject.put("targetId", message.getTargetId());
-                } catch (org.json.JSONException e) {
-                    e.printStackTrace();
+            if (!TextUtils.isEmpty(textMessage.getExtra())) {
+                //                ReadBean bean = JsonUtils.objectFromJson(textMessage.getExtra(), ReadBean.class);
+                if ("delete".equals(textMessage.getExtra())) {
+                    JSONObject jsonObject = new JSONObject();
+                    try {
+                        jsonObject.put("id", message.getMessageId());
+                        jsonObject.put("targetId", message.getTargetId());
+                    } catch (org.json.JSONException e) {
+                        e.printStackTrace();
+                    }
+                    BroadcastManager.getInstance(mContext).sendBroadcast(SealConst.BAOJIA_DELETE_AFTER_READ, jsonObject.toString());
                 }
-                BroadcastManager.getInstance(mContext).sendBroadcast(SealConst.BAOJIA_DELETE_AFTER_READ, jsonObject.toString());
             }
-        }else if (message.getContent() instanceof ImageMessage){
+        } else if (message.getContent() instanceof ImageMessage) {
             ImageMessage imageMessage = (ImageMessage) message.getContent();
-            if ("delete".equals(imageMessage.getExtra())){
-                JSONObject jsonObject = new JSONObject();
-                try {
-                    jsonObject.put("id", message.getMessageId());
-                    jsonObject.put("targetId", message.getTargetId());
-                } catch (org.json.JSONException e) {
-                    e.printStackTrace();
+            if (!TextUtils.isEmpty(imageMessage.getExtra())) {
+                //                ReadBean bean = JsonUtils.objectFromJson(imageMessage.getExtra(), ReadBean.class);
+                if ("delete".equals((imageMessage.getExtra()))) {
+                    JSONObject jsonObject = new JSONObject();
+                    try {
+                        jsonObject.put("id", message.getMessageId());
+                        jsonObject.put("targetId", message.getTargetId());
+                    } catch (org.json.JSONException e) {
+                        e.printStackTrace();
+                    }
+                    BroadcastManager.getInstance(mContext).sendBroadcast(SealConst.BAOJIA_DELETE_AFTER_READ, jsonObject.toString());
                 }
-                BroadcastManager.getInstance(mContext).sendBroadcast(SealConst.BAOJIA_DELETE_AFTER_READ, jsonObject);
             }
-        }else if (message.getContent() instanceof VoiceMessage){
+        } else if (message.getContent() instanceof VoiceMessage) {
             VoiceMessage voiceMessage = (VoiceMessage) message.getContent();
-            if ("delete".equals(voiceMessage.getExtra())){
-                JSONObject jsonObject = new JSONObject();
-                try {
-                    jsonObject.put("id", message.getMessageId());
-                    jsonObject.put("targetId", message.getTargetId());
-                } catch (org.json.JSONException e) {
-                    e.printStackTrace();
+            if (!TextUtils.isEmpty(voiceMessage.getExtra())) {
+                //                ReadBean bean = JsonUtils.objectFromJson(voiceMessage.getExtra(), ReadBean.class);
+                if ("delete".equals(voiceMessage.getExtra())) {
+                    JSONObject jsonObject = new JSONObject();
+                    try {
+                        jsonObject.put("id", message.getMessageId());
+                        jsonObject.put("targetId", message.getTargetId());
+                    } catch (org.json.JSONException e) {
+                        e.printStackTrace();
+                    }
+                    BroadcastManager.getInstance(mContext).sendBroadcast(SealConst.BAOJIA_DELETE_AFTER_READ, jsonObject.toString());
                 }
-                BroadcastManager.getInstance(mContext).sendBroadcast(SealConst.BAOJIA_DELETE_AFTER_READ, jsonObject);
             }
-        } else if (messageContent instanceof DiscussionNotificationMessage){
+        } else if (messageContent instanceof DiscussionNotificationMessage) {
             DiscussionNotificationMessage discussionMessage = (DiscussionNotificationMessage) messageContent;
             RLog.v("discussionMessage", discussionMessage.getExtension());
             return false;
-        }else if (messageContent instanceof TransferMessage){
+        } else if (messageContent instanceof TransferMessage) {
             TransferMessage transferMessage = (TransferMessage) messageContent;
             return false;
         }
@@ -552,7 +563,6 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
             intent.putExtra("message", message);
             context.startActivity(intent);*/
         }
-
         return false;
     }
 
@@ -567,7 +577,7 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
 
     @Override
     public boolean onMessageLinkClick(Context context, String s) {
-        return false;
+        return true;
     }
 
     @Override
@@ -587,7 +597,7 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
             e.printStackTrace();
         }
 
-        if (message.getContent() instanceof TextMessage){
+        if (message.getContent() instanceof TextMessage) {
             if (hasSent
                     && enableMessageRecall
                     && (normalTime - message.getSentTime()) <= messageRecallInterval * 1000
@@ -598,7 +608,7 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
                     && !message.getConversationType().equals(Conversation.ConversationType.SYSTEM)
                     && !message.getConversationType().equals(Conversation.ConversationType.CHATROOM)) {
                 items = new String[]{context.getString(R.string.baojia_delete), context.getString(R.string.baojia_copy), context.getString(R.string.baojia_relay), context.getString(R.string.baojia_recall)};
-            }else {
+            } else {
                 items = new String[]{context.getString(R.string.baojia_delete), context.getString(R.string.baojia_copy), context.getString(R.string.baojia_relay)};
             }
 
@@ -606,15 +616,15 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
                 @Override
                 public void onOptionsItemClicked(int which) {
                     if (which == 0) {
-                        RongIM.getInstance().deleteMessages(new int[] {message.getMessageId()}, null);
+                        RongIM.getInstance().deleteMessages(new int[]{message.getMessageId()}, null);
                     } else if (which == 1) {
                         @SuppressWarnings("deprecation")
                         ClipboardManager clipboard = (ClipboardManager) view.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
                         clipboard.setText(((TextMessage) message.getContent()).getContent());
-                    }else if(which == 2) {
+                    } else if (which == 2) {
                         //转发
                         relay(message);
-                    }else if (which == 3) {
+                    } else if (which == 3) {
 
                         RongIM.getInstance().recallMessage(message, "撤回了一条消息");
                     }
@@ -622,7 +632,7 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
             }).show();
 
             //动作
-        }else if (message.getContent() instanceof ImageMessage){
+        } else if (message.getContent() instanceof ImageMessage) {
             if (hasSent
                     && enableMessageRecall
                     && (normalTime - message.getSentTime()) <= messageRecallInterval * 1000
@@ -633,7 +643,7 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
                     && !message.getConversationType().equals(Conversation.ConversationType.SYSTEM)
                     && !message.getConversationType().equals(Conversation.ConversationType.CHATROOM)) {
                 items = new String[]{context.getString(R.string.baojia_delete), context.getString(R.string.baojia_relay), context.getString(R.string.baojia_recall)};
-            }else {
+            } else {
                 items = new String[]{context.getString(R.string.baojia_delete), context.getString(R.string.baojia_relay)};
             }
 
@@ -641,17 +651,17 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
                 @Override
                 public void onOptionsItemClicked(int which) {
                     if (which == 0) {
-                        RongIM.getInstance().deleteMessages(new int[] {message.getMessageId()}, null);
-                    } else if(which == 1) {
+                        RongIM.getInstance().deleteMessages(new int[]{message.getMessageId()}, null);
+                    } else if (which == 1) {
                         //转发
                         relay(message);
-                    }else if (which == 2) {
+                    } else if (which == 2) {
                         RongIM.getInstance().recallMessage(message, "撤回了一条消息");
                     }
                 }
             }).show();
             //动作
-        }else {
+        } else {
             if (hasSent
                     && enableMessageRecall
                     && (normalTime - message.getSentTime()) <= messageRecallInterval * 1000
@@ -662,7 +672,7 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
                     && !message.getConversationType().equals(Conversation.ConversationType.SYSTEM)
                     && !message.getConversationType().equals(Conversation.ConversationType.CHATROOM)) {
                 items = new String[]{context.getString(R.string.baojia_delete), context.getString(R.string.baojia_recall)};
-            }else {
+            } else {
                 items = new String[]{context.getString(R.string.baojia_delete)};
             }
 
@@ -670,8 +680,8 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
                 @Override
                 public void onOptionsItemClicked(int which) {
                     if (which == 0) {
-                        RongIM.getInstance().deleteMessages(new int[] {message.getMessageId()}, null);
-                    }else if (which == 1) {
+                        RongIM.getInstance().deleteMessages(new int[]{message.getMessageId()}, null);
+                    } else if (which == 1) {
                         RongIM.getInstance().recallMessage(message, "撤回了一条消息");
                     }
                 }
@@ -847,102 +857,137 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
         }
     }
 
-    private void relay(Message message){
+    private void relay(Message message) {
 
-//        Intent intent = new Intent(mContext, ContactListActivity.class);
+        //        Intent intent = new Intent(mContext, ContactListActivity.class);
         Intent intent = new Intent(mContext, SelectFriendsActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("relay", true);
         intent.putExtra("relay_message", message);
         mContext.startActivity(intent);
-//        RongIM.getInstance().getConversationList(new RongIMClient.ResultCallback<List<Conversation>>() {
-//            @Override
-//            public void onSuccess(List<Conversation> conversations) {
-//
-//            }
-//
-//            @Override
-//            public void onError(RongIMClient.ErrorCode errorCode) {
-//
-//            }
-//        });
+        //        RongIM.getInstance().getConversationList(new RongIMClient.ResultCallback<List<Conversation>>() {
+        //            @Override
+        //            public void onSuccess(List<Conversation> conversations) {
+        //
+        //            }
+        //
+        //            @Override
+        //            public void onError(RongIMClient.ErrorCode errorCode) {
+        //
+        //            }
+        //        });
     }
 
-//    @Override
-//    public void onReadReceiptReceived(final Message message) {
-//        RLog.v("onReadReceiptReceived", message.getExtra());
-//        RongIMClient.getInstance().getHistoryMessages(Conversation.ConversationType.PRIVATE,
-//                message.getTargetId(), -1, 100, new RongIMClient.ResultCallback<List<Message>>() {
-//                    @Override
-//                    public void onSuccess(List<Message> messages) {
-//                        List<Integer> ids = new ArrayList<>();
-//                        for (Message msg: messages){
-//                            if (msg.getContent() instanceof TextMessage){
-//                                TextMessage textMessage = (TextMessage) msg.getContent();
-//                                if ("delete".equals(textMessage.getExtra())){
-//                                    ids.add(msg.getMessageId());
-//                                }
-//                            }else if (msg.getContent() instanceof ImageMessage){
-//                                ImageMessage imageMessage = (ImageMessage) msg.getContent();
-//                                if ("delete".equals(imageMessage.getExtra())){
-//                                    ids.add(msg.getMessageId());
-//                                }
-//                            } else if (msg.getContent() instanceof VoiceMessage) {
-//                                VoiceMessage voiceMessage = (VoiceMessage) msg.getContent();
-//                                if ("delete".equals(voiceMessage.getExtra())){
-//                                    ids.add(msg.getMessageId());
-//                                }
-//                            }
-//                        }
-//
-//                        if (ids.size() == 0){
-//                            return;
-//                        }
-//
-//                        int[] messageIds = new int[ids.size()];
-//                        for (int i = 0; i < ids.size(); i ++){
-//                            messageIds[i] = ids.get(i);
-//                        }
-//                        RongIM.getInstance().deleteMessages(messageIds,
-//                                new RongIMClient.ResultCallback<Boolean>() {
-//                            @Override
-//                            public void onSuccess(Boolean aBoolean) {
-//                                new Thread(new Runnable() {
-//                                    @Override
-//                                    public void run() {
-//                                        try {
-//                                            Thread.sleep(5000);
-//                                            RongIMClient.getInstance().sendReadReceiptMessage(Conversation.ConversationType.PRIVATE,
-//                                                    message.getTargetId(), message.getReceivedTime());
-//                                        } catch (InterruptedException e) {
-//                                            e.printStackTrace();
-//                                        }
-//                                    }
-//                                }).start();
-//                            }
-//
-//                            @Override
-//                            public void onError(RongIMClient.ErrorCode errorCode) {
-//
-//                            }
-//                        });
-//                    }
-//
-//                    @Override
-//                    public void onError(RongIMClient.ErrorCode errorCode) {
-//
-//                    }
-//                });
-//
-//    }
-//
-//    @Override
-//    public void onMessageReceiptRequest(Conversation.ConversationType conversationType, String s, String s1) {
-//        RLog.v("onReadReceiptReceived", s);
-//    }
-//
-//    @Override
-//    public void onMessageReceiptResponse(Conversation.ConversationType conversationType, String s, String s1, HashMap<String, Long> hashMap) {
-//        RLog.v("onReadReceiptReceived", s);
-//    }
+    @Override
+    public void onReadReceiptReceived(final Message message) {
+        RLog.v("onReadReceiptReceived", message.getExtra());
+
+        RongIMClient.getInstance().getHistoryMessages(Conversation.ConversationType.PRIVATE,
+                message.getTargetId(), -1, 100, new RongIMClient.ResultCallback<List<Message>>() {
+                    @Override
+                    public void onSuccess(List<Message> messages) {
+                        List<Integer> ids = new ArrayList<>();
+                        for (Message msg : messages) {
+                            if (msg.getContent() instanceof TextMessage) {
+                                TextMessage textMessage = (TextMessage) msg.getContent();
+                                if (!TextUtils.isEmpty(textMessage.getExtra())) {
+                                    //                                    ReadBean bean = JsonUtils.objectFromJson(textMessage.getExtra(), ReadBean.class);
+                                    //                                    if ("delete".equals(bean.getAction())) {
+                                    //                                        ids.add(msg.getMessageId());
+                                    //                                    }
+                                }
+                            } else if (msg.getContent() instanceof ImageMessage) {
+                                ImageMessage imageMessage = (ImageMessage) msg.getContent();
+
+                                if (!TextUtils.isEmpty(imageMessage.getExtra())) {
+                                    //                                    ReadBean bean = JsonUtils.objectFromJson(imageMessage.getExtra(), ReadBean.class);
+                                    //                                    if ("delete".equals(bean.getAction())) {
+                                    //                                        ids.add(msg.getMessageId());
+                                    //                                    }
+                                }
+                            } else if (msg.getContent() instanceof VoiceMessage) {
+                                VoiceMessage voiceMessage = (VoiceMessage) msg.getContent();
+
+                                if (!TextUtils.isEmpty(voiceMessage.getExtra())) {
+                                    //                                    ReadBean bean = JsonUtils.objectFromJson(voiceMessage.getExtra(), ReadBean.class);
+                                    //                                    if ("delete".equals(bean.getAction())) {
+                                    //                                        ids.add(msg.getMessageId());
+                                    //                                    }
+                                }
+                            }
+
+                            RongIM.getInstance().deleteMessages(new int[]{message.getMessageId()}, new RongIMClient.ResultCallback<Boolean>() {
+                                @Override
+                                public void onSuccess(Boolean aBoolean) {
+                                    JSONObject jsonObject = new JSONObject();
+                                    try {
+                                        jsonObject.put("id", message.getMessageId());
+                                        jsonObject.put("targetId", message.getTargetId());
+                                    } catch (org.json.JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                    BroadcastManager.getInstance(mContext).sendBroadcast(SealConst.BAOJIA_DELETE_AFTER_READ, jsonObject.toString());
+                                }
+
+                                @Override
+                                public void onError(RongIMClient.ErrorCode errorCode) {
+
+                                }
+                            });
+                        }
+
+                        if (ids.size() == 0) {
+                            return;
+                        }
+
+                        int[] messageIds = new int[ids.size()];
+                        for (int i = 0; i < ids.size(); i++) {
+                            messageIds[i] = ids.get(i);
+                        }
+
+
+                        //                        RongIM.getInstance().deleteMessages(messageIds,
+                        //                                new RongIMClient.ResultCallback<Boolean>() {
+                        //                                    @Override
+                        //                                    public void onSuccess(Boolean aBoolean) {
+                        //                                        new Thread(new Runnable() {
+                        //                                            @Override
+                        //                                            public void run() {
+                        //                                                try {
+                        //                                                    Thread.sleep(5000);
+                        //                                                    RongIMClient.getInstance().sendReadReceiptMessage(Conversation.ConversationType.PRIVATE,
+                        //                                                            message.getTargetId(), message.getReceivedTime());
+                        //                                                } catch (InterruptedException e) {
+                        //                                                    e.printStackTrace();
+                        //                                                }
+                        //                                            }
+                        //                                        }).start();
+                        //                                    }
+                        //
+                        //                                    @Override
+                        //                                    public void onError(RongIMClient.ErrorCode errorCode) {
+                        //
+                        //                                    }
+                        //                                });
+                    }
+
+                    @Override
+                    public void onError(RongIMClient.ErrorCode errorCode) {
+
+                    }
+                });
+
+    }
+
+    @Override
+    public void onMessageReceiptRequest(Conversation.ConversationType conversationType, String s, String s1) {
+        RLog.v("onReadReceiptReceived", s);
+    }
+
+    @Override
+    public void onMessageReceiptResponse(Conversation.ConversationType conversationType, String s, String s1, HashMap<String, Long> hashMap) {
+        RLog.v("onReadReceiptReceived", s);
+    }
+
+
 }

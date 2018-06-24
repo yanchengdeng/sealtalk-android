@@ -7,25 +7,19 @@ import android.support.v4.app.Fragment;
 
 import com.dbcapp.club.R;
 
-import java.util.HashMap;
-
 import cn.rongcloud.im.SealAppContext;
-import cn.rongcloud.im.SealConst;
-import cn.rongcloud.im.server.broadcast.BroadcastManager;
-import cn.rongcloud.im.server.utils.NToast;
+import cn.rongcloud.im.utils.DialogListSelect;
 import io.rong.imkit.RongExtension;
-import io.rong.imkit.RongIM;
 import io.rong.imkit.plugin.IPluginModule;
-import io.rong.imlib.RongIMClient;
-import io.rong.imlib.model.Conversation;
-import io.rong.imlib.model.Message;
-import io.rong.message.ContactNotificationMessage;
 
 /**
  * Created by star1209 on 2018/5/18.
  */
 
 public class DeleteAfterReadPlugin implements IPluginModule {
+
+    private DialogListSelect mDialog;
+
     @Override
     public Drawable obtainDrawable(Context context) {
         return context.getResources().getDrawable(R.drawable.baojia_delete_after_read_plugin_bg);
@@ -36,17 +30,47 @@ public class DeleteAfterReadPlugin implements IPluginModule {
         return context.getString(R.string.baojia_delete_after_delete_title);
     }
 
+    private Click click;
+
+    public void setListener(Click click) {
+        this.click = click;
+    }
+
+    public interface Click {
+        void pos();
+    }
+
     @Override
     public void onClick(Fragment fragment, RongExtension rongExtension) {
-        if (SealAppContext.getInstance().isDeleteAfterReadFlag()){
+        if (SealAppContext.getInstance().isDeleteAfterReadFlag()) {
             SealAppContext.getInstance().setDeleteAfterReadFlag(false);
-            NToast.shortToast(fragment.getContext(), R.string.baojia_undelete_after_read);
-        }else {
-            NToast.shortToast(fragment.getContext(), R.string.baojia_delete_after_read);
+            SealAppContext.getInstance().setmTimer(0);
+            //            NToast.shortToast(fragment.getContext(), R.string.baojia_undelete_after_read);
+            if (click != null) {
+                click.pos();
+            }
+        } else {
+            //            NToast.shortToast(fragment.getContext(), R.string.baojia_delete_after_read);
             SealAppContext.getInstance().setDeleteAfterReadFlag(true);
+            if (click != null)
+                click.pos();
+            //            if (mDialog == null) {
+            //                mDialog = new DialogListSelect(fragment.getContext());
+            //            }
+            //            mDialog.setCancelable(false);
+            //            mDialog.setOnItemClickCallBack(new ICallBackListener() {
+            //                @Override
+            //                public void doWork(int flag, Object object) {
+            //                    SealAppContext.getInstance().setDeleteAfterReadFlag(true);
+            //                    SealAppContext.getInstance().setmTimer(Integer.valueOf(((String) object).replace("s", "")));
+            //                    mDialog.dismiss();
+            //                }
+            //            });
+            //            mDialog.show();
+
+            //            BroadcastManager.getInstance(fragment.getContext()).sendBroadcast(SealConst.BAOJIA_DELETE_AFTER_READ);
         }
 
-//        BroadcastManager.getInstance(fragment.getContext()).sendBroadcast(SealConst.BAOJIA_DELETE_AFTER_READ);
     }
 
     @Override

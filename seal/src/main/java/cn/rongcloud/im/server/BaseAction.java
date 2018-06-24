@@ -17,7 +17,7 @@ public class BaseAction {
 
     private static final String DOMAIN = "http://api.sealtalk.im";
     protected Context mContext;
-    protected SyncHttpClient httpManager;
+    public SyncHttpClient httpManager;
 
 
     /**

@@ -77,20 +77,20 @@ public class TransferActivity extends BaseActivity {
             public void onClick(View v) {
                 String moneyContent = mEtMoney.getText().toString().trim();
                 mTransferMoney = CommonUtils.string2Double(moneyContent, 0);
-                if (TextUtils.isEmpty(moneyContent) || mTransferMoney <= 0){
-                    NToast.shortToast(TransferActivity.this, R.string.baojia_transfer_zero_money);
-                    return;
-                }
+                //                if (TextUtils.isEmpty(moneyContent) || mTransferMoney <= 0){
+                //                    NToast.shortToast(TransferActivity.this, R.string.baojia_transfer_zero_money);
+                //                    return;
+                //                }
+                //
+                //                if (mMineAmount < mTransferMoney){
+                //                    NToast.shortToast(TransferActivity.this, R.string.baojia_transfer_max_limit);
+                //                    return;
+                //                }
 
-                if (mMineAmount < mTransferMoney){
-                    NToast.shortToast(TransferActivity.this, R.string.baojia_transfer_max_limit);
-                    return;
-                }
 
-
-                if (TextUtils.isEmpty(mEtLeave.getText().toString().trim())){
+                if (TextUtils.isEmpty(mEtLeave.getText().toString().trim())) {
                     mLeaveWords = getString(R.string.baojia_transfer_leave_default);
-                }else {
+                } else {
                     mLeaveWords = mEtLeave.getText().toString().trim();
                 }
 
@@ -107,7 +107,7 @@ public class TransferActivity extends BaseActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String string = s.toString().trim();
-                if (string.length() > 16){
+                if (string.length() > 16) {
                     mEtLeave.setText(string.substring(0, 16));
                     mEtLeave.setSelection(mEtLeave.getText().toString().trim().length());
                 }
@@ -122,7 +122,7 @@ public class TransferActivity extends BaseActivity {
 
     @Override
     public Object doInBackground(int requestCode, String id) throws HttpException {
-        switch (requestCode){
+        switch (requestCode) {
             case GET_MINE_AMOUNT:
                 return mAction.getAmount(mSyncName);
             case TRANSFER_MONEY:
@@ -135,22 +135,22 @@ public class TransferActivity extends BaseActivity {
 
     @Override
     public void onSuccess(int requestCode, Object result) {
-        switch (requestCode){
+        switch (requestCode) {
             case GET_MINE_AMOUNT: //我的金额
                 LoadDialog.dismiss(this);
                 GetMineAmountResponse response = (GetMineAmountResponse) result;
-                if (response.getCode() == 100000){
+                if (response.getCode() == 100000) {
                     mMineAmount = response.getData();
                     mTvRemained.setText(String.format(getString(R.string.baojia_transfer_amount),
                             CommonUtils.twoDecimalFormat(response.getData())));
-                }else {
+                } else {
                     NToast.shortToast(this, response.getMessage());
                 }
                 break;
             case TRANSFER_MONEY:
                 LoadDialog.dismiss(this);
                 TransferResponse transferRespons = (TransferResponse) result;
-                if (transferRespons.getCode() == 100000){
+                if (transferRespons.getCode() == 100000) {
                     TransferMessage transferMessage = new TransferMessage(mTransferMoney, mUserName,
                             mSyncName, mLeaveWords, mPortrait);
                     RongIM.getInstance().sendMessage(Message.obtain(mTargetId, Conversation.ConversationType.PRIVATE, transferMessage),
@@ -175,8 +175,11 @@ public class TransferActivity extends BaseActivity {
 
                                 }
                             });
+
+                    RongIM.getInstance().startPrivateChat(TransferActivity.this, mTargetId, mUserName);
+
                     finish();
-                }else {
+                } else {
                     NToast.shortToast(this, transferRespons.getMessage());
                 }
                 break;

@@ -4,6 +4,7 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.rong.callkit.VideoPlugin;
 import io.rong.imkit.DefaultExtensionModule;
 import io.rong.imkit.RongExtension;
 import io.rong.imkit.emoticon.IEmoticonTab;
@@ -18,6 +19,8 @@ import io.rong.imlib.model.Message;
 public class SealExtensionModule extends DefaultExtensionModule {
 
     @Override
+
+
     public void onInit(String appKey) {
         super.onInit(appKey);
     }
@@ -82,7 +85,27 @@ public class SealExtensionModule extends DefaultExtensionModule {
             }
             return pluginModules;
         } else {
-            return super.getPluginModules(conversationType);
+            //            return super.getPluginModules(conversationType);
+
+            List<IPluginModule> pluginModules = super.getPluginModules(conversationType);
+            if (conversationType == Conversation.ConversationType.PRIVATE) {
+                if (pluginModules != null) {
+                    for (IPluginModule module : pluginModules) {
+                        if (module instanceof VideoPlugin) {
+                            pluginModules.remove(module);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            //TODO  自定义模块
+            List<IPluginModule> pluginModuleList = new ArrayList<>();
+            IPluginModule image = new ImagePlugin();
+            IPluginModule locationPlugin = new AmapAndGoogleMapLocationPlugin();
+            pluginModuleList.add(image);
+            pluginModuleList.add(locationPlugin);
+            return pluginModuleList;
         }
     }
 

@@ -8,12 +8,12 @@ android {
         applicationId "com.dbcapp.club"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 2018042617
-        versionName "1.2.21"
+        versionCode 1222
+        versionName "1.2.22"
 
         multiDexEnabled true
         ndk {
-            abiFilters "armeabi-v7a", "x86"
+            abiFilters "armeabi-v7a"//, "x86"
         }
     }
 
@@ -58,8 +58,10 @@ android {
 }
 
 dependencies {
+    implementation 'com.android.support:appcompat-v7:23.4.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:support-v4:23.0.3'
+    compile 'com.android.support:support-v4:27.0.0'
     compile project(':recognizer')
     compile project(':contactcard')
     compile project(':sticker')
@@ -67,10 +69,15 @@ dependencies {
     compile 'com.facebook.stetho:stetho:1.4.1'
     compile project(':IMKit')
     compile project(':CallKit')
-//    compile project(':RedPacket')
+    //    compile project(':RedPacket')
     compile 'com.huawei.android.hms:push:2.5.3.305'
     compile project(path: ':IMLib')
-    compile 'com.google.code.gson:gson:2.2.4'
+    compile 'com.google.code.gson:gson:2.8.2'
     compile 'com.bm.photoview:library:1.4.1'
+    implementation 'com.blankj:utilcode:1.16.4'
+    compile 'com.amap.api:3dmap:latest.integration'
+    compile 'com.amap.api:location:latest.integration'
+    implementation 'com.google.android.gms:play-services-maps:11.6.2'
+
 }
 apply plugin: 'com.google.gms.google-services'

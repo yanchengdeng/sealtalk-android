@@ -45,6 +45,44 @@ public class GetCircleResponse {
         private String userName;
         private long publishTime;
         private String syncName;
+        private int complaintCount ;
+        private int likeCount ;
+        private boolean complaint;
+        private boolean like;
+        private int collectCount;
+        private boolean collect;
+
+        public boolean isComplaint() {
+            return complaint;
+        }
+
+        public void setComplaint(boolean complaint) {
+            this.complaint = complaint;
+        }
+
+        public boolean isLike() {
+            return like;
+        }
+
+        public void setLike(boolean like) {
+            this.like = like;
+        }
+
+        public int getComplaintCount() {
+            return complaintCount;
+        }
+
+        public void setComplaintCount(int complaintCount) {
+            this.complaintCount = complaintCount;
+        }
+
+        public int getLikeCount() {
+            return likeCount;
+        }
+
+        public void setLikeCount(int likeCount) {
+            this.likeCount = likeCount;
+        }
 
         public long getId() {
             return id;
@@ -108,6 +146,22 @@ public class GetCircleResponse {
 
         public void setSyncName(String syncName) {
             this.syncName = syncName;
+        }
+
+        public int getCollectCount() {
+            return collectCount;
+        }
+
+        public void setCollectCount(int collectCount) {
+            this.collectCount = collectCount;
+        }
+
+        public boolean isCollect() {
+            return collect;
+        }
+
+        public void setCollect(boolean collect) {
+            this.collect = collect;
         }
     }
 }

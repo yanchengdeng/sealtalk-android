@@ -40,6 +40,11 @@ public class CircleActivity extends BaseActivity implements View.OnClickListener
 
     private static final int GET_CIRCLE = 55;
     private static final int DELETE_CIRCLE = 33;
+    private static final int LIKE_CIRCLE = 34;
+    private static final int COMPLAIN_CIRCLE = 35;
+    private static final int COLLECTED_CIRCLE = 36;
+
+    private static final int PAGE_SIZE = 20;
 
     private SwipeRefreshLayout mRefreshLayout;
     private AutoLoadListView mLvCircle;
@@ -54,6 +59,8 @@ public class CircleActivity extends BaseActivity implements View.OnClickListener
     private FrameLayout mLayoutBg;
     private List<String> mUrls = new ArrayList<>();
     private UrlPagerAdapter mUrlPagerAdapter;
+    private int currentActionPosion = -1;//当前操作的行
+
 
     private Paint mPaint;
 
@@ -97,7 +104,7 @@ public class CircleActivity extends BaseActivity implements View.OnClickListener
         mGalleryViewPager.setOnItemClickListener(new GalleryViewPager.OnItemClickListener() {
             @Override
             public void onItemClicked(View view, int position) {
-                if (mLayoutBg.getVisibility() == View.VISIBLE){
+                if (mLayoutBg.getVisibility() == View.VISIBLE) {
                     mLayoutBg.setVisibility(View.GONE);
                 }
             }
@@ -105,7 +112,7 @@ public class CircleActivity extends BaseActivity implements View.OnClickListener
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mLvCircle.setLayoutManager(layoutManager);
-        mCirCleAdapter = new CircleAdapter(mSyncName);
+        mCirCleAdapter = new CircleAdapter(CircleActivity.this, mSyncName);
         mLvCircle.setAdapter(mCirCleAdapter);
         mLvCircle.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
@@ -113,7 +120,7 @@ public class CircleActivity extends BaseActivity implements View.OnClickListener
                 int right = parent.getMeasuredWidth();
 
                 int count = parent.getChildCount();
-                for (int i = 0; i < count; i ++){
+                for (int i = 0; i < count; i++) {
                     View childView = parent.getChildAt(i);
 
                     RecyclerView.LayoutParams layoutParams = (RecyclerView.LayoutParams) childView.getLayoutParams();
@@ -157,7 +164,7 @@ public class CircleActivity extends BaseActivity implements View.OnClickListener
         mCirCleAdapter.setOnImageClickListener(new CircleAdapter.OnImageClickListener() {
             @Override
             public void onImageClick(List<String> urls, int position) {
-                if (urls != null){
+                if (urls != null) {
                     UrlPagerAdapter adapter = new UrlPagerAdapter(CircleActivity.this, urls);
                     mGalleryViewPager.setAdapter(adapter);
                     mGalleryViewPager.setCurrentItem(position);
@@ -166,11 +173,43 @@ public class CircleActivity extends BaseActivity implements View.OnClickListener
             }
         });
 
+
+        //点赞
+        mCirCleAdapter.setLikeClickListener(new CircleAdapter.OnLikeClickListerner() {
+            @Override
+            public void onLike(int id) {
+                currentActionPosion = id;
+                LoadDialog.show(CircleActivity.this);
+                request(LIKE_CIRCLE);
+            }
+        });
+
+        //投诉
+        mCirCleAdapter.setmOnComplainClickListener(new CircleAdapter.OnComplainClickListerner() {
+            @Override
+            public void onComplain(int id) {
+                currentActionPosion = id;
+                LoadDialog.show(CircleActivity.this);
+                request(COMPLAIN_CIRCLE);
+            }
+        });
+
+
+        //收藏
+        mCirCleAdapter.setOnCollectedClickListerner(new CircleAdapter.OnCollectedClickListerner() {
+            @Override
+            public void onColleced(int id) {
+                currentActionPosion = id;
+                LoadDialog.show(CircleActivity.this);
+                request(COLLECTED_CIRCLE);
+            }
+        });
+
         //下拉
         mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                if (!mIsRefreshing){
+                if (!mIsRefreshing) {
                     mIsRefreshing = true;
                     mRequestTime = 0;
                     mIsComplete = false;
@@ -183,7 +222,7 @@ public class CircleActivity extends BaseActivity implements View.OnClickListener
         mLvCircle.setOnloadMore(new AutoLoadListView.OnLoadMoreCallback() {
             @Override
             public void onLoadMore() {
-                if (mIsComplete){
+                if (mIsComplete) {
                     return;
                 }
 
@@ -194,35 +233,50 @@ public class CircleActivity extends BaseActivity implements View.OnClickListener
 
     @Override
     public Object doInBackground(int requestCode, String id) throws HttpException {
-        switch (requestCode){
+        switch (requestCode) {
             case GET_CIRCLE:
-                return mAction.getCircle(mSyncName, mRequestTime);
+                return mAction.getCircle(mSyncName, mRequestTime, PAGE_SIZE);
             case DELETE_CIRCLE:
                 return mAction.deleteSelfCircle(mSyncName, mDeleteId);
+            case LIKE_CIRCLE:
+                if (mCirCleAdapter.getDatas() == null) {
+                    return null;
+                }
+                return mAction.likeCircle(mSyncName, mCirCleAdapter.getDatas().get(currentActionPosion).getId());
+            case COLLECTED_CIRCLE:
+                if (mCirCleAdapter.getDatas() == null) {
+                    return null;
+                }
+                return mAction.collectCircle(mSyncName, mCirCleAdapter.getDatas().get(currentActionPosion).getId());
+            case COMPLAIN_CIRCLE:
+                if (mCirCleAdapter.getDatas() == null) {
+                    return null;
+                }
+                return mAction.complainCircle(mSyncName, mCirCleAdapter.getDatas().get(currentActionPosion).getId());
         }
         return null;
     }
 
     @Override
     public void onSuccess(int requestCode, Object result) {
-        switch (requestCode){
+        switch (requestCode) {
             case GET_CIRCLE:
                 LoadDialog.dismiss(this);
                 GetCircleResponse response = (GetCircleResponse) result;
-                if (response.getCode() == 100000){
+                if (response.getCode() == 100000) {
                     List<GetCircleResponse.ResultEntity> datas = response.getData();
                     //如果是刷新状态下
-                    if (mRequestTime == 0){
+                    if (mRequestTime == 0) {
                         mRefreshLayout.setRefreshing(false);
                     }
                     mLvCircle.completeLoad();
                     mIsRefreshing = false;
 
                     mCirCleAdapter.addData(datas, mRequestTime == 0);
-                    if (datas != null && datas.size() > 0){
+                    if (datas != null && datas.size() > 0) {
                         mRequestTime = datas.get(datas.size() - 1).getPublishTime();
                     }
-                    if (datas.size() < 20){
+                    if (datas.size() < PAGE_SIZE) {
                         mIsComplete = true;
                     }
                 }
@@ -230,14 +284,47 @@ public class CircleActivity extends BaseActivity implements View.OnClickListener
             case DELETE_CIRCLE:
                 mDeleteId = -1;
                 DeleteSelfCircleResponse deleteResponse = (DeleteSelfCircleResponse) result;
-                if (deleteResponse.getCode() == 100000){
+                if (deleteResponse.getCode() == 100000) {
                     mRequestTime = 0;
                     mIsComplete = false;
                     request(GET_CIRCLE);
                     NToast.shortToast(this, R.string.baojia_delete_circle_success);
-                }else {
+                } else {
                     NToast.shortToast(this, deleteResponse.getMessage());
                 }
+                break;
+            case LIKE_CIRCLE:
+                LoadDialog.dismiss(this);
+//                NToast.shortToast(this, R.string.baojia_delete_circle_success);
+                if (mCirCleAdapter.getDatas() == null) {
+                    return;
+                }
+
+                mCirCleAdapter.getDatas().get((int) currentActionPosion).setLikeCount(mCirCleAdapter.getDatas().get((int) currentActionPosion).getLikeCount() + 1);
+                mCirCleAdapter.notifyItemChanged((int) currentActionPosion);
+                mCirCleAdapter.getDatas().get((int) currentActionPosion).setLike(true);
+                break;
+            case COLLECTED_CIRCLE:
+                LoadDialog.dismiss(this);
+//                NToast.shortToast(this, R.string.baojia_delete_circle_success);
+                if (mCirCleAdapter.getDatas() == null) {
+                    return;
+                }
+
+                mCirCleAdapter.getDatas().get(currentActionPosion).setCollectCount(mCirCleAdapter.getDatas().get(currentActionPosion).getCollectCount() + 1);
+                mCirCleAdapter.notifyItemChanged((int) currentActionPosion);
+                mCirCleAdapter.getDatas().get((int) currentActionPosion).setCollect(true);
+                break;
+
+            case COMPLAIN_CIRCLE:
+//                NToast.shortToast(this, R.string.baojia_delete_circle_success);
+                LoadDialog.dismiss(this);
+                if (mCirCleAdapter.getDatas() == null) {
+                    return;
+                }
+                mCirCleAdapter.getDatas().get((int) currentActionPosion).setComplaintCount(mCirCleAdapter.getDatas().get((int) currentActionPosion).getComplaintCount() + 1);
+                mCirCleAdapter.notifyItemChanged((int) currentActionPosion);
+                mCirCleAdapter.getDatas().get((int) currentActionPosion).setComplaint(true);
                 break;
         }
 
@@ -251,7 +338,7 @@ public class CircleActivity extends BaseActivity implements View.OnClickListener
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.text_right: //发布
                 gotoPublish();
                 break;
@@ -262,9 +349,9 @@ public class CircleActivity extends BaseActivity implements View.OnClickListener
 
     @Override
     public void onBackPressed() {
-        if (mLayoutBg.getVisibility() == View.VISIBLE){
+        if (mLayoutBg.getVisibility() == View.VISIBLE) {
             mLayoutBg.setVisibility(View.GONE);
-        }else {
+        } else {
             super.onBackPressed();
         }
     }

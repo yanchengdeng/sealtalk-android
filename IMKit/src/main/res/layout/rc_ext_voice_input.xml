@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Button
-    android:id="@+id/rc_audio_input_toggle"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rc_audio_input_toggle"
     android:layout_width="match_parent"
     android:layout_height="32dp"
     android:layout_marginLeft="12dp"

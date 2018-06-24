@@ -15,17 +15,25 @@ import android.widget.RelativeLayout;
 
 import com.dbcapp.club.R;
 
+import cn.rongcloud.im.ui.activity.QRReceivablesCodeActivity;
 import cn.rongcloud.im.ui.activity.SearchFriendActivity;
 import cn.rongcloud.im.ui.activity.SelectFriendsActivity;
 
 
 public class MorePopWindow extends PopupWindow {
 
+    private OnClickListener listener;
+
+
+    public void setListener(OnClickListener listener) {
+        this.listener = listener;
+    }
+
     @SuppressLint("InflateParams")
     public MorePopWindow(final Activity context) {
         LayoutInflater inflater = (LayoutInflater) context
-                                  .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View content = inflater.inflate(R.layout.popupwindow_add, null);
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        final View content = inflater.inflate(R.layout.popupwindow_add, null);
 
         // 设置SelectPicPopupWindow的View
         this.setContentView(content);
@@ -47,10 +55,12 @@ public class MorePopWindow extends PopupWindow {
         this.setAnimationStyle(R.style.AnimationPreview);
 
 
-        RelativeLayout re_addfriends = (RelativeLayout) content.findViewById(R.id.re_addfriends);
+        RelativeLayout re_disscution = (RelativeLayout) content.findViewById(R.id.re_disscution);
         RelativeLayout re_chatroom = (RelativeLayout) content.findViewById(R.id.re_chatroom);
+        RelativeLayout re_addfriends = (RelativeLayout) content.findViewById(R.id.re_addfriends);
         RelativeLayout re_scanner = (RelativeLayout) content.findViewById(R.id.re_scanner);
-        re_addfriends.setOnClickListener(new OnClickListener() {
+        RelativeLayout re_code = (RelativeLayout) content.findViewById(R.id.re_code);
+        re_disscution.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -71,16 +81,35 @@ public class MorePopWindow extends PopupWindow {
             }
 
         });
-        re_scanner.setOnClickListener(new OnClickListener() {
+        re_addfriends.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 context.startActivity(new Intent(context, SearchFriendActivity.class));
                 MorePopWindow.this.dismiss();
             }
         });
+        re_scanner.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+
+                listener.onClick(view);
+
+
+            }
+        });
+
+        re_code.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                context.startActivity(new Intent(context, QRReceivablesCodeActivity.class));
+                MorePopWindow.this.dismiss();
+            }
+        });
 
 
     }
+
 
     /**
      * 显示popupWindow

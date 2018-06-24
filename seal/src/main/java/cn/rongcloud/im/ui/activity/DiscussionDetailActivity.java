@@ -28,6 +28,7 @@ import cn.rongcloud.im.db.Friend;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.response.GetUserInfosResponse;
+import cn.rongcloud.im.server.response.SearchContactListResponse;
 import cn.rongcloud.im.server.response.SearchContactResponse;
 import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.server.utils.OperationRong;
@@ -54,8 +55,13 @@ public class DiscussionDetailActivity extends BaseActivity implements CompoundBu
 
     private static final int FIND_USER_INFO = 10;
     private static final int GET_USER_INFO = 22;
+    //后台获取 剩余用户数
+    private static final int GET_LEFT_INFO = 32;
 
     private static final int UPDATE_DISCUSS_NAME = 55;
+
+    //TODO 如果总共的请求用户数  大于20 则分步请求  第一次请求20   第二次请求剩余全部 ；反之则一次性请求全部
+    private static final int PAGE_SIZE_SIZE = 20;
 
     private String targetId;
     private String createId;
@@ -162,31 +168,35 @@ public class DiscussionDetailActivity extends BaseActivity implements CompoundBu
         if (ids != null) {
             for (String id : ids) {
                 UserInfo userInfo = RongUserInfoManager.getInstance().getUserInfo((id));
-                if (userInfo == null){
+                if (userInfo == null) {
                     mUnknowIds.add(id);
 //                    userInfo = new UserInfo(id, "", Uri.parse(""));
-                }else {
+                } else {
                     memberList.add(userInfo);
                 }
             }
 
-            if (mUnknowIds.size() > 0){
-                LoadDialog.show(this);
-                request(GET_USER_INFO);
-            }else {
-                String loginId = getSharedPreferences("config", MODE_PRIVATE).getString(SealConst.SEALTALK_LOGIN_ID, "");
-                if (loginId.equals(createId)) {
-                    isCreated = true;
-                }
-                if (memberList != null && memberList.size() > 1) {
-                    if (adapter == null) {
-                        adapter = new GridAdapter(mContext, memberList);
-                        mGridView.setAdapter(adapter);
-                    } else {
-                        adapter.updateListView(memberList);
-                    }
+
+//            }else {
+            String loginId = getSharedPreferences("config", MODE_PRIVATE).getString(SealConst.SEALTALK_LOGIN_ID, "");
+            if (loginId.equals(createId)) {
+                isCreated = true;
+            }
+            if (memberList != null && memberList.size() > 1) {
+                if (adapter == null) {
+                    adapter = new GridAdapter(mContext, memberList);
+                    mGridView.setAdapter(adapter);
+                } else {
+                    adapter.updateListView(memberList);
                 }
             }
+
+            if (mUnknowIds.size() > 0) {
+//                LoadDialog.show(this);
+                request(GET_USER_INFO);
+            }
+
+//            }
         }
     }
 
@@ -469,7 +479,9 @@ public class DiscussionDetailActivity extends BaseActivity implements CompoundBu
             case FIND_USER_INFO:
                 return action.getUserInfos(ids);
             case GET_USER_INFO:
-                return mAction.searchContact(mUnknowIds.get(0));
+                return mAction.searchContact(mUnknowIds.size()>PAGE_SIZE_SIZE?mUnknowIds.subList(0,PAGE_SIZE_SIZE):mUnknowIds);
+            case GET_LEFT_INFO:
+                return mAction.searchContact(mUnknowIds);
         }
         return super.doInBackground(requestCode, id);
     }
@@ -500,38 +512,99 @@ public class DiscussionDetailActivity extends BaseActivity implements CompoundBu
                     LoadDialog.dismiss(mContext);
                 }
                 break;
+            case GET_LEFT_INFO:
+                SearchContactListResponse contactResponseLeft = (SearchContactListResponse) result;
+                if (contactResponseLeft.getCode() == 100000) {
+                    try {
+                        SearchContactListResponse getCustomerListResponse = contactResponseLeft;
+                        if (getCustomerListResponse != null && getCustomerListResponse.getData() != null && getCustomerListResponse.getData().size() > 0) {
+
+                            List<UserInfo> userInfos = new ArrayList<>();
+                            for (SearchContactResponse.ResultEntity entity : getCustomerListResponse.getData()) {
+                                UserInfo userInfo = new UserInfo(entity.getSyncName(), entity.getUserName(), TextUtils.isEmpty(entity.getPortrait()) ? Uri.parse("") : Uri.parse(entity.getPortrait()));
+                                userInfos.add(userInfo);
+                            }
+                            memberList.addAll(userInfos);
+                            adapter.notifyDataSetChanged();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                }
+                break;
             case GET_USER_INFO:
-                SearchContactResponse contactResponse = (SearchContactResponse) result;
-                if (contactResponse.getCode() == 100000){
-                    SearchContactResponse.ResultEntity entity = contactResponse.getData();
-                    UserInfo userInfo = new UserInfo(entity.getSyncName(), entity.getUserName(), Uri.parse(entity.getPortrait()));
-                    memberList.add(userInfo);
-                }else {
-                    UserInfo userInfo = new UserInfo(mUnknowIds.get(0), "", Uri.parse(""));
-                    memberList.add(userInfo);
+                SearchContactListResponse contactResponse = (SearchContactListResponse) result;
+                if (contactResponse.getCode() == 100000) {
+//                    SearchContactResponse.ResultEntity entity = contactResponse.getData();
+//                    UserInfo userInfo = new UserInfo(entity.getSyncName(), entity.getUserName(), TextUtils.isEmpty(entity.getPortrait())?Uri.parse(""):Uri.parse(entity.getPortrait()));
+//                    memberList.add(userInfo);
+//                }else {
+//                    UserInfo userInfo = new UserInfo(mUnknowIds.get(0), "", Uri.parse(""));
+//                    memberList.add(userInfo);
+//                }
+
+//                mUnknowIds.remove(0);
+
+                    if (adapter == null) {
+                        adapter = new GridAdapter(mContext, memberList);
+                        mGridView.setAdapter(adapter);
+                    }
+                    try {
+                        SearchContactListResponse getCustomerListResponse = contactResponse;
+                        if (getCustomerListResponse != null && getCustomerListResponse.getData() != null && getCustomerListResponse.getData().size() > 0) {
+
+                            List<UserInfo> userInfos = new ArrayList<>();
+                            for (SearchContactResponse.ResultEntity entity : getCustomerListResponse.getData()) {
+                                UserInfo userInfo = new UserInfo(entity.getSyncName(), entity.getUserName(), TextUtils.isEmpty(entity.getPortrait()) ? Uri.parse("") : Uri.parse(entity.getPortrait()));
+                                userInfos.add(userInfo);
+                            }
+                            if (mUnknowIds.size() > PAGE_SIZE_SIZE) {
+                                mUnknowIds.removeAll(mUnknowIds.subList(0, PAGE_SIZE_SIZE));
+                                request(GET_LEFT_INFO);
+                            }
+
+                            memberList.addAll(userInfos);
+                            adapter.notifyDataSetChanged();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
                 }
 
-                mUnknowIds.remove(0);
 
-                if (mUnknowIds.size() == 0){
+               /* if (mUnknowIds.size() == 0){
                     LoadDialog.dismiss(this);
                     String loginId = getSharedPreferences("config", MODE_PRIVATE).getString(SealConst.SEALTALK_LOGIN_ID, "");
                     if (loginId.equals(createId)) {
                         isCreated = true;
                     }
                     if (memberList != null && memberList.size() > 1) {
-                        if (adapter == null) {
-                            adapter = new GridAdapter(mContext, memberList);
-                            mGridView.setAdapter(adapter);
-                        } else {
-                            adapter.updateListView(memberList);
-                        }
+                       adapter.updateListView(memberList);
                     }
                 }else {
-                    request(GET_USER_INFO);
+//                    request(GET_USER_INFO);
+
+                    try {
+                        SearchContactListResponse getCustomerListResponse = mAction.searchContact(mUnknowIds);
+                        if (getCustomerListResponse!=null && getCustomerListResponse.getData()!=null && getCustomerListResponse.getData().size()>0){
+
+                            List<UserInfo> userInfos = new ArrayList<>();
+                            for (SearchContactResponse.ResultEntity entity:getCustomerListResponse.getData()){
+                                UserInfo userInfo = new UserInfo(entity.getSyncName(), entity.getUserName(), TextUtils.isEmpty(entity.getPortrait())?Uri.parse(""):Uri.parse(entity.getPortrait()));
+                                userInfos.add(userInfo);
+                            }
+                            memberList.addAll(userInfos);
+                            adapter.notifyDataSetChanged();
+                        }
+                    } catch (HttpException e) {
+                        e.printStackTrace();
+                    }
+
                 }
 
-                adapter.notifyDataSetChanged();
+                adapter.notifyDataSetChanged();*/
                 break;
         }
     }

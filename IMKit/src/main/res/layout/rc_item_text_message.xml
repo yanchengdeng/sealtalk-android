@@ -1,13 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<io.rong.imkit.widget.AutoLinkTextView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@android:id/text1"
-    style="@style/RCTheme.Message.TextView"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:autoLink="all"
+    android:clickable="true"
+    android:enabled="true"
     android:gravity="center_vertical|left"
-    android:textColorLink="#2972ab"
-    app:RCMaxWidth="235dp"
-    android:paddingLeft="9dp" />
+
+    >
+
+    <ImageView
+        android:id="@+id/delete_im"
+        android:layout_width="8dp"
+        android:layout_height="8dp"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/jie"
+        android:visibility="gone"
+        />
+
+    <io.rong.imkit.widget.AutoLinkTextView
+        android:id="@android:id/text1"
+        style="@style/RCTheme.Message.TextView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/delete_im"
+        android:autoLink="all"
+        android:paddingLeft="9dp"
+        android:textColorLink="#2972ab"
+        app:RCMaxWidth="235dp"/>
+
+    <ImageView
+        android:id="@+id/click_im"
+        android:layout_width="8dp"
+        android:layout_height="8dp"
+
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@android:id/text1"
+        android:src="@drawable/suo"
+        android:visibility="gone"
+        />
+
+    <LinearLayout
+        android:id="@+id/time_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@android:id/text1"
+        android:layout_alignTop="@android:id/text1"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@android:id/text1"
+        android:visibility="gone"
+        >
+
+        <TextView
+            android:id="@+id/time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/rc_unread_count_bg"
+            android:gravity="center"
+            android:text="10"
+            android:textColor="@android:color/white"
+            android:textSize="13sp"
+            />
+
+    </LinearLayout>
+
+</RelativeLayout>

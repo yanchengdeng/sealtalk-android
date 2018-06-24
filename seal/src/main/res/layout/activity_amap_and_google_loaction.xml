@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
+    <LinearLayout
+        android:id="@+id/layout_head"
+        android:layout_width="match_parent"
+        android:layout_height="48dip"
+        android:background="#000000"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_left"
+            android:layout_width="48dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/selector_btn_back"
+            android:drawableLeft="@drawable/ac_back_icon"
+            android:gravity="center_vertical"
+            android:textColor="@drawable/selector_btn_top" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="24dp"
+            android:layout_marginBottom="12dp"
+            android:layout_marginTop="12dp"
+            android:background="#0083e0" />
+
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:gravity="center_vertical|left"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:maxLength="20"
+            android:text="@string/location"
+            android:layout_marginLeft="12dp"
+            android:maxLines="1"
+            android:textColor="#FFA500"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/btn_right"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="15dp"
+            android:background="@null"
+            android:onClick="onHeadRightButtonClick"
+            android:maxLines="1"
+            android:textColor="@drawable/selector_btn_top" />
+
+        <TextView
+            android:id="@+id/text_right"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:clickable="true"
+            android:maxLines="1"
+            android:textColor="#fff"
+            android:text="@string/confirm"
+            android:textSize="18sp"
+            />
+    </LinearLayout>
+
+
+<FrameLayout
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:ignore="MergeRootFrame">
+
+    <LinearLayout
+        android:id="@+id/map_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+    </LinearLayout>
+
+
+    <TextView
+        android:id="@+id/tv_ext_location_marker"
+        android:layout_width="wrap_content"
+        android:background="@color/white"
+        android:layout_gravity="center_horizontal"
+        android:padding="@dimen/activity_horizontal_margin"
+        android:textColor="@color/black_textview"
+        android:text="@string/app_name"
+        android:layout_height="wrap_content" />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity= "top|right"
+        android:background="@android:color/transparent">
+        <Button
+            android:id="@+id/button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/activity_horizontal_margin"
+            android:text="To GoogleMap"/>
+        <ToggleButton
+            android:id="@+id/auto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textOn="自动切换开启"
+            android:textOff="自动切换关闭"
+            android:visibility="gone"
+            android:checked="true"/>
+    </LinearLayout>
+
+
+
+
+</FrameLayout>
+</LinearLayout>

@@ -5,12 +5,12 @@
     android:background="@color/main_regist"
     android:orientation="vertical">
 
-    <android.support.v7.widget.RecyclerView
+    <cn.rongcloud.im.ui.widget.AutoLoadListView
         android:id="@+id/lv_customer_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    </android.support.v7.widget.RecyclerView>
+    </cn.rongcloud.im.ui.widget.AutoLoadListView>
 
     <!--<RelativeLayout-->
         <!--android:id="@+id/re_chatroom"-->

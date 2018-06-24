@@ -8,7 +8,6 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <!-- 获取机型信息权限 -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-
     <uses-permission android:name="android.permission.GET_TASKS" />
     <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS_FULL" />
 
@@ -23,11 +22,10 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <!-- 防止设备休眠 -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" />
-    <!--获取联系人信息，demo中演示发送通讯录消息-->
+    <!-- 获取联系人信息，demo中演示发送通讯录消息 -->
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -36,30 +34,32 @@
     <permission
         android:name="cn.rongcloud.im.permission.MIPUSH_RECEIVE"
         android:protectionLevel="signature" />
+
     <uses-permission android:name="cn.rongcloud.im.permission.MIPUSH_RECEIVE" />
     <!-- ⼩米 配置结束 < -->
     <!-- GCM 配置开始 < -->
     <permission
         android:name="cn.rongcloud.im.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
+
     <uses-permission android:name="cn.rongcloud.im.permission.C2D_MESSAGE" />
     <!-- GCM 配置结束 < -->
     <!-- 华为 配置开始 < -->
-    <!--HMS-SDK引导升级HMS功能，访问OTA服务器需要网络权限-->
+    <!-- HMS-SDK引导升级HMS功能，访问OTA服务器需要网络权限 -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <!--HMS-SDK引导升级HMS功能，保存下载的升级包需要SD卡写权限-->
+    <!-- HMS-SDK引导升级HMS功能，保存下载的升级包需要SD卡写权限 -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <!--检测网络状态-->
+    <!-- 检测网络状态 -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <!--检测wifi状态-->
+    <!-- 检测wifi状态 -->
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <!--为了获取用户手机的IMEI，用来唯一的标识用户。-->
+    <!-- 为了获取用户手机的IMEI，用来唯一的标识用户。 -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
-    <!--如果是安卓8.0，应用编译配置的targetSdkVersion>=26，请务必添加以下权限 -->
+    <!-- 如果是安卓8.0，应用编译配置的targetSdkVersion>=26，请务必添加以下权限 -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
-    <!-- 华为 配置结束 < -->
 
+    <!-- 华为 配置结束 < -->
     <application
         android:name="cn.rongcloud.im.App"
         android:allowBackup="true"
@@ -68,22 +68,22 @@
         android:theme="@style/MyTheme"
         tools:replace="android:icon, android:theme">
 
-        <!--登录页面-->
+        <!-- 登录页面 -->
         <activity
             android:name="cn.rongcloud.im.ui.activity.LoginActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden" />
 
-        <!--主页面-->
+        <!-- 主页面 -->
         <activity
             android:name="cn.rongcloud.im.ui.activity.MainActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustPan">
-
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <data
@@ -98,81 +98,88 @@
         <activity
             android:name="cn.rongcloud.im.ui.activity.PrivateChatDetailActivity"
             android:screenOrientation="portrait" />
-        <!--注册页面-->
+        <!-- 注册页面 -->
         <activity
             android:name="cn.rongcloud.im.ui.activity.RegisterActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait" />
-        <!--发起聊天页面-->
+        <activity
+            android:name="cn.rongcloud.im.ui.activity.MipcaActivityCapture"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="cn.rongcloud.im.ui.activity.QRReceivablesCodeActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
+        <!-- 发起聊天页面 -->
 
 
-        <!--我的账号-->
+        <!-- 我的账号 -->
         <activity
             android:name="cn.rongcloud.im.ui.activity.MyAccountActivity"
             android:screenOrientation="portrait" />
 
-        <!--新消息提醒-->
+        <!-- 新消息提醒 -->
         <activity
             android:name="cn.rongcloud.im.ui.activity.NewMessageRemindActivity"
             android:screenOrientation="portrait" />
-        <!--消息免打扰-->
+        <!-- 消息免打扰 -->
         <activity
             android:name="cn.rongcloud.im.ui.activity.DisturbActivity"
             android:screenOrientation="portrait" />
         <activity android:name="cn.rongcloud.im.ui.activity.MessageDisturbActivity" />
-        <!--隐私-->
+        <!-- 隐私 -->
         <activity
             android:name="cn.rongcloud.im.ui.activity.PrivacyActivity"
             android:screenOrientation="portrait" />
-        <!--关于融云-->
+        <!-- 关于融云 -->
         <activity
             android:name="cn.rongcloud.im.ui.activity.AboutRongCloudActivity"
             android:screenOrientation="portrait" />
-        <!--关于融云－更新日志-->
+        <!-- 关于融云－更新日志 -->
         <activity
             android:name="cn.rongcloud.im.ui.activity.UpdateLogActivity"
             android:screenOrientation="portrait" />
-        <!--关于融云－功能介绍-->
+        <!-- 关于融云－功能介绍 -->
         <activity
             android:name="cn.rongcloud.im.ui.activity.FunctionIntroducedActivity"
             android:screenOrientation="portrait" />
 
-        <!--关于融云－官方网站-->
+        <!-- 关于融云－官方网站 -->
         <activity
             android:name="cn.rongcloud.im.ui.activity.RongWebActivity"
             android:screenOrientation="portrait" />
-        <!--黑名单列表-->
+        <!-- 黑名单列表 -->
         <activity
             android:name="cn.rongcloud.im.ui.activity.BlackListActivity"
             android:screenOrientation="portrait" />
 
-        <!--搜索好友-->
+        <!-- 搜索好友 -->
         <activity
             android:name="cn.rongcloud.im.ui.activity.SearchFriendActivity"
             android:screenOrientation="portrait" />
-        <!--新的朋友列表-->
+        <!-- 新的朋友列表 -->
         <activity
             android:name="cn.rongcloud.im.ui.activity.NewFriendListActivity"
             android:screenOrientation="portrait" />
-
+        <activity
+            android:name="cn.rongcloud.im.ui.activity.AddFriendActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name="cn.rongcloud.im.ui.activity.TotalGroupMemberActivity"
             android:screenOrientation="portrait" />
-
         <activity
             android:name="cn.rongcloud.im.ui.activity.MembersOnlineStatusActivity"
             android:screenOrientation="portrait" />
-
         <activity
             android:name="cn.rongcloud.im.ui.activity.PublicServiceActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait" />
-
         <activity
             android:name="cn.rongcloud.im.ui.activity.PublicServiceSearchActivity"
             android:screenOrientation="portrait" />
 
-        <!--选择联系人 多人聊天-->
+        <!-- 选择联系人 多人聊天 -->
         <activity
             android:name="cn.rongcloud.im.ui.activity.SelectFriendsActivity"
             android:screenOrientation="portrait" />
@@ -185,11 +192,9 @@
         <activity
             android:name="cn.rongcloud.im.ui.activity.ReadReceiptDetailActivity"
             android:screenOrientation="portrait" />
-
         <activity
             android:name="cn.rongcloud.im.ui.activity.DiscussionDetailActivity"
             android:screenOrientation="portrait" />
-
         <activity
             android:name="cn.rongcloud.im.ui.activity.ForgetPasswordActivity"
             android:screenOrientation="portrait" />
@@ -197,75 +202,92 @@
             android:name="cn.rongcloud.im.ui.activity.GroupNoticeActivity"
             android:screenOrientation="portrait" />
 
-        <!-- 二维码-->
-        <activity android:name="cn.rongcloud.im.ui.activity.QRCodeActivity"
-            android:screenOrientation="portrait"/>
+        <!-- 二维码 -->
+        <activity
+            android:name="cn.rongcloud.im.ui.activity.QRCodeActivity"
+            android:screenOrientation="portrait" />
 
-        <!-- 登录h5界面-->
-        <activity android:name="cn.rongcloud.im.ui.activity.loginWebActivity"
-            android:screenOrientation="portrait"/>
+        <!-- 登录h5界面 -->
+        <activity
+            android:name="cn.rongcloud.im.ui.activity.loginWebActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
 
-        <!-- 补充资料-->
-        <activity android:name="cn.rongcloud.im.ui.activity.CompleteInfoActivity"
-            android:screenOrientation="portrait"/>
+        <!-- 补充资料 -->
+        <activity
+            android:name="cn.rongcloud.im.ui.activity.CompleteInfoActivity"
+            android:screenOrientation="portrait" />
 
-        <!-- 小程序-->
-        <activity android:name="cn.rongcloud.im.ui.activity.SoftWareActivity"
-            android:screenOrientation="portrait"/>
+        <!-- 小程序 -->
+        <activity
+            android:name="cn.rongcloud.im.ui.activity.SoftWareActivity"
+            android:screenOrientation="portrait" />
 
-        <!-- 朋友圈-->
-        <activity android:name="cn.rongcloud.im.ui.activity.CircleActivity"
-            android:screenOrientation="portrait"/>
+        <!-- 朋友圈 -->
+        <activity
+            android:name="cn.rongcloud.im.ui.activity.CircleActivity"
+            android:screenOrientation="portrait" />
 
-        <!-- 发布-->
-        <activity android:name="cn.rongcloud.im.ui.activity.PublishActivity"
+        <!-- 发布 -->
+        <activity
+            android:name="cn.rongcloud.im.ui.activity.PublishActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan|stateHidden" />
 
-        <!-- 转账-->
-        <activity android:name="cn.rongcloud.im.ui.activity.TransferActivity"
-            android:screenOrientation="portrait"/>
+        <!-- 转账 -->
+        <activity
+            android:name="cn.rongcloud.im.ui.activity.TransferActivity"
+            android:screenOrientation="portrait" />
 
-        <!-- 转账详情-->
-        <activity android:name="cn.rongcloud.im.ui.activity.TransferDetailActivity"
-            android:screenOrientation="portrait"/>
+        <!-- 转账详情 -->
+        <activity
+            android:name="cn.rongcloud.im.ui.activity.TransferDetailActivity"
+            android:screenOrientation="portrait" />
 
-        <!-- 我的钱包-->
-        <activity android:name="cn.rongcloud.im.ui.activity.MineWalletActivity"
-            android:screenOrientation="portrait"/>
+        <!-- 我的钱包 -->
+        <activity
+            android:name="cn.rongcloud.im.ui.activity.MineWalletActivity"
+            android:screenOrientation="portrait" />
 
-        <!-- 修改讨论组名称-->
-        <activity android:name="cn.rongcloud.im.ui.activity.UpdateDiscussionNameActivity"
-            android:screenOrientation="portrait"/>
+        <!-- 修改讨论组名称 -->
+        <activity
+            android:name="cn.rongcloud.im.ui.activity.UpdateDiscussionNameActivity"
+            android:screenOrientation="portrait" />
 
-        <!-- 充值输入页面-->
-        <activity android:name="cn.rongcloud.im.ui.activity.RechargeWebActivity"
-            android:screenOrientation="portrait"/>
+        <!-- 充值输入页面 -->
+        <activity
+            android:name="cn.rongcloud.im.ui.activity.RechargeWebActivity"
+            android:screenOrientation="portrait" />
 
-        <!-- 收到的币-->
-        <activity android:name="cn.rongcloud.im.ui.activity.TransferHistoryActivity"
-            android:screenOrientation="portrait"/>
+        <!-- 收到的币 -->
+        <activity
+            android:name="cn.rongcloud.im.ui.activity.TransferHistoryActivity"
+            android:screenOrientation="portrait" />
 
-        <!-- 收到的币-->
-        <activity android:name="cn.rongcloud.im.ui.activity.CollectionActivity"
-            android:screenOrientation="portrait"/>
+        <!-- 收到的币 -->
+        <activity
+            android:name="cn.rongcloud.im.ui.activity.CollectionActivity"
+            android:screenOrientation="portrait" />
 
-        <!--公众-->
+        <!-- 公众 -->
         <activity
             android:name="cn.rongcloud.im.ui.activity.PublicServiceInfoActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data
                     android:host="cn.rongcloud.im"
                     android:pathPrefix="/publicServiceProfile"
                     android:scheme="rong" />
             </intent-filter>
-
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data
                     android:host="com.dbcapp.club"
                     android:pathPrefix="/publicServiceInfo"
@@ -273,16 +295,16 @@
             </intent-filter>
         </activity>
 
-        <!--会话页面-->
+        <!-- 会话页面 -->
         <activity android:name="cn.rongcloud.im.ui.activity.DoubleChatRoomActivity" />
         <activity
             android:name="cn.rongcloud.im.ui.activity.ConversationActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustResize">
-
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <data
@@ -290,18 +312,18 @@
                     android:pathPrefix="/conversation/"
                     android:scheme="rong" />
             </intent-filter>
-
         </activity>
-        <!--聚合会话列表-->
+        <!-- 聚合会话列表 -->
         <activity
             android:name="cn.rongcloud.im.ui.activity.SubConversationListActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustResize">
-
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data
                     android:host="com.dbcapp.club"
                     android:path="/subconversationlist"
@@ -309,16 +331,17 @@
             </intent-filter>
         </activity>
 
-        <!--会话列表-->
+        <!-- 会话列表 -->
         <activity
             android:name="cn.rongcloud.im.ui.activity.ConversationListActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustResize">
-
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data
                     android:host="com.dbcapp.club"
                     android:path="/conversationlist"
@@ -366,7 +389,6 @@
         <service android:name="io.rong.imlib.ReConnectService" />
 
         <receiver android:name="io.rong.imlib.ConnectChangeReceiver" />
-
         <receiver
             android:name="io.rong.imlib.HeartbeatReceiver"
             android:process=":ipc" />
@@ -386,11 +408,12 @@
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
-
         <activity
             android:name="cn.rongcloud.im.ui.activity.SplashActivity"
             android:screenOrientation="portrait"
@@ -398,10 +421,10 @@
             android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity android:name="cn.rongcloud.im.ui.activity.NoteInformationActivity" />
 
         <receiver
@@ -416,26 +439,35 @@
             </intent-filter>
         </receiver>
 
+        <!-- <meta-data -->
+        <!-- android:name="RONG_CLOUD_APP_KEY" -->
+        <!-- android:value="kj7swf8ok1x12" /> -->
 
-        <!--<meta-data-->
-        <!--android:name="RONG_CLOUD_APP_KEY"-->
-        <!--android:value="kj7swf8ok1x12" />-->
 
-        <!-- 正式 n19jmcy59f1q9  测试 p5tvi9dst25b4  小乔 e0x9wycfx7flq-->
+        <!-- 正式 n19jmcy59f1q9  测试 p5tvi9dst25b4  小乔 e0x9wycfx7flq -->
 
-        <!--end rongcloud-->
+
+        <!-- end rongcloud -->
+
 
         <!-- 请将CHANNAL改为app的发布渠道 < -->
         <meta-data
             android:name="InstallChannel"
             android:value="CHANNAL" />
 
-        <!-- 高德地图-->
+        <!-- 高德地图 -->
         <meta-data
             android:name="com.amap.api.v2.apikey"
             android:value="9726f49e80e7e963412de35da43dbcb3" />
 
 
+        <service
+            android:name="com.amap.api.location.APSService"
+            android:exported="true" />
+
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyBoNsxYEo3s4UMsuUIi8ZLHP4qsGKGkiiw"/>
         <meta-data
             android:name="UMENG_APPKEY"
             android:value="577b2b55e0f55afbcb0026c6" />
@@ -443,8 +475,8 @@
             android:name="UMENG_CHANNEL"
             android:value="RongCloudApp" />
 
+        <!-- 第三方的推送 权限 广播 和服务 -->
 
-        <!--第三方的推送 权限 广播 和服务-->
 
         <!-- 小米 配置开始 < -->
         <service
@@ -457,20 +489,21 @@
         <service
             android:name="com.xiaomi.mipush.sdk.MessageHandleService"
             android:enabled="true" />
-        <!--注：此service必须在2.2.5版本以后（包括2.2.5版本）加入-->
+        <!-- 注：此service必须在2.2.5版本以后（包括2.2.5版本）加入 -->
 
         <service
             android:name="com.xiaomi.push.service.XMJobService"
             android:enabled="true"
             android:exported="false"
             android:permission="android.permission.BIND_JOB_SERVICE" />
-        <!--注：此service必须在3.0.1版本以后（包括3.0.1版本）加入-->
+        <!-- 注：此service必须在3.0.1版本以后（包括3.0.1版本）加入 -->
 
         <receiver
             android:name="com.xiaomi.push.service.receivers.NetworkStatusReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
@@ -496,12 +529,13 @@
         </receiver>
         <!-- 小米 配置结束 < -->
 
-        <!-- HMS 配置开始-->
+
+        <!-- HMS 配置开始 -->
         <meta-data
             android:name="com.huawei.hms.client.appid"
             android:value="10535759" />
 
-        <!-- BridgeActivity定义了HMS-SDK中一些跳转所需要的透明页面-->
+        <!-- BridgeActivity定义了HMS-SDK中一些跳转所需要的透明页面 -->
         <activity
             android:name="com.huawei.hms.activity.BridgeActivity"
             android:configChanges="orientation|locale|screenSize|layoutDirection|fontScale"
@@ -514,7 +548,7 @@
                 android:value="androidhwext:style/Theme.Emui.Translucent" />
         </activity>
 
-        <!-- 解决华为移动服务升级问题的透明界面（必须声明）-->
+        <!-- 解决华为移动服务升级问题的透明界面（必须声明） -->
         <activity
             android:name="com.huawei.android.hms.agent.common.HMSAgentActivity"
             android:configChanges="orientation|locale|screenSize|layoutDirection|fontScale"
@@ -531,10 +565,11 @@
             android:name="com.huawei.hms.update.provider.UpdateProvider"
             android:authorities="com.dbcapp.club.hms.update.provider"
             android:exported="false"
-            android:grantUriPermissions="true"></provider>
+            android:grantUriPermissions="true" />
         <!-- 第三方相关 :接收Push消息（注册、Push消息、Push连接状态）广播 -->
         <receiver android:name="io.rong.push.platform.HMSReceiver">
             <intent-filter>
+
                 <!-- 必须,用于接收token -->
                 <action android:name="com.huawei.android.push.intent.REGISTRATION" />
                 <!-- 必须，用于接收消息 -->
@@ -552,10 +587,12 @@
                 <action android:name="com.huawei.intent.action.PUSH" />
             </intent-filter>
         </receiver>
-        <!-- HMS 配置结束-->
+        <!-- HMS 配置结束 -->
+
 
         <!-- GCM 配置 < -->
-        <!--<receiver
+        <!--
+        <receiver
             android:name="com.google.android.gms.gcm.GcmReceiver"
             android:exported="true"
             android:permission="com.google.android.c2dm.permission.SEND">
@@ -579,8 +616,10 @@
             <intent-filter>
                 <action android:name="com.google.android.gms.iid.InstanceID" />
             </intent-filter>
-        </service>-->
+        </service>
+        -->
         <!-- GCM 配置结束 < -->
+
 
         <!-- [START firebase_service] -->
         <service
@@ -602,7 +641,7 @@
         <!-- [END firebase_iid_service] -->
 
 
-        <!--第三方推送的权限 广播 服务 配置结束-->
+        <!-- 第三方推送的权限 广播 服务 配置结束 -->
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -613,7 +652,8 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/rc_file_path" />
         </provider>
-    </application>
 
+        <activity android:name="cn.rongcloud.im.ui.activity.AmapAndGoogleLoactionActivity"></activity>
+    </application>
 
 </manifest>

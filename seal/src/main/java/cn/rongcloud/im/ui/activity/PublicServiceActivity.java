@@ -17,6 +17,7 @@ import cn.rongcloud.im.server.response.GetCustomerListResponse;
 import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.server.widget.LoadDialog;
 import cn.rongcloud.im.ui.adapter.CustomerAdapter;
+import cn.rongcloud.im.ui.widget.AutoLoadListView;
 import io.rong.imkit.RongIM;
 import io.rong.imlib.model.CSCustomServiceInfo;
 
@@ -25,9 +26,13 @@ public class PublicServiceActivity extends BaseActivity {
 
     private static final int REQUEST_CUSTOMER = 35;
 
-    private RecyclerView mLvCustomer;
+    private static final int PAGE_SIZE = 20;
+
+    private AutoLoadListView mLvCustomer;
     private CustomerAdapter mAdapter;
 
+    private boolean mIsComplete;
+    private long mRequestTime;
     private Paint mPaint;
 
     @Override
@@ -85,13 +90,24 @@ public class PublicServiceActivity extends BaseActivity {
                 super.getItemOffsets(outRect, view, parent, state);
             }
         });
+
+        mLvCustomer.setOnloadMore(new AutoLoadListView.OnLoadMoreCallback() {
+            @Override
+            public void onLoadMore() {
+                if (mIsComplete){
+                    return;
+                }
+
+                request(REQUEST_CUSTOMER);
+            }
+        });
     }
 
     @Override
     public Object doInBackground(int requestCode, String id) throws HttpException {
         switch (requestCode){
             case REQUEST_CUSTOMER:
-                return mAction.getCustomerList(50, 0);
+                return mAction.getCustomerList(PAGE_SIZE, mRequestTime);
         }
         return super.doInBackground(requestCode, id);
     }
@@ -101,9 +117,15 @@ public class PublicServiceActivity extends BaseActivity {
         switch (requestCode){
             case REQUEST_CUSTOMER:
                 LoadDialog.dismiss(this);
+                mLvCustomer.completeLoad();
                 GetCustomerListResponse response = (GetCustomerListResponse) result;
                 if (response.getCode() == 100000){
-                    mAdapter.setData(response.getData());
+                    if (response.getData() == null || response.getData().size() < PAGE_SIZE){
+                        mIsComplete = true;
+                    }
+                    mAdapter.addData(response.getData(), mRequestTime == 0);
+                    mLvCustomer.completeLoad();
+                    mRequestTime = response.getData().get(response.getData().size() - 1).getCreateTime1();
                 }else {
                     NToast.shortToast(this, response.getMessage());
                 }

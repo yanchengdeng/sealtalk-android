@@ -13,6 +13,8 @@
     <string name="main_customer">意见反馈</string>
     <string name="main_customer_xn">小能客服</string>
     <string name="private_chat">发起聊天</string>
+    <string name="private_scan">扫一扫</string>
+    <string name="private_code">二维码收款</string>
     <string name="group_chat">创建群组</string>
     <string name="add_contacts">添加好友</string>
     <string name="add_select_group">创建群组</string>
@@ -322,7 +324,7 @@
     <string name="fr_chat_room_three">聊天室 III</string>
     <string name="fr_chat_room_four">聊天室 IV</string>
     <string name="fr_chat_room_join_failure">加入聊天室失败</string>
-    
+
     <string name="ac_new_friend_list_no_data">暂无数据</string>
     <string name="share_dialog_share">分享</string>
     <string name="share_dialog_cancel">取消</string>
@@ -363,11 +365,13 @@
     <string name="cs_evaluate_input_must">必须输入建议</string>
     <string name="cs_evaluate_select_must">必选</string>
 
+    <string name="scan">扫一扫</string>
     <string name="baojia_mine_corn">收到的币</string>
     <string name="baojia_mine_collection">收藏</string>
     <string name="baojia_mine_settings">设置</string>
     <string name="baojia_mine_qrcode">我的二维码</string>
     <string name="baojia_qrcode_title">我的二维码</string>
+    <string name="baojia_qrcode_receivables_title">二维码收款</string>
     <string name="baojia_discover_circle">圈圈</string>
     <string name="baojia_discover_software">小程序</string>
     <string name="baojia_complete_name">请输入姓名（昵称）</string>
@@ -403,7 +407,7 @@
     <string name="baojia_platform_remained">bwallet</string>
     <string name="baojia_recharge">充值</string>
     <string name="baojia_mine_ammount_title">我的钱包</string>
-    <string name="baojia_mine_wallet_ammount" >%s 币</string>
+    <string name="baojia_mine_wallet_ammount">%s 币</string>
     <string name="baojia_update_discuss_name">修改讨论组名称</string>
     <string name="baojia_update_discuss_name_success">修改成功！</string>
     <string name="baojia_update_discuss_name_fail">修改讨论组名失败！</string>
@@ -434,4 +438,8 @@
     <string name="baojia_collections_title">收藏</string>
     <string name="baojia_delete_by_contact">您已被对方删除好友！</string>
     <string name="baojia_input_id_hint">输入6~18位字母或数字</string>
+    <string name="scan_text">将二维码/条形码放入框内,即可自动扫描</string>
+    <string name="has_complaint_circle">已举报</string>
+    <string name="has_like_circle">已点赞</string>
+    <string name="has_collect_circle">已收藏</string>
 </resources>

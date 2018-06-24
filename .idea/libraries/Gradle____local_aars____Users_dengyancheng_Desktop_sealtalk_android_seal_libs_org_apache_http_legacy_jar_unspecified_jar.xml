@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Gradle: __local_aars__:/Users/dengyancheng/Desktop/sealtalk-android/seal/libs/org.apache.http.legacy.jar:unspecified@jar">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/seal/libs/org.apache.http.legacy.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -19,10 +19,12 @@ import cn.rongcloud.im.SealConst;
 import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.response.GetLoginStatusResponse;
+import cn.rongcloud.im.server.response.UpdateVersionResponse;
 import cn.rongcloud.im.server.utils.MD5;
 import cn.rongcloud.im.server.utils.NLog;
 import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.server.utils.RongGenerate;
+import cn.rongcloud.im.utils.UpdateManager;
 import io.rong.common.RLog;
 import io.rong.imkit.RongIM;
 import io.rong.imlib.RongIMClient;
@@ -51,9 +53,12 @@ public class loginWebActivity extends BaseActivity {
     private String mTransId;
     private String connectResultId;
     private GetLoginStatusResponse.ResultEntiry mUserData;
+    private UpdateManager updateManager;
+    private boolean flag = false;
+
 
     //用以轮训获取服务端返回登录状态
-    private Handler mHandler = new Handler(){
+    private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             request(LOOPER_REQUEST, true);
@@ -65,9 +70,14 @@ public class loginWebActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_web);
         mSp = getSharedPreferences("config", MODE_PRIVATE);
+        flag = getIntent().getBooleanExtra("flag", false);
         editor = mSp.edit();
-
+        updateManager = new UpdateManager();
         mWebLogin = findViewById(R.id.web_login);
+        if (flag) {
+            request(38);
+
+        }
         initWebView();
         loadWebUrl();
 
@@ -100,9 +110,11 @@ public class loginWebActivity extends BaseActivity {
 
     @Override
     public Object doInBackground(int requestCode, String id) throws HttpException {
-        switch (requestCode){
+        switch (requestCode) {
             case LOOPER_REQUEST:
                 return mAction.getLoginStatus(mTransId);
+            case 38:
+                return mAction.appLatest();
             default:
                 break;
         }
@@ -111,20 +123,20 @@ public class loginWebActivity extends BaseActivity {
 
     @Override
     public void onSuccess(int requestCode, Object result) {
-        switch (requestCode){
+        switch (requestCode) {
             case LOOPER_REQUEST:
                 GetLoginStatusResponse response = (GetLoginStatusResponse) result;
                 RLog.v("loginWebActivity", "code:" + response.getCode());
-                if (response.getCode() == 100000){
+                if (response.getCode() == 100000) {
                     //终止轮询
                     mHandler.removeMessages(LOOPER_WHAT);
                     //获取到登录状态，再判断是否信息完整
-                    if (response.getData().getStatus() == NOT_COMPLETE_STATUS){
+                    if (response.getData().getStatus() == NOT_COMPLETE_STATUS) {
                         mUserData = response.getData();
                         editor.putString(SealConst.BAOJIA_USER_SYNCNAME, mUserData.getSyncName()).commit();
                         editor.putString(SealConst.BAOJIA_LOGIN_NAME, mUserData.getLoginName()).commit();
                         gotoComplete(((GetLoginStatusResponse) result).getData());
-                    }else {
+                    } else {
                         mUserData = response.getData();
                         RongIM.connect(mUserData.getImToken(), new RongIMClient.ConnectCallback() {
                             @Override
@@ -148,19 +160,27 @@ public class loginWebActivity extends BaseActivity {
                             }
                         });
                     }
-                }else if (response.getCode() == 110002){
+                } else if (response.getCode() == 110002) {
                     NToast.shortToast(this, response.getMessage());
                     loadWebUrl();
                     mHandler.sendEmptyMessageDelayed(LOOPER_WHAT, LOOPER_INTERVAL);
-                }else {
+                } else {
                     //没有登录成功，继续轮询
                     mHandler.sendEmptyMessageDelayed(LOOPER_WHAT, LOOPER_INTERVAL);
+                }
+                break;
+            case 38:
+                UpdateVersionResponse response1 = (UpdateVersionResponse) result;
+                if (response1.getCode() == 100000) {
+                    updateManager.checkAppUpdate(loginWebActivity.this, response1);
+                } else {
+                    NToast.shortToast(loginWebActivity.this, response1.getMessage());
                 }
                 break;
         }
     }
 
-    private void loadWebUrl(){
+    private void loadWebUrl() {
         //获取transid并存储
         mTransId = UUID.randomUUID().toString();
         mSp.edit().putString("transid", mTransId);
@@ -191,6 +211,7 @@ public class loginWebActivity extends BaseActivity {
         Intent intent = new Intent(this, CompleteInfoActivity.class);
         intent.putExtra("user_info", data);
         startActivity(intent);
+        finish();
     }
 
     @Override
@@ -202,5 +223,6 @@ public class loginWebActivity extends BaseActivity {
     private void gotoMain() {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
+        finish();
     }
 }

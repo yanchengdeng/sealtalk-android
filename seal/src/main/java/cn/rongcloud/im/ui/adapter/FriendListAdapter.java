@@ -45,7 +45,8 @@ public class FriendListAdapter extends BaseAdapter implements SectionIndexer {
 
     @Override
     public int getCount() {
-        if (list != null) return list.size();
+        if (list != null)
+            return list.size();
         return 0;
     }
 
@@ -76,6 +77,7 @@ public class FriendListAdapter extends BaseAdapter implements SectionIndexer {
             viewHolder.tvLetter = (TextView) convertView.findViewById(R.id.catalog);
             viewHolder.mImageView = (SelectableRoundedImageView) convertView.findViewById(R.id.frienduri);
             viewHolder.tvUserId = (TextView) convertView.findViewById(R.id.friend_id);
+            viewHolder.friend_note = (TextView) convertView.findViewById(R.id.friend_note);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -87,7 +89,7 @@ public class FriendListAdapter extends BaseAdapter implements SectionIndexer {
         if (position == getPositionForSection(section)) {
             viewHolder.tvLetter.setVisibility(View.VISIBLE);
             String letterFirst = mContent.getLetters();
-            if(!TextUtils.isEmpty(letterFirst)){
+            if (!TextUtils.isEmpty(letterFirst)) {
                 letterFirst = String.valueOf(letterFirst.toUpperCase().charAt(0));
             }
             viewHolder.tvLetter.setText(letterFirst);
@@ -95,7 +97,7 @@ public class FriendListAdapter extends BaseAdapter implements SectionIndexer {
             viewHolder.tvLetter.setVisibility(View.GONE);
         }
         if (mContent.isExitsDisplayName()) {
-            viewHolder.tvTitle.setText(this.list.get(position).getDisplayName());
+            viewHolder.tvTitle.setText(this.list.get(position).getName());
         } else {
             viewHolder.tvTitle.setText(this.list.get(position).getName());
         }
@@ -103,7 +105,13 @@ public class FriendListAdapter extends BaseAdapter implements SectionIndexer {
         ImageLoader.getInstance().displayImage(portraitUri, viewHolder.mImageView, App.getOptions());
         if (context.getSharedPreferences("config", Context.MODE_PRIVATE).getBoolean("isDebug", false)) {
             viewHolder.tvUserId.setVisibility(View.VISIBLE);
-            viewHolder.tvUserId.setText(list.get(position).getUserId());
+            viewHolder.tvUserId.setText(list.get(position).getName());
+        }
+        if (!TextUtils.isEmpty(list.get(position).getDisplayName())) {
+            viewHolder.friend_note.setVisibility(View.VISIBLE);
+            viewHolder.friend_note.setText("(" + list.get(position).getDisplayName() + ")");
+        } else {
+            viewHolder.friend_note.setVisibility(View.GONE);
         }
         return convertView;
     }
@@ -149,5 +157,7 @@ public class FriendListAdapter extends BaseAdapter implements SectionIndexer {
          * userid
          */
         TextView tvUserId;
+
+        TextView friend_note;
     }
 }
