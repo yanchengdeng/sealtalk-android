@@ -23,10 +23,10 @@ import java.util.List;
 
 import cn.rongcloud.im.App;
 import cn.rongcloud.im.SealConst;
-import cn.rongcloud.im.SealUserInfoManager;
-import cn.rongcloud.im.db.Groups;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
-import cn.rongcloud.im.server.utils.RongGenerate;
+import cn.rongcloud.im.server.network.http.HttpException;
+import cn.rongcloud.im.server.response.GroupListBaoResponse;
+import cn.rongcloud.im.server.widget.LoadDialog;
 import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
 import io.rong.imageloader.core.ImageLoader;
 import io.rong.imkit.RongIM;
@@ -41,8 +41,10 @@ public class GroupListActivity extends BaseActivity {
     private GroupAdapter adapter;
     private TextView mNoGroups;
     private EditText mSearch;
-    private List<Groups> mList;
+    private List<GroupListBaoResponse.ResultEntity> mList;
     private TextView mTextView;
+    private String mSyncName;
+    public static final int GET_GROUP_LIST = 20;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +55,8 @@ public class GroupListActivity extends BaseActivity {
         mNoGroups = (TextView) findViewById(R.id.show_no_group);
         mSearch = (EditText) findViewById(R.id.group_search);
         mTextView = (TextView)findViewById(R.id.foot_group_size);
+        mSyncName = getSharedPreferences("config", MODE_PRIVATE).
+                getString(SealConst.BAOJIA_USER_SYNCNAME, "");
         initData();
         BroadcastManager.getInstance(mContext).addAction(SealConst.GROUP_LIST_UPDATE, new BroadcastReceiver() {
             @Override
@@ -63,7 +67,7 @@ public class GroupListActivity extends BaseActivity {
     }
 
     private void initData() {
-        SealUserInfoManager.getInstance().getGroups(new SealUserInfoManager.ResultCallback<List<Groups>>() {
+        /*SealUserInfoManager.getInstance().getGroups(new SealUserInfoManager.ResultCallback<List<Groups>>() {
             @Override
             public void onSuccess(List<Groups> groupsList) {
                 mList = groupsList;
@@ -105,15 +109,83 @@ public class GroupListActivity extends BaseActivity {
 
             }
         });
+*/
+        LoadDialog.show(this);
+        request(GET_GROUP_LIST, true);
+    }
+
+    @Override
+    public Object doInBackground(int requestCode, String id) throws HttpException {
+        switch (requestCode) {
+            case GET_GROUP_LIST:
+                return mAction.getGroupList(mSyncName);
+
+        }
+        return null;
+    }
+
+    @Override
+    public void onSuccess(int requestCode, Object result) {
+        switch (requestCode){
+            case GET_GROUP_LIST:
+                LoadDialog.dismiss(this);
+                GroupListBaoResponse response = (GroupListBaoResponse) result;
+                if (response.getCode() == 100000) {
+                    List<GroupListBaoResponse.ResultEntity> datas = response.getData();
+                        mList = datas;
+                        if (mList != null && mList.size() > 0) {
+                            adapter = new GroupAdapter(mContext, mList);
+                            mGroupListView.setAdapter(adapter);
+                            mNoGroups.setVisibility(View.GONE);
+                            mTextView.setVisibility(View.VISIBLE);
+                            mTextView.setText(getString(R.string.ac_group_list_group_number, mList.size()));
+                            mGroupListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                @Override
+                                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                    GroupListBaoResponse.ResultEntity bean = (GroupListBaoResponse.ResultEntity) adapter.getItem(position);
+                                    RongIM.getInstance().startGroupChat(GroupListActivity.this, bean.getId(), bean.getGroupName());
+                                }
+                            });
+                            mSearch.addTextChangedListener(new TextWatcher() {
+                                @Override
+                                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                                }
+
+                                @Override
+                                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                                    filterData(s.toString());
+                                }
+
+                                @Override
+                                public void afterTextChanged(Editable s) {
+                                }
+                            });
+                        } else {
+                            mNoGroups.setVisibility(View.VISIBLE);
+                        }
+
+                }
+
+                break;
+
+        }
+    }
+
+
+    @Override
+    public void onFailure(int requestCode, int state, Object result) {
+        super.onFailure(requestCode, state, result);
+        LoadDialog.dismiss(this);
     }
 
     private void filterData(String s) {
-        List<Groups> filterDataList = new ArrayList<>();
+        List<GroupListBaoResponse.ResultEntity> filterDataList = new ArrayList<>();
         if (TextUtils.isEmpty(s)) {
             filterDataList = mList;
         } else {
-            for (Groups groups : mList) {
-                if (groups.getName().contains(s)) {
+            for (GroupListBaoResponse.ResultEntity groups : mList) {
+                if (groups.getGroupName().contains(s)) {
                     filterDataList.add(groups);
                 }
             }
@@ -127,9 +199,9 @@ public class GroupListActivity extends BaseActivity {
 
         private Context context;
 
-        private List<Groups> list;
+        private List<GroupListBaoResponse.ResultEntity> list;
 
-        public GroupAdapter(Context context, List<Groups> list) {
+        public GroupAdapter(Context context, List<GroupListBaoResponse.ResultEntity> list) {
             this.context = context;
             this.list = list;
         }
@@ -137,7 +209,7 @@ public class GroupListActivity extends BaseActivity {
         /**
          * 传入新的数据 刷新UI的方法
          */
-        public void updateListView(List<Groups> list) {
+        public void updateListView(List<GroupListBaoResponse.ResultEntity> list) {
             this.list = list;
             notifyDataSetChanged();
         }
@@ -167,7 +239,7 @@ public class GroupListActivity extends BaseActivity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             ViewHolder viewHolder;
-            final Groups mContent = list.get(position);
+            final GroupListBaoResponse.ResultEntity mContent = list.get(position);
             if (convertView == null) {
                 viewHolder = new ViewHolder();
                 convertView = LayoutInflater.from(context).inflate(R.layout.group_item_new, parent, false);
@@ -178,12 +250,12 @@ public class GroupListActivity extends BaseActivity {
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
-            viewHolder.tvTitle.setText(mContent.getName());
-            String portraitUri = SealUserInfoManager.getInstance().getPortraitUri(mContent);
-            ImageLoader.getInstance().displayImage(portraitUri, viewHolder.mImageView, App.getOptions());
+            viewHolder.tvTitle.setText(mContent.getGroupName());
+//            String portraitUri = SealUserInfoManager.getInstance().getPortraitUri(mContent.getGroupIcon());
+            ImageLoader.getInstance().displayImage(mContent.getGroupIcon(), viewHolder.mImageView, App.getOptions());
             if (context.getSharedPreferences("config", MODE_PRIVATE).getBoolean("isDebug", false)) {
                 viewHolder.groupId.setVisibility(View.VISIBLE);
-                viewHolder.groupId.setText(mContent.getGroupsId());
+//                viewHolder.groupId.setText(mContent.getGroupsId());
             }
             return convertView;
         }

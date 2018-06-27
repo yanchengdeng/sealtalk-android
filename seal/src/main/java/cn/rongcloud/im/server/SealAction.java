@@ -492,6 +492,8 @@ public class SealAction extends BaseAction {
         return response;
     }
 
+
+
     /**
      * 创建者设置群组头像
      *

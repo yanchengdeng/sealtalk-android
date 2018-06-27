@@ -2,6 +2,8 @@ package cn.rongcloud.im.ui.activity;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -10,6 +12,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -19,6 +22,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
@@ -40,6 +44,12 @@ import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.Marker;
 import com.amap.api.maps.model.MarkerOptions;
 import com.amap.api.maps.model.MyLocationStyle;
+import com.amap.api.services.core.LatLonPoint;
+import com.amap.api.services.geocoder.GeocodeResult;
+import com.amap.api.services.geocoder.GeocodeSearch;
+import com.amap.api.services.geocoder.RegeocodeAddress;
+import com.amap.api.services.geocoder.RegeocodeQuery;
+import com.amap.api.services.geocoder.RegeocodeResult;
 import com.dbcapp.club.R;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -56,10 +66,11 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import cn.rongcloud.im.utils.PerfectClickListener;
+import io.rong.common.RLog;
 
 public class AmapAndGoogleLoactionActivity extends FragmentActivity implements View.OnClickListener,
         AMap.OnCameraChangeListener, OnMapReadyCallback, GoogleMap.OnCameraMoveListener,
-        AMapLocationListener, CompoundButton.OnCheckedChangeListener  {
+        AMapLocationListener, CompoundButton.OnCheckedChangeListener, GeocodeSearch.OnGeocodeSearchListener {
     private ToggleButton mcheckbtn;
     private Button mapbtn;
     private LinearLayout mContainerLayout;
@@ -67,9 +78,9 @@ public class AmapAndGoogleLoactionActivity extends FragmentActivity implements V
     private TextureMapView mAmapView;
     private MapView mGoogleMapView;
     private float zoom = 10;
-    private double latitude ;
-    private double longitude ;
-    private boolean mIsAmapDisplay = true;
+    private double latitude;
+    private double longitude;
+    //    private boolean mIsAmapDisplay = true;
     private boolean mIsAuto = true;
     private GoogleMap googlemap;
     private AMapLocationClient mlocationClient;
@@ -79,20 +90,21 @@ public class AmapAndGoogleLoactionActivity extends FragmentActivity implements V
     private IntentFilter mIntentFilter;
 
 
-
-    private TextView mLocationTip ;
-    private double mLatResult;
-    private double mLngResult;
+    private TextView mLocationTip;
     private String mPoiResult;
     private Marker mMarker;
-    private Handler mHandler;
+    private ValueAnimator animator;
+    //    private double mLatResult;
+//    private double mLngResult;、
+//    private Handler mHandler;、
+    private GeocodeSearch mGeocodeSearch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_amap_and_google_loaction);
-        this.mHandler = new Handler();
+//        this.mHandler = new Handler();
         init();
         initLocation();
 
@@ -126,7 +138,8 @@ public class AmapAndGoogleLoactionActivity extends FragmentActivity implements V
         mIntentFilter.addAction(Intent.ACTION_PACKAGE_REPLACED);
         mIntentFilter.addDataScheme("package");
         registerReceiver(mInstallReciver, mIntentFilter);
-
+        this.mGeocodeSearch = new GeocodeSearch(this);
+        this.mGeocodeSearch.setOnGeocodeSearchListener(this);
 
 
         //显示当前定位蓝点
@@ -137,8 +150,8 @@ public class AmapAndGoogleLoactionActivity extends FragmentActivity implements V
         myLocationStyle.radiusFillColor(0);
         mAmapView.getMap().setMyLocationStyle(myLocationStyle);
 //        mAmapView.getMap().setLocationSource(this);
-        mAmapView.getMap().setMyLocationEnabled(true);
-        
+//        mAmapView.getMap().setMyLocationEnabled(true);
+
         //发送位置
         findViewById(R.id.text_right).setOnClickListener(new PerfectClickListener() {
             @Override
@@ -147,7 +160,11 @@ public class AmapAndGoogleLoactionActivity extends FragmentActivity implements V
                     Toast.makeText(AmapAndGoogleLoactionActivity.this, AmapAndGoogleLoactionActivity.this.getString(io.rong.imkit.R.string.rc_location_temp_failed), Toast.LENGTH_SHORT).show();
                 } else {
                     Intent intent = new Intent();
-                    intent.putExtra("thumb", AmapAndGoogleLoactionActivity.this.getMapUrl(AmapAndGoogleLoactionActivity.this.mLatResult, AmapAndGoogleLoactionActivity.this.mLngResult));
+                    if (isInArea(latitude, longitude)) {
+                        intent.putExtra("thumb", AmapAndGoogleLoactionActivity.this.getMapUrl(AmapAndGoogleLoactionActivity.this.latitude, AmapAndGoogleLoactionActivity.this.longitude));
+                    } else {
+                        intent.putExtra("thumb", AmapAndGoogleLoactionActivity.this.getGoogleMapUrl(AmapAndGoogleLoactionActivity.this.latitude, AmapAndGoogleLoactionActivity.this.longitude));
+                    }
                     intent.putExtra("lat", AmapAndGoogleLoactionActivity.this.latitude);
                     intent.putExtra("lng", AmapAndGoogleLoactionActivity.this.longitude);
                     intent.putExtra("poi", AmapAndGoogleLoactionActivity.this.mPoiResult);
@@ -192,11 +209,11 @@ public class AmapAndGoogleLoactionActivity extends FragmentActivity implements V
             case R.id.button:
                 mcheckbtn.setChecked(false);
                 mIsAuto = false;
-                if (mIsAmapDisplay) {
-                    changeToGoogleMapView();
-                } else {
-                    changeToAmapView();
-                }
+//                if (mIsAmapDisplay) {
+//                    changeToGoogleMapView();
+//                } else {
+//                    changeToAmapView();
+//                }
                 break;
         }
     }
@@ -231,7 +248,7 @@ public class AmapAndGoogleLoactionActivity extends FragmentActivity implements V
             }
         });
         mAmapView.getMap().setOnCameraChangeListener(this);
-        mIsAmapDisplay = true;
+//        mIsAmapDisplay = true;
         mapbtn.setText("To Google");
     }
 
@@ -253,12 +270,14 @@ public class AmapAndGoogleLoactionActivity extends FragmentActivity implements V
         if (!checkGooglePlayServices()) {
             return;
         }
-        zoom = mAmapView.getMap().getCameraPosition().zoom;
-        latitude = mAmapView.getMap().getCameraPosition().target.latitude;
-        longitude = mAmapView.getMap().getCameraPosition().target.longitude;
+        if (googlemap != null && googlemap.getCameraPosition() != null) {
+            zoom = googlemap.getCameraPosition().zoom;
+            latitude = googlemap.getCameraPosition().target.latitude;
+            longitude = googlemap.getCameraPosition().target.longitude;
+        }
 
         mapbtn.setText("To Amap");
-        mIsAmapDisplay = false;
+//        mIsAmapDisplay = false;
         mGoogleMapView = new com.google.android.gms.maps.MapView(this, new GoogleMapOptions()
                 .camera(new com.google.android.gms.maps.model
                         .CameraPosition(new com.google.android.gms.maps.model.LatLng(latitude, longitude), zoom, 0, 0)));
@@ -272,6 +291,11 @@ public class AmapAndGoogleLoactionActivity extends FragmentActivity implements V
     @Override
     public void onCameraChange(com.amap.api.maps.model.CameraPosition cameraPosition) {
 
+        if (Build.VERSION.SDK_INT < 11) {
+            if (this.mMarker != null) {
+                this.mMarker.setPosition(cameraPosition.target);
+            }
+        }
     }
 
     /**
@@ -281,12 +305,81 @@ public class AmapAndGoogleLoactionActivity extends FragmentActivity implements V
      */
     @Override
     public void onCameraChangeFinish(com.amap.api.maps.model.CameraPosition cameraPosition) {
-        longitude = cameraPosition.target.longitude;
-        latitude = cameraPosition.target.latitude;
+//        longitude = cameraPosition.target.longitude;
+//        latitude = cameraPosition.target.latitude;
+// Point(223065007, 114012764)  Point(223069344, 114021728)
+//        addLocatedMarker(cameraPosition.target,"");
+
+
         zoom = cameraPosition.zoom;
-        if (!isInArea(latitude, longitude) && mIsAmapDisplay && mIsAuto) {
+
+        LatLonPoint point = new LatLonPoint(cameraPosition.target.latitude, cameraPosition.target.longitude);
+        RegeocodeQuery query = new RegeocodeQuery(point, 50.0F, "autonavi");
+        this.mGeocodeSearch.getFromLocationAsyn(query);
+        if (this.mMarker != null) {
+            animMarker(cameraPosition);
+
+        }
+
+
+        if (!isInArea(latitude, longitude) && mIsAuto) {
             changeToGoogleMapView();
         }
+    }
+
+
+    @Override
+    public void onRegeocodeSearched(RegeocodeResult regeocodeResult, int i) {
+        if (regeocodeResult != null) {
+            RegeocodeAddress regeocodeAddress = regeocodeResult.getRegeocodeAddress();
+            this.latitude = regeocodeResult.getRegeocodeQuery().getPoint().getLatitude();
+            this.longitude = regeocodeResult.getRegeocodeQuery().getPoint().getLongitude();
+            String formatAddress = regeocodeResult.getRegeocodeAddress().getFormatAddress();
+            this.mPoiResult = formatAddress.replace(regeocodeAddress.getProvince(), "").replace(regeocodeAddress.getCity(), "").replace(regeocodeAddress.getDistrict(), "");
+            this.mLocationTip.setText(this.mPoiResult);
+            LatLng latLng = new LatLng(this.latitude, this.longitude);
+            if (this.mMarker != null) {
+                this.mMarker.setPosition(latLng);
+            }
+        } else {
+            Toast.makeText(this, this.getString(io.rong.imkit.R.string.rc_location_fail), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onGeocodeSearched(GeocodeResult geocodeResult, int i) {
+
+    }
+
+    @TargetApi(11)
+    private void animMarker(final com.amap.api.maps.model.CameraPosition target) {
+        if (Build.VERSION.SDK_INT > 11) {
+            if (this.animator != null) {
+                this.animator.start();
+                return;
+            }
+
+            this.animator = ValueAnimator.ofFloat(new float[]{(float) (this.mAmapView.getHeight() / 2), (float) (this.mAmapView.getHeight() / 2 - 30)});
+            this.animator.setInterpolator(new DecelerateInterpolator());
+            this.animator.setDuration(150L);
+            this.animator.setRepeatCount(1);
+            this.animator.setRepeatMode(ValueAnimator.REVERSE);
+            this.animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    RLog.d("AMapLocationActivity", "onAnimationUpdate");
+                    Float value = (Float) animation.getAnimatedValue();
+                    mMarker.setPositionByPixels(mAmapView.getWidth() / 2, Math.round(value));
+                }
+            });
+            this.animator.addListener(new AnimatorListenerAdapter() {
+                public void onAnimationEnd(Animator animation) {
+                    mMarker.setIcon(mBitmapDescriptor);
+//                    addLocatedMarker(target.target,"");
+                }
+            });
+            this.animator.start();
+        }
+
     }
 
     /**
@@ -369,8 +462,13 @@ public class AmapAndGoogleLoactionActivity extends FragmentActivity implements V
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.googlemap = googleMap;
+
+        com.google.android.gms.maps.model.BitmapDescriptor googleBitmaps = com.google.android.gms.maps.model.BitmapDescriptorFactory.fromResource(io.rong.imkit.R.drawable.rc_ext_location_marker);
         if (googlemap != null) {
             googlemap.setOnCameraMoveListener(this);
+            com.google.android.gms.maps.model.LatLng sydney = new com.google.android.gms.maps.model.LatLng(latitude, longitude);
+            googlemap.addMarker(new com.google.android.gms.maps.model.MarkerOptions().position(sydney).icon(googleBitmaps));
+            googlemap.moveCamera(com.google.android.gms.maps.CameraUpdateFactory.newLatLng(sydney));
         }
     }
 
@@ -383,7 +481,7 @@ public class AmapAndGoogleLoactionActivity extends FragmentActivity implements V
         longitude = cameraPosition.target.longitude;
         latitude = cameraPosition.target.latitude;
         zoom = cameraPosition.zoom;
-        if (isInArea(latitude, longitude) && !mIsAmapDisplay && mIsAuto) {
+        if (isInArea(latitude, longitude) && mIsAuto) {
             changeToAmapView();
         }
     }
@@ -399,12 +497,22 @@ public class AmapAndGoogleLoactionActivity extends FragmentActivity implements V
                 changeToGoogleMapView();
             } else {
                 mAmapView.getMap().moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 15));
+                com.amap.api.maps.CameraUpdate update = com.amap.api.maps.CameraUpdateFactory.zoomTo(17.0F);
+                mAmapView.getMap().animateCamera(update, new com.amap.api.maps.AMap.CancelableCallback() {
+                    public void onFinish() {
+                        mAmapView.getMap().setOnCameraChangeListener(AmapAndGoogleLoactionActivity.this);
+                    }
+
+                    public void onCancel() {
+                    }
+                });
+
+                //设置当前位置
+                addLocatedMarker(mPoiResult);
             }
 //            Toast.makeText(AmapAndGoogleLoactionActivity.this, aMapLocation.getCountry(), Toast.LENGTH_LONG).show();
             mIsAuto = false;
             mcheckbtn.setChecked(false);
-            //设置当前位置
-            addLocatedMarker(new LatLng(longitude, longitude), mPoiResult);
 
         } else {
             String errText = "定位失败," + aMapLocation.getErrorCode() + ": " + aMapLocation.getErrorInfo();
@@ -415,12 +523,26 @@ public class AmapAndGoogleLoactionActivity extends FragmentActivity implements V
 
 
     private BitmapDescriptor mBitmapDescriptor;
-    private void addLocatedMarker(LatLng latLng, String poi) {
+
+    private void addLocatedMarker(String poi) {
         this.mBitmapDescriptor = BitmapDescriptorFactory.fromResource(io.rong.imkit.R.drawable.rc_ext_location_marker);
-        MarkerOptions markerOptions = (new MarkerOptions()).position(latLng).icon(mBitmapDescriptor);
+        MarkerOptions markerOptions = (new MarkerOptions()).position(new LatLng(latitude, longitude)).icon(mBitmapDescriptor);
         this.mMarker = this.mAmapView.getMap().addMarker(markerOptions);
         this.mMarker.setPositionByPixels(this.mAmapView.getWidth() / 2, this.mAmapView.getHeight() / 2);
         this.mLocationTip.setText(String.format("%s", poi));
+
+        //添加原点
+//        Marker positionMark;
+//        locaionDescriptro =  BitmapDescriptorFactory.fromResource(io.rong.imkit.R.drawable.rc_ext_my_locator);
+//        MarkerOptions locationMarketOptions = (new MarkerOptions()).position(new LatLng(longitude, longitude)).icon(locaionDescriptro).visible(true);
+//        this.mMarker = this.mAmapView.getMap().addMarker(locationMarketOptions);
+//        this.mMarker.setPositionByPixels(this.mAmapView.getWidth() / 2, this.mAmapView.getHeight() / 2);
+//        positionMark = mAmapView.getMap().addMarker(locationMarketOptions);
+//        positionMark.setDraggable(false);
+//        positionMark.setMarkerOptions(locationMarketOptions);
+//        positionMark.setPositionByPixels(this.mAmapView.getWidth() / 2, this.mAmapView.getHeight() / 2);
+
+
     }
 
     /**
@@ -558,6 +680,11 @@ public class AmapAndGoogleLoactionActivity extends FragmentActivity implements V
 
     private String getMapUrl(double latitude, double longitude) {
         return "http://restapi.amap.com/v3/staticmap?location=" + longitude + "," + latitude + "&zoom=16&scale=2&size=408*240&markers=mid,,A:" + longitude + "," + latitude + "&key=e09af6a2b26c02086e9216bd07c960ae";
+    }
+
+
+    private String getGoogleMapUrl(double latitude, double longitude) {
+        return "http://maps.google.com/maps/api/staticmap?zoom=13&size=256x256&markers=" + longitude + "," + latitude + "&maptype=roadmap&sensor=false";
     }
 
 

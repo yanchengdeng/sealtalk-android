@@ -15,6 +15,7 @@ import android.widget.RelativeLayout;
 
 import com.dbcapp.club.R;
 
+import cn.rongcloud.im.ui.activity.CreateGroupActivity;
 import cn.rongcloud.im.ui.activity.QRReceivablesCodeActivity;
 import cn.rongcloud.im.ui.activity.SearchFriendActivity;
 import cn.rongcloud.im.ui.activity.SelectFriendsActivity;
@@ -23,7 +24,6 @@ import cn.rongcloud.im.ui.activity.SelectFriendsActivity;
 public class MorePopWindow extends PopupWindow {
 
     private OnClickListener listener;
-
 
     public void setListener(OnClickListener listener) {
         this.listener = listener;
@@ -55,11 +55,24 @@ public class MorePopWindow extends PopupWindow {
         this.setAnimationStyle(R.style.AnimationPreview);
 
 
+        RelativeLayout re_group = content.findViewById(R.id.re_creat_group);
         RelativeLayout re_disscution = (RelativeLayout) content.findViewById(R.id.re_disscution);
         RelativeLayout re_chatroom = (RelativeLayout) content.findViewById(R.id.re_chatroom);
         RelativeLayout re_addfriends = (RelativeLayout) content.findViewById(R.id.re_addfriends);
         RelativeLayout re_scanner = (RelativeLayout) content.findViewById(R.id.re_scanner);
         RelativeLayout re_code = (RelativeLayout) content.findViewById(R.id.re_code);
+
+
+        //建群
+        re_group.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(new Intent(context, CreateGroupActivity.class));
+//                intent.putExtra("CONVERSATION_DISCUSSION", true);
+                context.startActivity(intent);
+                MorePopWindow.this.dismiss();
+            }
+        });
         re_disscution.setOnClickListener(new OnClickListener() {
 
             @Override
@@ -107,6 +120,10 @@ public class MorePopWindow extends PopupWindow {
             }
         });
 
+
+    }
+
+    private void doCreateGrooup() {
 
     }
 

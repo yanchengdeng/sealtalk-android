@@ -460,14 +460,13 @@
             android:name="com.amap.api.v2.apikey"
             android:value="9726f49e80e7e963412de35da43dbcb3" />
 
-
         <service
             android:name="com.amap.api.location.APSService"
             android:exported="true" />
 
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyBoNsxYEo3s4UMsuUIi8ZLHP4qsGKGkiiw"/>
+            android:value="AIzaSyBoNsxYEo3s4UMsuUIi8ZLHP4qsGKGkiiw" />
         <meta-data
             android:name="UMENG_APPKEY"
             android:value="577b2b55e0f55afbcb0026c6" />
@@ -653,7 +652,8 @@
                 android:resource="@xml/rc_file_path" />
         </provider>
 
-        <activity android:name="cn.rongcloud.im.ui.activity.AmapAndGoogleLoactionActivity"></activity>
+        <activity android:name="cn.rongcloud.im.ui.activity.AmapAndGoogleLoactionActivity" />
+        <activity android:name="cn.rongcloud.im.ui.activity.PreGooglMapsLocationActivity"></activity>
     </application>
 
 </manifest>

@@ -14,6 +14,7 @@ import com.facebook.stetho.inspector.database.DefaultDatabaseConnectionProvider;
 import com.facebook.stetho.inspector.protocol.ChromeDevtoolsDomain;
 
 import cn.rongcloud.im.message.plugins.DeleteAfterReadExtensionModule;
+import cn.rongcloud.im.message.plugins.LocationMessageItemProvider;
 import cn.rongcloud.im.message.plugins.TransferExtensionModule;
 import cn.rongcloud.im.server.utils.NLog;
 import cn.rongcloud.im.stetho.RongDatabaseDriver;
@@ -89,7 +90,7 @@ public class App extends MultiDexApplication {
 //                RongIM.registerMessageTemplate(new ContactNotificationMessageProvider());
                 //LocationMessageItemProvider
                 //RealTimeLocationMessageProvider   带位置共享的
-//                RongIM.registerMessageTemplate(new LocationMessageItemProvider());
+                RongIM.registerMessageTemplate(new LocationMessageItemProvider());
 //                RongIM.registerMessageTemplate(new RealTimeLocationMessageProvider());
                 //                                             、   RongIM、.registerMessage、Type(MyTextMessage.class);
                 //                                RongIM.registerMessageType(TestMessage.class);

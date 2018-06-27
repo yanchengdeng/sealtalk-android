@@ -14,4 +14,15 @@ public class AddGroupMemberResponse {
     public void setCode(int code) {
         this.code = code;
     }
+
+
+    private String message;
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
 }

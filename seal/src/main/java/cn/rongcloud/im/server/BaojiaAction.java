@@ -4,6 +4,8 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import org.apache.http.entity.StringEntity;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
@@ -12,9 +14,12 @@ import java.util.List;
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.request.CompleteInfoRequest;
 import cn.rongcloud.im.server.response.AdResponse;
+import cn.rongcloud.im.server.response.AddGroupMemberResponse;
 import cn.rongcloud.im.server.response.AgreeFriendResponse;
 import cn.rongcloud.im.server.response.CompleteInfoResponse;
+import cn.rongcloud.im.server.response.CreateGroupBaoResponse;
 import cn.rongcloud.im.server.response.DeleteContactResponse;
+import cn.rongcloud.im.server.response.DeleteGroupMemberResponse;
 import cn.rongcloud.im.server.response.DeleteSelfCircleResponse;
 import cn.rongcloud.im.server.response.FriendResponse;
 import cn.rongcloud.im.server.response.GetCircleResponse;
@@ -28,9 +33,13 @@ import cn.rongcloud.im.server.response.GetRechargeStatusResponse;
 import cn.rongcloud.im.server.response.GetRelationFriendResponse;
 import cn.rongcloud.im.server.response.GetTransferAggregationResponse;
 import cn.rongcloud.im.server.response.GetTransferHistoryResponse;
+import cn.rongcloud.im.server.response.GroupDetailBaoResponse;
+import cn.rongcloud.im.server.response.GroupListBaoResponse;
+import cn.rongcloud.im.server.response.GroupNumbersBaoResponse;
 import cn.rongcloud.im.server.response.ModifyNameResponse;
 import cn.rongcloud.im.server.response.ModifyPortraitResponse;
 import cn.rongcloud.im.server.response.PublishCircleResponse;
+import cn.rongcloud.im.server.response.QuitGroupResponse;
 import cn.rongcloud.im.server.response.SearchContactListResponse;
 import cn.rongcloud.im.server.response.SearchContactResponse;
 import cn.rongcloud.im.server.response.SetFriendDisplayNameResponse;
@@ -655,6 +664,7 @@ public class BaojiaAction extends BaseAction {
             response = jsonToBean(responseStr, GetCustomerListResponse.class);
         }
 
+
         return response;
     }
 
@@ -698,4 +708,240 @@ public class BaojiaAction extends BaseAction {
         return response;
     }
 
+
+
+    /**
+     * 直接创建群  默认只有 自己
+     *
+     * @param name
+     * @param icon
+     * @param brief
+     * @return
+     * @throws HttpException
+     */
+    public CreateGroupBaoResponse createGroup(String username, String name, String icon, String brief) throws HttpException {
+        String url = BASE_URL+"/group/create?username=" + username;
+        JSONObject groupinf = new JSONObject();
+        try {
+            /**
+             *  "createTime1": 0,
+             "groupIcon": "string",
+             "groupIntro": "string",
+             "groupMemberCount": 0,
+             "groupName": "string",
+             "groupToken": "string",
+             "id": 0
+             */
+
+            groupinf.put("groupIcon", icon);
+            groupinf.put("groupIntro", brief);
+            groupinf.put("groupName", name);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        StringEntity entity = null;
+        try {
+            entity = new StringEntity(groupinf.toString(), ENCODING);
+            entity.setContentType(CONTENT_TYPE);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        String result = httpManager.post(mContext, url, entity, CONTENT_TYPE);
+        CreateGroupBaoResponse response = null;
+        if (!TextUtils.isEmpty(result)) {
+            response = jsonToBean(result, CreateGroupBaoResponse.class);
+        }
+        return response;
+    }
+
+
+    /**
+     * 获取群列表
+     * @param userName
+     * @return
+     * @throws HttpException
+     */
+    public GroupListBaoResponse getGroupList(String userName) throws HttpException {
+
+        String url = String.format(BASE_URL + "/group/list?pageSize=%s&startTime=%s&username=%s", "30", "0", userName);
+        RLog.e("ziji", url);
+        String result = httpManager.get(mContext, url);
+        RLog.e("ziji", result);
+        GroupListBaoResponse response = null;
+        if (!TextUtils.isEmpty(result)) {
+            response = jsonToBean(result, GroupListBaoResponse.class);
+        }
+        return response;
+    }
+
+
+
+    /**
+     * 修改群头像
+     *
+     * @param syncName
+     * @param imageUrl
+     * @return
+     * @throws HttpException
+     */
+    public ModifyPortraitResponse modifyGroupIcon(String token,String syncName, String imageUrl) throws HttpException {
+        String url = String.format(BASE_URL + "/group/modify/icon?groupIcon=%s&token=%s&username=%s",imageUrl, token ,syncName );
+        RLog.v("modifyPortrait", url);
+        String responseStr = httpManager.post(url);
+        RLog.v("modifyPortrait", responseStr);
+        ModifyPortraitResponse response = null;
+        if (!TextUtils.isEmpty(responseStr)) {
+            response = jsonToBean(responseStr, ModifyPortraitResponse.class);
+        }
+
+        return response;
+    }
+
+
+    /**
+     * 获取群组信息  /group/details/token
+     * @param
+     * @return
+     */
+    public Object getGroupInfo(String groupToken,String username)throws HttpException  {
+        String url = String.format(BASE_URL + "/group/details/token?groupToken=%s&username=%s",groupToken, username );
+        RLog.v("modifyPortrait", url);
+        String responseStr = httpManager.get(url);
+        RLog.v("modifyPortrait", responseStr);
+        GroupDetailBaoResponse response = null;
+        if (!TextUtils.isEmpty(responseStr)) {
+            response = jsonToBean(responseStr, GroupDetailBaoResponse.class);
+        }
+
+        return response;
+    }
+
+
+    /**
+     * 解散群
+     * @param groupToken
+     * @param username
+     * @return
+     * @throws HttpException
+     */
+    public Object groupDissmiss(String groupToken,String username)throws HttpException  {
+        String url = String.format(BASE_URL + "/group/dismiss/token?token=%s&username=%s",groupToken, username );
+        RLog.v("modifyPortrait", url);
+        String responseStr = httpManager.post(url);
+        RLog.v("modifyPortrait", responseStr);
+        GroupDetailBaoResponse response = null;
+        if (!TextUtils.isEmpty(responseStr)) {
+            response = jsonToBean(responseStr, GroupDetailBaoResponse.class);
+        }
+
+        return response;
+    }
+
+
+    /**
+     * 群成员退出群组
+     * @param groupToken
+     * @param username
+     * @return
+     * @throws HttpException
+     */
+    public Object groupQuit(String groupToken,String username)throws HttpException  {
+        String url = String.format(BASE_URL + "/group/member/quit/token?token=%s&username=%s",groupToken, username );
+        RLog.v("modifyPortrait", url);
+        String responseStr = httpManager.post(url);
+        RLog.v("modifyPortrait", responseStr);
+        QuitGroupResponse response = null;
+        if (!TextUtils.isEmpty(responseStr)) {
+            response = jsonToBean(responseStr, QuitGroupResponse.class);
+        }
+
+        return response;
+    }
+
+    /**
+     * 获取群员列表
+     * @param groupToken
+     * @param username
+     * @return
+     * @throws HttpException
+     */
+    public Object getGroupNumbers(String groupToken,String username)throws HttpException  {
+        String url = String.format(BASE_URL + "/group/member/list/token?pageSize=%s&startTime=0&token=%s&username=%s",String.valueOf(Integer.MAX_VALUE),groupToken, username );
+        RLog.v("modifyPortrait", url);
+        String responseStr = httpManager.get(url);
+        RLog.v("modifyPortrait", responseStr);
+        GroupNumbersBaoResponse response = null;
+        if (!TextUtils.isEmpty(responseStr)) {
+            response = jsonToBean(responseStr, GroupNumbersBaoResponse.class);
+        }
+
+        return response;
+    }
+
+    /**
+     * 设置群名称
+     * @param newGroupName
+     * @param groupToken
+     * @param username
+     * @return
+     * @throws HttpException
+     */
+    public Object setGroupName(String  newGroupName,String groupToken, String username) throws HttpException {
+        String url = String.format(BASE_URL + "/group/modify/groupName?groupName=%s&token=%s&username=%s",newGroupName,groupToken, username );
+        RLog.v("modifyPortrait", url);
+        String responseStr = httpManager.post(url);
+        RLog.v("modifyPortrait", responseStr);
+        QuitGroupResponse response = null;
+        if (!TextUtils.isEmpty(responseStr)) {
+            response = jsonToBean(responseStr, QuitGroupResponse.class);
+        }
+
+        return response;
+
+    }
+
+
+    /**
+     * 添加群成员
+     * @param groupToken
+     * @param username
+     * @param startDisList
+     * @return
+     */
+    public Object addGroupMember(String groupToken,String username, List<String> startDisList)throws HttpException  {
+        String url = String.format(BASE_URL + "/group/invitation/batch/request/token?token=%s&username=%s",groupToken, username );
+
+        StringEntity entity = null;
+        try {
+            entity = new StringEntity(BeanTojson(startDisList), ENCODING);
+            entity.setContentType(CONTENT_TYPE);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        HashMap<String,String> maps = new HashMap<>();
+        maps.put("friendname",BeanTojson(startDisList));
+
+        String responseStr = httpManager.post(mContext, url, entity, CONTENT_TYPE);
+        RLog.v("modifyPortrait", responseStr);
+        AddGroupMemberResponse response = null;
+        if (!TextUtils.isEmpty(responseStr)) {
+            response = jsonToBean(responseStr, AddGroupMemberResponse.class);
+        }
+
+        return response;
+    }
+
+    //group/member/kickout?member=sdf&token=dfs&username=sdf
+    public Object deleGroupMember(String groupToken,String username,String kickoutName) throws HttpException {
+
+        String url = String.format(BASE_URL + "/group/member/kickout?member=%s&token=%s&username=%s",kickoutName,groupToken, username );
+        RLog.v("modifyPortrait", url);
+        String responseStr = httpManager.post(url);
+        RLog.v("modifyPortrait", responseStr);
+        DeleteGroupMemberResponse response = null;
+        if (!TextUtils.isEmpty(responseStr)) {
+            response = jsonToBean(responseStr, DeleteGroupMemberResponse.class);
+        }
+        return response;
+    }
 }

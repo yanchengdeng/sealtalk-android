@@ -35,12 +35,32 @@
         </RelativeLayout>
 
         <RelativeLayout
+            android:id="@+id/re_creat_group"
+            android:layout_width="match_parent"
+            android:layout_height="49dp"
+            android:layout_marginLeft="14dp"
+            android:layout_marginRight="18dp"
+            android:background="@color/white">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@drawable/pop_group"
+                android:drawablePadding="10dp"
+                android:gravity="center_vertical"
+                android:text="@string/baojia_create_group"
+                android:textColor="@color/text_color"
+                android:textSize="16sp"/>
+
+
+        </RelativeLayout>
+
+        <RelativeLayout
             android:id="@+id/re_addfriends"
             android:layout_width="match_parent"
             android:layout_height="49dp"
             android:layout_marginLeft="14dp"
             android:layout_marginRight="18dp"
-            android:layout_marginTop="15dp"
             android:background="@color/white">
 
             <TextView

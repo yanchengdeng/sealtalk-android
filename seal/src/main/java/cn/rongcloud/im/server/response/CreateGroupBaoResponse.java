@@ -1,13 +1,14 @@
 package cn.rongcloud.im.server.response;
 
 /**
- * Created by AMing on 16/1/28.
- * Company RongCloud
+ * Created by star1209 on 2018/5/12.
  */
-public class SetGroupNameResponse {
+
+public class CreateGroupBaoResponse {
 
     private int code;
     private String message;
+    private String data;
 
     public int getCode() {
         return code;
@@ -24,4 +25,14 @@ public class SetGroupNameResponse {
     public void setMessage(String message) {
         this.message = message;
     }
+
+    public String getData() {
+        return data;
+    }
+
+    public void setData(String data) {
+        this.data = data;
+    }
+
+
 }

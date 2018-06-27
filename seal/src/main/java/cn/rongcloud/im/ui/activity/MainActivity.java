@@ -59,7 +59,7 @@ public class MainActivity extends FragmentActivity implements
         ViewPager.OnPageChangeListener,
         View.OnClickListener,
         DragPointView.OnDragListencer,
-        IUnReadMessageObserver {
+        IUnReadMessageObserver  {
 
     private final static int VERSION_UPDATE = 38;
     public static ViewPager mViewPager;
@@ -95,6 +95,7 @@ public class MainActivity extends FragmentActivity implements
         mAsyncTaskManager = AsyncTaskManager.getInstance(getApplicationContext());
         isDebug = getSharedPreferences("config", MODE_PRIVATE).getBoolean("isDebug", false);
         boolean flag = getIntent().getBooleanExtra("flag", false);
+
         initViews();
         changeTextViewColor();
         changeSelectedTabState(0);
@@ -105,14 +106,11 @@ public class MainActivity extends FragmentActivity implements
             initVersion();
 
         }
-
     }
 
+
     private void initVersion() {
-
-
         request(VERSION_UPDATE);
-
     }
 
 
@@ -585,6 +583,7 @@ public class MainActivity extends FragmentActivity implements
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         PermissionUtils.onRequestPermissionsResult(this, 101, PERMISSIONS);
     }
+
 
 
 }

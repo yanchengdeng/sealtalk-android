@@ -10,7 +10,7 @@
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="50dp"
         android:src="@drawable/add_group_head" />
 
     <cn.rongcloud.im.server.widget.ClearWriteEditText
@@ -20,10 +20,28 @@
         android:layout_marginBottom="40dp"
         android:layout_marginLeft="35dp"
         android:layout_marginRight="35dp"
-        android:background="@null"
-        android:layout_marginTop="80dp"
+        android:singleLine="true"
+        android:background="@drawable/baojia_conersation_input_bg"
+        android:layout_marginTop="30dp"
         android:gravity="center"
+        android:padding="@dimen/activity_horizontal_margin"
         android:hint="@string/edit_group_name"
+        android:maxLength="10" />
+
+
+
+    <cn.rongcloud.im.server.widget.ClearWriteEditText
+        android:id="@+id/create_group_brief"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_marginBottom="40dp"
+        android:layout_marginLeft="35dp"
+        android:layout_marginRight="35dp"
+        android:background="@drawable/baojia_conersation_input_bg"
+        android:layout_marginTop="30dp"
+        android:gravity="left|top"
+        android:padding="@dimen/activity_horizontal_margin"
+        android:hint="@string/edit_group_brief"
         android:maxLength="10" />
 
     <Button

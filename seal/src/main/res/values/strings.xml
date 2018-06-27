@@ -442,4 +442,6 @@
     <string name="has_complaint_circle">已举报</string>
     <string name="has_like_circle">已点赞</string>
     <string name="has_collect_circle">已收藏</string>
+    <string name="baojia_create_group">创建群聊</string>
+    <string name="edit_group_brief">群简介</string>
 </resources>

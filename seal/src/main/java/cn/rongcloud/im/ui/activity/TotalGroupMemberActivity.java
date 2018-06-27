@@ -22,11 +22,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.rongcloud.im.App;
+import cn.rongcloud.im.SealConst;
 import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.db.Friend;
-import cn.rongcloud.im.db.GroupMember;
+import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.pinyin.CharacterParser;
+import cn.rongcloud.im.server.response.GroupNumbersBaoResponse;
 import cn.rongcloud.im.server.utils.RongGenerate;
+import cn.rongcloud.im.server.widget.LoadDialog;
 import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
 import io.rong.imageloader.core.ImageLoader;
 import io.rong.imlib.model.Conversation;
@@ -38,13 +41,15 @@ import io.rong.imlib.model.UserInfo;
  */
 public class TotalGroupMemberActivity extends BaseActivity {
     private static final int CLICK_CONVERSATION_USER_PORTRAIT = 1;
+    private static final int ALL_GROUP_NUMBERS = 22;
 
-    private List<GroupMember> mGroupMember;
+    private List<GroupNumbersBaoResponse.ResultEntity> mGroupMember;
 
     private ListView mTotalListView;
     private TotalGroupMember adapter;
     private EditText mSearch;
     private String mGroupID;
+    private String mSyncName;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -52,11 +57,14 @@ public class TotalGroupMemberActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_toatl_member);
         setTitle(R.string.total_member);
+
+        mSyncName = getSharedPreferences("config", MODE_PRIVATE).
+                getString(SealConst.BAOJIA_USER_SYNCNAME, "");
         initViews();
         mGroupID = getIntent().getStringExtra("targetId");
-        SealUserInfoManager.getInstance().getGroupMembers(mGroupID, new SealUserInfoManager.ResultCallback<List<GroupMember>>() {
+        /*SealUserInfoManager.getInstance().getGroupMembers(mGroupID, new SealUserInfoManager.ResultCallback<List<GroupNumbersBaoResponse.ResultEntity>>() {
             @Override
-            public void onSuccess(List<GroupMember> groupMembers) {
+            public void onSuccess(List<GroupNumbersBaoResponse.ResultEntity> groupMembers) {
                 mGroupMember = groupMembers;
                 if (mGroupMember != null && mGroupMember.size() > 0) {
                     setTitle(getString(R.string.total_member) + "(" + mGroupMember.size() + ")");
@@ -65,7 +73,7 @@ public class TotalGroupMemberActivity extends BaseActivity {
                     mTotalListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            GroupMember bean = (GroupMember) adapter.getItem(position);
+                            GroupNumbersBaoResponse.ResultEntity bean = (GroupNumbersBaoResponse.ResultEntity) adapter.getItem(position);
                             UserInfo userInfo = new UserInfo(bean.getUserId(), bean.getName(),
                                                              TextUtils.isEmpty(bean.getPortraitUri().toString())
                                                                      ? Uri.parse(RongGenerate.generateDefaultAvatar(bean.getName(), bean.getUserId())) : bean.getPortraitUri());
@@ -101,15 +109,93 @@ public class TotalGroupMemberActivity extends BaseActivity {
 
             }
         });
+*/
+
+        LoadDialog.show(this);
+        request(ALL_GROUP_NUMBERS);
+    }
+
+
+    @Override
+    public Object doInBackground(int requestCode, String id) throws HttpException {
+        switch (requestCode){
+            case ALL_GROUP_NUMBERS:
+                return  mAction.getGroupNumbers(mGroupID,mSyncName);
+        }
+        return super.doInBackground(requestCode, id);
+    }
+
+
+    @Override
+    public void onSuccess(int requestCode, Object result) {
+        switch (requestCode){
+            case ALL_GROUP_NUMBERS:
+                LoadDialog.dismiss(this);
+                GroupNumbersBaoResponse response = (GroupNumbersBaoResponse) result;
+                if (response.getCode() == 100000) {
+                    if (response.getData()!=null && response.getData().size()>0) {
+                        initGroupNumbers(response.getData());
+                    }
+                }
+                break;
+                
+        }
+
+    }
+
+    private void initGroupNumbers(List<GroupNumbersBaoResponse.ResultEntity> groupMembers) {
+        mGroupMember = groupMembers;
+        if (mGroupMember != null && mGroupMember.size() > 0) {
+            setTitle(getString(R.string.total_member) + "(" + mGroupMember.size() + ")");
+            adapter = new TotalGroupMember(mGroupMember, mContext);
+            mTotalListView.setAdapter(adapter);
+            mTotalListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    GroupNumbersBaoResponse.ResultEntity bean = (GroupNumbersBaoResponse.ResultEntity) adapter.getItem(position);
+                    UserInfo userInfo = new UserInfo(bean.getId(), bean.getSyncName(),
+                            TextUtils.isEmpty(bean.getPortrait().toString())
+                                    ? Uri.parse(RongGenerate.generateDefaultAvatar(bean.getUserName(), bean.getId())) : Uri.parse(bean.getPortrait()));
+                    Intent intent = new Intent(mContext, UserDetailActivity.class);
+                    Friend friend = CharacterParser.getInstance().generateFriendFromUserInfo(userInfo);
+                    intent.putExtra("friend", friend);
+                    intent.putExtra("type", CLICK_CONVERSATION_USER_PORTRAIT);
+                    intent.putExtra("conversationType", Conversation.ConversationType.GROUP.getValue());
+                    startActivity(intent);
+                }
+            });
+            mSearch.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    filterData(s.toString());
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onFailure(int requestCode, int state, Object result) {
+        super.onFailure(requestCode, state, result);
+        LoadDialog.dismiss(this);
     }
 
     private void filterData(String s) {
-        List<GroupMember> filterDateList = new ArrayList<>();
+        List<GroupNumbersBaoResponse.ResultEntity> filterDateList = new ArrayList<>();
         if (TextUtils.isEmpty(s)) {
             filterDateList = mGroupMember;
         } else {
-            for (GroupMember groupMember : mGroupMember) {
-                if (groupMember.getDisplayName().contains(s) || groupMember.getName().contains(s)) {
+            for (GroupNumbersBaoResponse.ResultEntity groupMember : mGroupMember) {
+                if (groupMember.getUserName().contains(s)) {
                     filterDateList.add(groupMember);
                 }
             }
@@ -125,14 +211,14 @@ public class TotalGroupMemberActivity extends BaseActivity {
 
     class TotalGroupMember extends BaseAdapter {
 
-        private List<GroupMember> list;
+        private List<GroupNumbersBaoResponse.ResultEntity> list;
 
         private Context context;
 
         private ViewHolder holder;
 
 
-        public TotalGroupMember(List<GroupMember> list, Context mContext) {
+        public TotalGroupMember(List<GroupNumbersBaoResponse.ResultEntity> list, Context mContext) {
             this.list = list;
             this.context = mContext;
         }
@@ -163,20 +249,19 @@ public class TotalGroupMemberActivity extends BaseActivity {
             } else {
                 holder = (ViewHolder) convertView.getTag();
             }
-            GroupMember bean = list.get(position);
-            Friend friend = SealUserInfoManager.getInstance().getFriendByID(bean.getUserId());
+            GroupNumbersBaoResponse.ResultEntity bean = list.get(position);
+            Friend friend = SealUserInfoManager.getInstance().getFriendByID(bean.getId());
             if (friend != null && !TextUtils.isEmpty(friend.getDisplayName())) {
                 holder.title.setText(friend.getDisplayName());
             } else {
-                holder.title.setText(bean.getName());
+                holder.title.setText(bean.getUserName());
             }
-            String portraitUri = SealUserInfoManager.getInstance().getPortraitUri(bean);
-            ImageLoader.getInstance().displayImage(portraitUri, holder.mImageView, App.getOptions());
+            ImageLoader.getInstance().displayImage(bean.getPortrait(), holder.mImageView, App.getOptions());
             return convertView;
         }
 
 
-        public void updateListView(List<GroupMember> list) {
+        public void updateListView(List<GroupNumbersBaoResponse.ResultEntity> list) {
             this.list = list;
             notifyDataSetChanged();
         }

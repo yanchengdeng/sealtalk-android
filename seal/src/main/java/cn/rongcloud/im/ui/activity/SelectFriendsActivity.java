@@ -106,6 +106,7 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
 
     private boolean mIsRelay;
     private Message mRelayMessage;
+    private String mSyncName;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -127,6 +128,8 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
         isDeleteGroupMember = getIntent().getBooleanExtra("isDeleteGroupMember", false);
         mIsRelay = getIntent().getBooleanExtra("relay", false);
         mRelayMessage = getIntent().getParcelableExtra("relay_message");
+        mSyncName = getSharedPreferences("config", MODE_PRIVATE).
+                getString(SealConst.BAOJIA_USER_SYNCNAME, "");
         if (isAddGroupMember || isDeleteGroupMember) {
             initGroupMemberList();
         }
@@ -134,6 +137,7 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
         deleDisList = (ArrayList<UserInfo>) getIntent().getSerializableExtra("DeleteDiscuMember");
 
         mCurrentUsername = getSharedPreferences("config", MODE_PRIVATE).getString(SealConst.SEALTALK_LOGIN_NAME, "");
+
 
         setTitle();
         initView();
@@ -581,9 +585,9 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
     public Object doInBackground(int requestCode, String id) throws HttpException {
         switch (requestCode) {
             case ADD_GROUP_MEMBER:
-                return action.addGroupMember(groupId, startDisList);
+                return mAction.addGroupMember(groupId,mSyncName, startDisList);
             case DELETE_GROUP_MEMBER:
-                return action.deleGroupMember(groupId, startDisList);
+                return mAction.deleGroupMember(groupId,mSyncName, startDisList.get(0));
         }
         return super.doInBackground(requestCode, id);
     }
@@ -593,19 +597,21 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
         if (result != null) {
             switch (requestCode) {
                 case ADD_GROUP_MEMBER:
+                    LoadDialog.dismiss(mContext);
                     AddGroupMemberResponse res = (AddGroupMemberResponse) result;
-                    if (res.getCode() == 200) {
+                    if (res.getCode() == 100000) {
                         Intent data = new Intent();
                         data.putExtra("newAddMember", (Serializable) createGroupList);
                         setResult(101, data);
-                        LoadDialog.dismiss(mContext);
                         NToast.shortToast(mContext, getString(R.string.add_successful));
                         finish();
+                    }else{
+                        NToast.shortToast(mContext, res.getMessage());
                     }
                     break;
                 case DELETE_GROUP_MEMBER:
                     DeleteGroupMemberResponse response = (DeleteGroupMemberResponse) result;
-                    if (response.getCode() == 200) {
+                    if (response.getCode() == 100000) {
                         Intent intent = new Intent();
                         intent.putExtra("deleteMember", (Serializable) createGroupList);
                         setResult(102, intent);
