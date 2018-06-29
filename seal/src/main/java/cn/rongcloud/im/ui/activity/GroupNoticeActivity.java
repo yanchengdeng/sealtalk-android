@@ -1,22 +1,24 @@
 package cn.rongcloud.im.ui.activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
+import com.blankj.utilcode.util.ToastUtils;
 import com.dbcapp.club.R;
 
+import cn.rongcloud.im.SealConst;
+import cn.rongcloud.im.server.network.http.HttpException;
+import cn.rongcloud.im.server.response.FriendInvitationResponse;
 import cn.rongcloud.im.server.widget.DialogWithYesOrNoUtils;
-import io.rong.imkit.emoticon.AndroidEmoji;
 import io.rong.imkit.RongContext;
 import io.rong.imkit.RongIM;
+import io.rong.imkit.emoticon.AndroidEmoji;
 import io.rong.imlib.IRongCallback;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
@@ -26,9 +28,12 @@ import io.rong.message.TextMessage;
 
 @SuppressWarnings("deprecation")
 public class GroupNoticeActivity extends BaseActivity implements View.OnClickListener, TextWatcher {
+    private static final int UPDATE_GROUP_NOTICE = 10;
     EditText mEdit;
     Conversation.ConversationType mConversationType;
     String mTargetId;
+    private String mSyncName;
+    private String content ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +41,12 @@ public class GroupNoticeActivity extends BaseActivity implements View.OnClickLis
         setContentView(R.layout.activity_group_notice);
         mEdit = (EditText) findViewById(R.id.edit_area);
         Intent intent = getIntent();
+        content = getIntent().getStringExtra("content");
+        if (!TextUtils.isEmpty(content)){
+            mEdit.setText(content);
+        }
+        mSyncName = getSharedPreferences("config", MODE_PRIVATE).
+                getString(SealConst.BAOJIA_USER_SYNCNAME, "");
         mConversationType = Conversation.ConversationType.setValue(intent.getIntExtra("conversationType", 0));
         mTargetId = getIntent().getStringExtra("targetId");
         setTitle(R.string.group_announcement);
@@ -97,7 +108,9 @@ public class GroupNoticeActivity extends BaseActivity implements View.OnClickLis
                             }
                         });
 
-                        finish();
+
+                        request(UPDATE_GROUP_NOTICE);
+
                     }
 
                     @Override
@@ -110,8 +123,34 @@ public class GroupNoticeActivity extends BaseActivity implements View.OnClickLis
 
                     }
                 });
+
+
                 break;
         }
+    }
+
+    @Override
+    public Object doInBackground(int requestCode, String id) throws HttpException {
+        if (requestCode==UPDATE_GROUP_NOTICE) {
+            return mAction.updateGroupNotice(mEdit.getText().toString(), mTargetId, mSyncName);
+        }
+        return super.doInBackground(requestCode, id);
+    }
+
+    @Override
+    public void onSuccess(int requestCode, Object result) {
+        FriendInvitationResponse  friendInvitationResponse = (FriendInvitationResponse) result;
+        if (friendInvitationResponse.getCode()==100000){
+            ToastUtils.showShort("修改成功");
+        }
+        finish();
+        super.onSuccess(requestCode, result);
+    }
+
+    @Override
+    public void onFailure(int requestCode, int state, Object result) {
+        super.onFailure(requestCode, state, result);
+        ToastUtils.showShort("修改失败");
     }
 
     @Override

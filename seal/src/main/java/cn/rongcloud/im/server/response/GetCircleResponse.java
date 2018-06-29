@@ -37,7 +37,7 @@ public class GetCircleResponse {
     }
 
     public static class ResultEntity{
-        private long id;
+        private int id;
         private int circleType;
         private String content;
         private List<String> circleImagePath;
@@ -84,11 +84,11 @@ public class GetCircleResponse {
             this.likeCount = likeCount;
         }
 
-        public long getId() {
+        public int getId() {
             return id;
         }
 
-        public void setId(long id) {
+        public void setId(int id) {
             this.id = id;
         }
 

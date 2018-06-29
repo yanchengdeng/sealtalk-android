@@ -13,9 +13,12 @@ import com.facebook.stetho.dumpapp.DumperPlugin;
 import com.facebook.stetho.inspector.database.DefaultDatabaseConnectionProvider;
 import com.facebook.stetho.inspector.protocol.ChromeDevtoolsDomain;
 
+import cn.rongcloud.im.message.TestMessage;
 import cn.rongcloud.im.message.plugins.DeleteAfterReadExtensionModule;
-import cn.rongcloud.im.message.plugins.LocationMessageItemProvider;
 import cn.rongcloud.im.message.plugins.TransferExtensionModule;
+import cn.rongcloud.im.message.provider.ContactNotificationMessageProvider;
+import cn.rongcloud.im.message.provider.GroupNotificationMessageItemProviderDIY;
+import cn.rongcloud.im.message.provider.TestMessageProvider;
 import cn.rongcloud.im.server.utils.NLog;
 import cn.rongcloud.im.stetho.RongDatabaseDriver;
 import cn.rongcloud.im.stetho.RongDatabaseFilesProvider;
@@ -25,6 +28,7 @@ import io.rong.imageloader.core.DisplayImageOptions;
 import io.rong.imageloader.core.display.FadeInBitmapDisplayer;
 import io.rong.imkit.RongExtensionManager;
 import io.rong.imkit.RongIM;
+import io.rong.imkit.widget.provider.RealTimeLocationMessageProvider;
 import io.rong.imlib.ipc.RongExceptionHandler;
 import io.rong.imlib.model.Conversation;
 import io.rong.push.RongPushClient;
@@ -57,6 +61,7 @@ public class App extends MultiDexApplication {
             }
         });
 
+
         if (getApplicationInfo().packageName.equals(getCurProcessName(getApplicationContext()))) {
 
             //            LeakCanary.install(this);//内存泄露检测
@@ -86,15 +91,12 @@ public class App extends MultiDexApplication {
             Thread.setDefaultUncaughtExceptionHandler(new RongExceptionHandler(this));
 
             try {
+                RongIM.registerMessageTemplate(new ContactNotificationMessageProvider());
+                RongIM.registerMessageTemplate(new RealTimeLocationMessageProvider());
+                RongIM.registerMessageType(TestMessage.class);
+                RongIM.registerMessageTemplate(new TestMessageProvider());
+                RongIM.registerMessageTemplate(new GroupNotificationMessageItemProviderDIY());
 //                RongIM.registerMessageTemplate(new TextMessageItemProvider());
-//                RongIM.registerMessageTemplate(new ContactNotificationMessageProvider());
-                //LocationMessageItemProvider
-                //RealTimeLocationMessageProvider   带位置共享的
-                RongIM.registerMessageTemplate(new LocationMessageItemProvider());
-//                RongIM.registerMessageTemplate(new RealTimeLocationMessageProvider());
-                //                                             、   RongIM、.registerMessage、Type(MyTextMessage.class);
-                //                                RongIM.registerMessageType(TestMessage.class);
-                //                                RongIM.registerMessageTemplate(new TestMessageProvider());
 
 
             } catch (Exception e) {

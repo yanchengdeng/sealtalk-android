@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.os.Bundle;
 import android.text.ClipboardManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -31,6 +32,7 @@ import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.pinyin.CharacterParser;
 import cn.rongcloud.im.server.response.ContactNotificationMessageData;
 import cn.rongcloud.im.server.utils.NLog;
+import cn.rongcloud.im.ui.activity.AllowGroupRequestActivity;
 import cn.rongcloud.im.ui.activity.MainActivity;
 import cn.rongcloud.im.ui.activity.NewFriendListActivity;
 import cn.rongcloud.im.ui.activity.SelectFriendsActivity;
@@ -189,8 +191,6 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
         //        RongIMClient.getInstance().setReadReceiptListener(this);
         //        RongIM.getInstance().setSendMessageListener(this);
         //        RongIMClient.getInstance().sendReadReceiptMessage();
-
-
     }
 
 
@@ -261,6 +261,44 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
                 context.startActivity(new Intent(context, NewFriendListActivity.class));
             }
             return true;
+        } else if (messageContent instanceof GroupNotificationMessage) {
+            GroupNotificationMessage groupNotificationMessage = (GroupNotificationMessage) messageContent;
+            NLog.e("onReceived:" + groupNotificationMessage.getMessage());
+
+            if (groupNotificationMessage.getOperation().equals("joinRequest")) {
+                Intent intent = new Intent(context, AllowGroupRequestActivity.class);
+                Bundle bundle= new Bundle();
+                groupNotificationMessage.setOperatorUserId(uiConversation.getConversationTargetId());
+                bundle.putParcelable("data",groupNotificationMessage);
+                intent.putExtras(bundle);
+                context.startActivity(intent);
+                return true;
+            }else if (groupNotificationMessage.getOperation().equals("invitationRequest")){
+                Intent intent = new Intent(context, AllowGroupRequestActivity.class);
+                Bundle bundle= new Bundle();
+                groupNotificationMessage.setOperatorUserId(uiConversation.getConversationTargetId());
+                bundle.putParcelable("data",groupNotificationMessage);
+                intent.putExtras(bundle);
+                context.startActivity(intent);
+                return true;
+            }else if (groupNotificationMessage.getOperation().equals("acceptInvitationGrpRequest")){
+                //好友同意进群
+                return true;
+            }else if (groupNotificationMessage.getOperation().equals("quitGrpRequest")){
+                return true;
+            }else if (groupNotificationMessage.getOperation().equals("dismissGrpRequest")){
+                return true;
+            }else if (groupNotificationMessage.getOperation().equals("quitGrpRequest")){
+                return true;
+            }else if (groupNotificationMessage.getOperation().equals("rejectJoinGrpRequest")){
+                return true;
+            }else if (groupNotificationMessage.getOperation().equals("acceptJoinGrpRequest")){
+                return true;
+            }else if (groupNotificationMessage.getOperation().equals("rejectInvitationGrpRequest")){
+                return true;
+            }else if (groupNotificationMessage.getOperation().equals("acceptInvitationGrpRequest")){
+                return true;
+            }
         }
         return false;
     }
@@ -335,6 +373,7 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
             GroupNotificationMessage groupNotificationMessage = (GroupNotificationMessage) messageContent;
             NLog.e("onReceived:" + groupNotificationMessage.getMessage());
             String groupID = message.getTargetId();
+//            groupID = groupNotificationMessage.getExtra();
             GroupNotificationMessageData data = null;
             try {
                 String currentID = RongIM.getInstance().getCurrentUserId();
@@ -347,11 +386,22 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
                     //创建群组
                     SealUserInfoManager.getInstance().getGroups(groupID);
                     SealUserInfoManager.getInstance().getGroupMember(groupID);
-                } else if (groupNotificationMessage.getOperation().equals("Dismiss")) {
+                    //邀请请求
+                } else if (groupNotificationMessage.getOperation().equals("invitationRequest")) {
+                    BroadcastManager.getInstance(mContext).sendBroadcast(UPDATE_GROUP_MEMBER, groupID);
+                }else if (groupNotificationMessage.getOperation().equals("rejectJoinGrpRequest")) {
+                    BroadcastManager.getInstance(mContext).sendBroadcast(UPDATE_GROUP_MEMBER, groupID);
+                }else if (groupNotificationMessage.getOperation().equals("acceptJoinGrpRequest")) {
+                    BroadcastManager.getInstance(mContext).sendBroadcast(UPDATE_GROUP_MEMBER, groupID);
+                }else if (groupNotificationMessage.getOperation().equals("rejectInvitationGrpRequest")) {
+                    BroadcastManager.getInstance(mContext).sendBroadcast(UPDATE_GROUP_MEMBER, groupID);
+                }else if (groupNotificationMessage.getOperation().equals("acceptInvitationGrpRequest")) {
+                    BroadcastManager.getInstance(mContext).sendBroadcast(UPDATE_GROUP_MEMBER, groupID);
+                } else if (groupNotificationMessage.getOperation().equals("dismissGrpRequest")) {
                     //解散群组
                     hangUpWhenQuitGroup();      //挂断电话
                     handleGroupDismiss(groupID);
-                } else if (groupNotificationMessage.getOperation().equals("Kicked")) {
+                } else if (groupNotificationMessage.getOperation().equals("kickOutGrpRequest")) {
                     //群组踢人
                     if (data != null) {
                         List<String> memberIdList = data.getTargetUserIds();
@@ -378,12 +428,12 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
                         SealUserInfoManager.getInstance().deleteGroupMembers(groupID, kickedUserIDs);
                         BroadcastManager.getInstance(mContext).sendBroadcast(UPDATE_GROUP_MEMBER, groupID);
                     }
-                } else if (groupNotificationMessage.getOperation().equals("Add")) {
+                } else if (groupNotificationMessage.getOperation().equals("joinRequest")) {
                     //群组添加人员
                     SealUserInfoManager.getInstance().getGroups(groupID);
                     SealUserInfoManager.getInstance().getGroupMember(groupID);
                     BroadcastManager.getInstance(mContext).sendBroadcast(UPDATE_GROUP_MEMBER, groupID);
-                } else if (groupNotificationMessage.getOperation().equals("Quit")) {
+                } else if (groupNotificationMessage.getOperation().equals("quitGrpRequest")) {
                     //退出群组
                     if (data != null) {
                         List<String> quitUserIDs = data.getTargetUserIds();
@@ -409,6 +459,8 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
                             RongIM.getInstance().refreshGroupInfoCache(group);
                         }
                     }
+                } else {
+                    BroadcastManager.getInstance(mContext).sendBroadcast(UPDATE_GROUP_MEMBER, groupID);
                 }
             } catch (Exception e) {
                 e.printStackTrace();

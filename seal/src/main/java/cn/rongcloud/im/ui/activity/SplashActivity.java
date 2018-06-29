@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.View;
@@ -33,7 +34,7 @@ import io.rong.imkit.RongIM;
  * Created by AMing on 16/8/5.
  * Company RongCloud
  */
-public class SplashActivity extends Activity  implements OnDataListener {
+public class SplashActivity extends Activity implements OnDataListener {
 
     private Context context;
     private android.os.Handler handler = new android.os.Handler();
@@ -49,6 +50,7 @@ public class SplashActivity extends Activity  implements OnDataListener {
 
     private static final int GET_AD = 30;
     private BaojiaAction mAction;
+    private CountDownTimer countDownTimer;
 
 
     @Override
@@ -61,67 +63,87 @@ public class SplashActivity extends Activity  implements OnDataListener {
         mAction = new BaojiaAction(this);
         ivAd = findViewById(R.id.iv_ad);
 
+        countDownTimer = new CountDownTimer(1000, 3500) {
+            @Override
+            public void onTick(long l) {
+
+            }
+
+            @Override
+            public void onFinish() {
+                SharedPreferences sp = getSharedPreferences("config", MODE_PRIVATE);
+                String cacheToken = sp.getString("loginToken", "");
+                if (!TextUtils.isEmpty(cacheToken)) {
+                    RongIM.connect(cacheToken, SealAppContext.getInstance().getConnectCallback());
+                    goToMain(true);
+                } else {
+                    goToLogin(true);
+                }
+            }
+        };
 
         findViewById(R.id.tv_jump).setOnClickListener(new PerfectClickListener() {
             @Override
             protected void onNoDoubleClick(View v) {
+                if (countDownTimer!=null){
+                    countDownTimer.cancel();
+                    countDownTimer = null;
+                }
                 SharedPreferences sp = getSharedPreferences("config", MODE_PRIVATE);
                 String cacheToken = sp.getString("loginToken", "");
-                mAction.httpManager.cancelRequests(SplashActivity.this,true);
+                mAction.httpManager.cancelRequests(SplashActivity.this, true);
                 if (!TextUtils.isEmpty(cacheToken)) {
                     RongIM.connect(cacheToken, SealAppContext.getInstance().getConnectCallback());
                     goToMain(true);
-                }else{
+                } else {
                     goToLogin(true);
                 }
             }
         });
 
 
-
-        if (!TextUtils.isEmpty(SPUtils.getInstance().getString(CURRENT_AD_URL,""))) {
-            ImageLoader.getInstance().displayImage(SPUtils.getInstance().getString(CURRENT_AD_URL,""),ivAd);
+        if (!TextUtils.isEmpty(SPUtils.getInstance().getString(CURRENT_AD_URL, ""))) {
+            ImageLoader.getInstance().displayImage(SPUtils.getInstance().getString(CURRENT_AD_URL, ""), ivAd);
         }
 
 
         doRequestQeuston();
     }
 
-    private void  doRequestQeuston(){
+    private void doRequestQeuston() {
         PermissionUtils.requestPermissions(SplashActivity.this, 101, PERMISSIONS,
                 new PermissionUtils.OnPermissionListener() {
                     @Override
                     public void onPermissionGranted() {
 
-                        LogUtils.w("dyc","onPermissionGranted");
+                        LogUtils.w("dyc", "onPermissionGranted");
                         request(GET_AD);
                     }
 
                     @Override
                     public void onPermissionDenied(String[] deniedPermissions) {
-                        LogUtils.w("dyc","onPermissionDenied");
+                        LogUtils.w("dyc", "onPermissionDenied");
                     }
 
 
                 }, new PermissionUtils.RationaleHandler() {
                     @Override
                     protected void showRationale() {
-                        LogUtils.w("dyc","showRationale");
+                        LogUtils.w("dyc", "showRationale");
                         requestPermissionsAgain();
                     }
                 });
     }
 
 
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if (grantResults!=null ){
+        if (grantResults != null) {
             boolean isGrant = true;
-            for (Integer grantR:grantResults){
-                if (grantR== -1){
+            for (Integer grantR : grantResults) {
+                if (grantR == -1) {
                     isGrant = false;
                 }
             }
@@ -129,7 +151,7 @@ public class SplashActivity extends Activity  implements OnDataListener {
 //            if (!isGrant){
 //                doRequestQeuston();
 //            }else{
-                request(GET_AD);
+            request(GET_AD);
 //            }
         }
 //        setData();
@@ -145,25 +167,8 @@ public class SplashActivity extends Activity  implements OnDataListener {
     }
 
     private void setData() {
-        SharedPreferences sp = getSharedPreferences("config", MODE_PRIVATE);
-        String cacheToken = sp.getString("loginToken", "");
-        if (!TextUtils.isEmpty(cacheToken)) {
-            RongIM.connect(cacheToken, SealAppContext.getInstance().getConnectCallback());
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    goToMain(true);
-                }
-            }, 2800);
-        } else {
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    goToLogin(true);
+        countDownTimer.start();
 
-                }
-            }, 2800);
-        }
     }
 
 
@@ -189,7 +194,7 @@ public class SplashActivity extends Activity  implements OnDataListener {
 
     @Override
     public Object doInBackground(int requestCode, String parameter) throws HttpException {
-        switch (requestCode){
+        switch (requestCode) {
             case GET_AD:
                 return mAction.getLoadingAd();
         }
@@ -203,9 +208,9 @@ public class SplashActivity extends Activity  implements OnDataListener {
             case GET_AD:
                 AdResponse adResponse = (AdResponse) result;
                 if (adResponse.getCode() == 100000) {
-                    if (adResponse.getData()!=null) {
-                        if (!TextUtils.isEmpty(adResponse.getData().getImagesPath())){
-                            SPUtils.getInstance().put(CURRENT_AD_URL,adResponse.getData().getImagesPath());
+                    if (adResponse.getData() != null) {
+                        if (!TextUtils.isEmpty(adResponse.getData().getImagesPath())) {
+                            SPUtils.getInstance().put(CURRENT_AD_URL, adResponse.getData().getImagesPath());
                         }
                     }
                 }
@@ -217,10 +222,19 @@ public class SplashActivity extends Activity  implements OnDataListener {
 
     @Override
     public void onFailure(int requestCode, int state, Object result) {
-        if (!TextUtils.isEmpty(SPUtils.getInstance().getString(CURRENT_AD_URL,""))) {
-            ImageLoader.getInstance().displayImage(SPUtils.getInstance().getString(CURRENT_AD_URL,""),ivAd);
+        if (!TextUtils.isEmpty(SPUtils.getInstance().getString(CURRENT_AD_URL, ""))) {
+            ImageLoader.getInstance().displayImage(SPUtils.getInstance().getString(CURRENT_AD_URL, ""), ivAd);
         }
         setData();
 
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        if (countDownTimer!=null){
+            countDownTimer.cancel();
+        }
+        super.onDestroy();
     }
 }

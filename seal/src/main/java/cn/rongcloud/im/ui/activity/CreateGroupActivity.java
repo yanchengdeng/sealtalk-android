@@ -43,6 +43,7 @@ import io.rong.imkit.RongIM;
 import io.rong.imkit.emoticon.AndroidEmoji;
 import io.rong.imkit.widget.AsyncImageView;
 import io.rong.imlib.model.Conversation;
+import io.rong.imlib.model.Group;
 
 /**
  * Created by AMing on 16/1/25.
@@ -62,7 +63,6 @@ public class CreateGroupActivity extends BaseActivity implements View.OnClickLis
     private List<String> groupIds = new ArrayList<>();
     private Uri selectUri;
     private UploadManager uploadManager;
-    private String imageUrl;
     private String mSyncName;
     private String mToken;
     private String mImageUrl;
@@ -172,12 +172,16 @@ public class CreateGroupActivity extends BaseActivity implements View.OnClickLis
 //                        mGroupId = createGroupResponse.getResult().getId(); //id == null
 //                        if (TextUtils.isEmpty(imageUrl)) {
                         mGroupId = createGroupResponse.getData();
-                        SealUserInfoManager.getInstance().addGroup(new Groups(mGroupId, mGroupName, imageUrl, String.valueOf(0)));
+                        SealUserInfoManager.getInstance().addGroup(new Groups(mGroupId, mGroupName, mImageUrl, String.valueOf(0)));
                         BroadcastManager.getInstance(mContext).sendBroadcast(REFRESH_GROUP_UI);
                         LoadDialog.dismiss(mContext);
                         NToast.shortToast(mContext, getString(R.string.create_group_success));
+                        if (!TextUtils.isEmpty(mImageUrl)) {
+                            RongIM.getInstance().refreshGroupInfoCache(new Group(mGroupId, mGroupName, Uri.parse(mImageUrl)));
+                        }
                         RongIM.getInstance().startConversation(mContext, Conversation.ConversationType.GROUP, mGroupId, mGroupName);
                         finish();
+
 
 //                        } else {
 //                            if (!TextUtils.isEmpty(mGroupId)) {
@@ -189,7 +193,7 @@ public class CreateGroupActivity extends BaseActivity implements View.OnClickLis
                 case SET_GROUP_PORTRAIT_URI:
                     SetGroupPortraitResponse groupPortraitResponse = (SetGroupPortraitResponse) result;
                     if (groupPortraitResponse.getCode() == 200) {
-                        SealUserInfoManager.getInstance().addGroup(new Groups(mGroupId, mGroupName, imageUrl, String.valueOf(0)));
+                        SealUserInfoManager.getInstance().addGroup(new Groups(mGroupId, mGroupName, mImageUrl, String.valueOf(0)));
                         BroadcastManager.getInstance(mContext).sendBroadcast(REFRESH_GROUP_UI);
                         LoadDialog.dismiss(mContext);
                         NToast.shortToast(mContext, getString(R.string.create_group_success));
@@ -215,18 +219,19 @@ public class CreateGroupActivity extends BaseActivity implements View.OnClickLis
 
     @Override
     public void onFailure(int requestCode, int state, Object result) {
+        LoadDialog.dismiss(mContext);
         switch (requestCode) {
             case CREATE_GROUP:
-                LoadDialog.dismiss(mContext);
                 NToast.shortToast(mContext, getString(R.string.group_create_api_fail));
                 break;
             case GET_QI_NIU_TOKEN:
-                LoadDialog.dismiss(mContext);
                 NToast.shortToast(mContext, getString(R.string.upload_portrait_failed));
                 break;
             case SET_GROUP_PORTRAIT_URI:
-                LoadDialog.dismiss(mContext);
                 NToast.shortToast(mContext, getString(R.string.group_header_api_fail));
+                break;
+            default:
+                NToast.shortToast(mContext, "稍后再试");
                 break;
         }
     }
@@ -302,7 +307,7 @@ public class CreateGroupActivity extends BaseActivity implements View.OnClickLis
                         LoadDialog.dismiss(mContext);
                         if (!TextUtils.isEmpty(mImageUrl)) {
 //                            request(SET_GROUP_PORTRAIT_URI);
-                            ImageLoader.getInstance().displayImage(mImageUrl,asyncImageView);
+                            ImageLoader.getInstance().displayImage(mImageUrl, asyncImageView);
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();

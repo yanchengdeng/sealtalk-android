@@ -26,6 +26,9 @@ public class ConversationListAdapterEx extends ConversationListAdapter {
         if (data != null) {
             if (data.getConversationType().equals(Conversation.ConversationType.DISCUSSION))
                 data.setUnreadType(UIConversation.UnreadRemindType.REMIND_ONLY);
+            if (data.getIconUrl()!=null) {
+                data.setIconUrl(data.getIconUrl());
+            }
         }
         super.bindView(v, position, data);
     }

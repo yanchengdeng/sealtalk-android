@@ -20,7 +20,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bm.library.Info;
 import com.bm.library.PhotoView;
 import com.dbcapp.club.R;
 
@@ -39,6 +38,7 @@ import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.pinyin.CharacterParser;
 import cn.rongcloud.im.server.response.DeleteContactResponse;
 import cn.rongcloud.im.server.response.FriendInvitationResponse;
+import cn.rongcloud.im.server.response.GetCircleResponse;
 import cn.rongcloud.im.server.response.GetFriendInfoByIDResponse;
 import cn.rongcloud.im.server.response.GetUserInfoByIdResponse;
 import cn.rongcloud.im.server.utils.NToast;
@@ -71,6 +71,7 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
     private static final int DELETE_CONTACT = 110;
 
     private static final int SYNC_FRIEND_INFO = 129;
+    private static final int GET_CIRCLE_CIRCLE = 130;
     private ImageView mUserPortrait;
     private TextView mUserNickName;
     private TextView mUserDisplayName;
@@ -86,11 +87,12 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
     private static final int SYN_USER_INFO = 10087;
     private Friend mFriend;
     private String addMessage;
-    private String mGroupName;
+    private String mGroupName, groupid;
     private String mPhoneString;
     private boolean mIsFriendsRelationship;
     private String mSyncName;
 
+    private ImageView ivCircle;
     private int mType;
     private static final int CLICK_CONVERSATION_USER_PORTRAIT = 1;
     private static final int CLICK_CONTACT_FRAGMENT_FRIEND = 2;
@@ -102,9 +104,11 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_detail);
+        ivCircle = findViewById(R.id.iv_circle);
         initView();
         initData();
         initBlackListStatusView();
+        request(GET_CIRCLE_CIRCLE);
     }
 
     private void initView() {
@@ -125,16 +129,19 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
         mUserPhone.setOnClickListener(this);
         mUserPortrait.setOnClickListener(this);
         mIvShow.setOnClickListener(this);
+        findViewById(R.id.ac_ll_circle).setOnClickListener(this);
     }
 
     private void initData() {
         mSyncName = getSharedPreferences("config", MODE_PRIVATE).getString(SealConst.BAOJIA_USER_SYNCNAME, "");
         mType = getIntent().getIntExtra("type", 0);
+
         if (mType == CLICK_CONVERSATION_USER_PORTRAIT) {
             SealAppContext.getInstance().pushActivity(this);
         }
         mGroupName = getIntent().getStringExtra("groupName");
         mFriend = getIntent().getParcelableExtra("friend");
+        groupid = getIntent().getStringExtra("groupid");
 
         if (mFriend != null) {
             if (mFriend.isExitsDisplayName()) {
@@ -357,6 +364,17 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
             case R.id.iv_image_show: //点击头像
                 mLayoutImagebg.setVisibility(View.GONE);
                 break;
+            case R.id.ac_ll_circle:
+                //个人圈圈
+
+
+                Intent intent = new Intent(UserDetailActivity.this, PersonalCircleActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putParcelable("friend",mFriend);
+                intent.putExtras(bundle);
+                startActivity(intent);
+                break;
+
         }
     }
 
@@ -382,13 +400,15 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
     public Object doInBackground(int requestCode, String id) throws HttpException {
         switch (requestCode) {
             case ADD_FRIEND:
-                return action.sendFriendInvitation(mFriend.getUserId(), addMessage);
+                return mAction.sendFriendInvitation(groupid, mFriend.getName());
             case SYN_USER_INFO:
                 return action.getUserInfoById(mFriend.getUserId());
             case SYNC_FRIEND_INFO:
                 return action.getFriendInfoByID(mFriend.getUserId());
             case DELETE_CONTACT:
                 return mAction.deleteContact(mFriend.getUserId(), mSyncName);
+            case GET_CIRCLE_CIRCLE:
+                return mAction.getCircleByUserName(mFriend.getUserId(), mSyncName, 0, 1);
         }
         return super.doInBackground(requestCode, id);
     }
@@ -399,10 +419,12 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
             switch (requestCode) {
                 case ADD_FRIEND:
                     FriendInvitationResponse response = (FriendInvitationResponse) result;
-                    if (response.getCode() == 200) {
-                        LoadDialog.dismiss(mContext);
+                    LoadDialog.dismiss(mContext);
+                    if (response.getCode() == 100000) {
                         NToast.shortToast(mContext, getString(R.string.request_success));
                         this.finish();
+                    } else {
+                        NToast.shortToast(mContext, response.getMessage());
                     }
                     break;
                 case SYN_USER_INFO:
@@ -494,26 +516,39 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
                     break;
                 case DELETE_CONTACT:
                     DeleteContactResponse deleteResponse = (DeleteContactResponse) result;
-                    if (deleteResponse.getCode() == 100000){
+                    if (deleteResponse.getCode() == 100000) {
                         SealUserInfoManager.getInstance().deleteFriend(mFriend);
                         NToast.shortToast(this, "删除成功！");
                         BroadcastManager.getInstance(this).sendBroadcast(SealAppContext.UPDATE_FRIEND);
                         RongIM.getInstance().removeConversation(Conversation.ConversationType.PRIVATE,
                                 mFriend.getUserId(), new RongIMClient.ResultCallback<Boolean>() {
-                            @Override
-                            public void onSuccess(Boolean aBoolean) {
+                                    @Override
+                                    public void onSuccess(Boolean aBoolean) {
 
-                            }
+                                    }
 
-                            @Override
-                            public void onError(RongIMClient.ErrorCode errorCode) {
-                                NToast.shortToast(UserDetailActivity.this, "code: " + errorCode.getMessage());
-                            }
-                        });
+                                    @Override
+                                    public void onError(RongIMClient.ErrorCode errorCode) {
+                                        NToast.shortToast(UserDetailActivity.this, "code: " + errorCode.getMessage());
+                                    }
+                                });
 //                        finish();
                         gotoMain();
-                    }else {
+                    } else {
                         NToast.shortToast(this, deleteResponse.getMessage());
+                    }
+                    break;
+                case GET_CIRCLE_CIRCLE:
+                    GetCircleResponse response11 = (GetCircleResponse) result;
+                    if (response11.getCode() == 100000) {
+                        List<GetCircleResponse.ResultEntity> datas = response11.getData();
+                        if (datas != null && datas.size() > 0) {
+                            if (datas.get(0).getCircleImagePath() != null) {
+                                if (datas.get(0).getCircleImagePath().size() > 0) {
+                                    ImageLoader.getInstance().displayImage(datas.get(0).getCircleImagePath().get(0), ivCircle);
+                                }
+                            }
+                        }
                     }
                     break;
             }
@@ -573,10 +608,10 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
         if (mType == CLICK_CONVERSATION_USER_PORTRAIT) {
             SealAppContext.getInstance().popActivity(this);
         }
-        if (mLayoutImagebg.getVisibility() == View.VISIBLE){
+        if (mLayoutImagebg.getVisibility() == View.VISIBLE) {
             mLayoutImagebg.setVisibility(View.GONE);
             return;
-        }else {
+        } else {
             super.onBackPressed();
         }
     }
@@ -614,7 +649,7 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
                     } else if (userOnlineStatusInfo.getServiceStatus() == 0) {
                         activity.mUserLineStatus.setTextColor(Color.parseColor("#666666"));
                         activity.mUserLineStatus.setText(R.string.offline);
-                    } else if (userOnlineStatusInfo != null){
+                    } else if (userOnlineStatusInfo != null) {
                         switch (userOnlineStatusInfo.getPlatform()) {
                             case Platform_PC:
                                 activity.mUserLineStatus.setText(R.string.pc_online);
@@ -644,19 +679,20 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
         }
     }
 
-    public void deleteContact(View view){
+    public void deleteContact(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("确定要删除吗？");
         builder.setPositiveButton(R.string.baojia_delete_contact_sure, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
                 request(DELETE_CONTACT);
             }
         });
         builder.setNegativeButton(R.string.baojia_delete_contact_cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
+                dialog.dismiss();
             }
         });
 

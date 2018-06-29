@@ -22,9 +22,11 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.dbcapp.club.R;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import cn.rongcloud.im.server.BaojiaAction;
@@ -106,6 +108,29 @@ public class MainActivity extends FragmentActivity implements
             initVersion();
 
         }
+
+//        getGroupConversationList();
+    }
+
+    private void getGroupConversationList() {
+        RongIMClient.getInstance().getConversationList(new RongIMClient.ResultCallback<List<Conversation>>() {
+            public void onSuccess(List<Conversation> conversations) {
+                    List<Conversation> resultConversations = new ArrayList();
+                    if (conversations != null) {
+                        Iterator var3 = conversations.iterator();
+                        while(var3.hasNext()) {
+                            Conversation conversation = (Conversation)var3.next();
+                                resultConversations.add(conversation);
+                        }
+
+                        LogUtils.w("dyc",resultConversations);
+                    }
+            }
+
+            public void onError(RongIMClient.ErrorCode e) {
+
+            }
+        }, new Conversation.ConversationType[]{ Conversation.ConversationType.GROUP});
     }
 
 

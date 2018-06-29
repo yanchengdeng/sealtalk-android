@@ -21,6 +21,7 @@ import cn.rongcloud.im.server.response.CreateGroupBaoResponse;
 import cn.rongcloud.im.server.response.DeleteContactResponse;
 import cn.rongcloud.im.server.response.DeleteGroupMemberResponse;
 import cn.rongcloud.im.server.response.DeleteSelfCircleResponse;
+import cn.rongcloud.im.server.response.FriendInvitationResponse;
 import cn.rongcloud.im.server.response.FriendResponse;
 import cn.rongcloud.im.server.response.GetCircleResponse;
 import cn.rongcloud.im.server.response.GetCustomerListResponse;
@@ -304,6 +305,19 @@ public class BaojiaAction extends BaseAction {
      */
     public GetCircleResponse getCircle(String syncName, long time, int pageSize) throws HttpException {
         String url = String.format(BASE_URL + "/circle/list?pageSize=%d&startTime=%d&username=%s", pageSize, time, syncName);
+        RLog.v("getCircle", url);
+        String responseStr = httpManager.get(url);
+        RLog.v("getCircle", responseStr);
+        GetCircleResponse response = null;
+        if (!TextUtils.isEmpty(responseStr)) {
+            response = jsonToBean(responseStr, GetCircleResponse.class);
+        }
+
+        return response;
+    }
+
+    public GetCircleResponse getCircleByUserName(String assignedName,String syncName, long time, int pageSize) throws HttpException {
+        String url = String.format(BASE_URL + "/circle/assigned/list?assignedName=%s&pageSize=%d&startTime=%d&username=%s", assignedName,pageSize, time, syncName);
         RLog.v("getCircle", url);
         String responseStr = httpManager.get(url);
         RLog.v("getCircle", responseStr);
@@ -606,6 +620,19 @@ public class BaojiaAction extends BaseAction {
     //收藏朋友圈
     public DeleteSelfCircleResponse collectCircle(String syncName, long id) throws HttpException {
         String url = String.format(BASE_URL + "/circle/collect?circle=%d&username=%s", id, syncName);
+        RLog.v("deleteSelfCircle", url);
+        String responseStr = httpManager.post(url);
+        RLog.v("deleteSelfCircle", responseStr);
+        DeleteSelfCircleResponse response = null;
+        if (!TextUtils.isEmpty(responseStr)) {
+            response = jsonToBean(responseStr, DeleteSelfCircleResponse.class);
+        }
+
+        return response;
+    }
+
+    public DeleteSelfCircleResponse cancleCollectCircle(String syncName, long id) throws HttpException {
+        String url = String.format(BASE_URL + "/circle/collect/cancel?circle=%d&username=%s", id, syncName);
         RLog.v("deleteSelfCircle", url);
         String responseStr = httpManager.post(url);
         RLog.v("deleteSelfCircle", responseStr);
@@ -941,6 +968,151 @@ public class BaojiaAction extends BaseAction {
         DeleteGroupMemberResponse response = null;
         if (!TextUtils.isEmpty(responseStr)) {
             response = jsonToBean(responseStr, DeleteGroupMemberResponse.class);
+        }
+        return response;
+    }
+
+    /**
+     * 申请加入群成员
+     * @param token
+     * @param username
+     * @return
+     * @throws HttpException
+     */
+    public Object sendFriendInvitation(String token, String username) throws HttpException{
+        String url = String.format(BASE_URL + "/group/join/request/token?token=%s&username=%s",token, username );
+        RLog.v("modifyPortrait", url);
+        String responseStr = httpManager.post(url);
+        RLog.v("modifyPortrait", responseStr);
+        FriendInvitationResponse response = null;
+        if (!TextUtils.isEmpty(responseStr)) {
+            response = jsonToBean(responseStr, FriendInvitationResponse.class);
+        }
+        return response;
+    }
+
+
+    /**
+     * 接受用户申请入群
+     * @param memberName
+     * @param token
+     * @param username
+     * @return
+     * @throws HttpException
+     */
+    public Object acceptetFriendInvitation(String memberName,String token, String username) throws HttpException{
+        String url = String.format(BASE_URL + "/group/request/accept/token?memberName=%s&token=%s&username=%s",memberName,token, username );
+        RLog.v("modifyPortrait", url);
+        String responseStr = httpManager.post(url);
+        RLog.v("modifyPortrait", responseStr);
+        FriendInvitationResponse response = null;
+        if (!TextUtils.isEmpty(responseStr)) {
+            response = jsonToBean(responseStr, FriendInvitationResponse.class);
+        }
+        return response;
+    }
+
+
+    /**
+     * 拒绝用户申请入群
+     * @param memberName
+     * @param token
+     * @param username
+     * @return
+     * @throws HttpException
+     */
+    public Object refuseFriendInvitation(String memberName,String token, String username) throws HttpException{
+        String url = String.format(BASE_URL + "/group/request/reject/token?memberName=%s&token=%s&username=%s",memberName,token, username );
+        RLog.v("modifyPortrait", url);
+        String responseStr = httpManager.post(url);
+        RLog.v("modifyPortrait", responseStr);
+        FriendInvitationResponse response = null;
+        if (!TextUtils.isEmpty(responseStr)) {
+            response = jsonToBean(responseStr, FriendInvitationResponse.class);
+        }
+        return response;
+    }
+
+
+    /**
+     * 用户接受入群邀请
+     * @param token
+     * @param username
+     * @return
+     * @throws HttpException
+     */
+
+    public Object invitationFriendInvitation(String token, String username) throws HttpException{
+        String url = String.format(BASE_URL + "/group/invitation/accept/token?token=%s&username=%s",token, username );
+        RLog.v("modifyPortrait", url);
+        String responseStr = httpManager.post(url);
+        RLog.v("modifyPortrait", responseStr);
+        FriendInvitationResponse response = null;
+        if (!TextUtils.isEmpty(responseStr)) {
+            response = jsonToBean(responseStr, FriendInvitationResponse.class);
+        }
+        return response;
+    }
+
+
+    /**
+     * 用户拒绝入群邀请
+     * @param token
+     * @param username
+     * @return
+     * @throws HttpException
+     */
+    public Object invitaitonRefuseFriendInvitation(String token, String username) throws HttpException{
+        String url = String.format(BASE_URL + "/group/invitation/reject/token?token=%s&username=%s",token, username );
+        RLog.v("modifyPortrait", url);
+        String responseStr = httpManager.post(url);
+        RLog.v("modifyPortrait", responseStr);
+        FriendInvitationResponse response = null;
+        if (!TextUtils.isEmpty(responseStr)) {
+            response = jsonToBean(responseStr, FriendInvitationResponse.class);
+        }
+        return response;
+    }
+
+
+    /**
+     * 更新群公告
+     * @param info
+     * @param token
+     * @param username
+     * @return
+     * @throws HttpException
+     */
+    public Object updateGroupNotice(String info,String token, String username) throws HttpException{
+        String url = String.format(BASE_URL + "/group/modify/groupIntro?groupIntro=%s&token=%s&username=%s",info,token, username );
+        RLog.v("modifyPortrait", url);
+        String responseStr = httpManager.post(url);
+        RLog.v("modifyPortrait", responseStr);
+        FriendInvitationResponse response = null;
+        if (!TextUtils.isEmpty(responseStr)) {
+            response = jsonToBean(responseStr, FriendInvitationResponse.class);
+        }
+        return response;
+    }
+
+
+
+
+    /**
+     * 群升级
+     * @param token
+     * @param username
+     * @return
+     * @throws HttpException
+     */
+    public Object groupUpdate(String token, String username) throws HttpException{
+        String url = String.format(BASE_URL + "/group/upgrade?token=%s&username=%s",token, username );
+        RLog.v("modifyPortrait", url);
+        String responseStr = httpManager.post(url);
+        RLog.v("modifyPortrait", responseStr);
+        FriendInvitationResponse response = null;
+        if (!TextUtils.isEmpty(responseStr)) {
+            response = jsonToBean(responseStr, FriendInvitationResponse.class);
         }
         return response;
     }

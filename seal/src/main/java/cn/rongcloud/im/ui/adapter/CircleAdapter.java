@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -108,15 +109,25 @@ public class CircleAdapter extends RecyclerView.Adapter {
             circleHolder.adapter.setData(data.getCircleImagePath());
         }
 
-        if (data.getSyncName().equals(mSyncName)){
-            circleHolder.tvDelete.setVisibility(View.VISIBLE);
-        }else {
-            circleHolder.tvDelete.setVisibility(View.GONE);
+        if (!TextUtils.isEmpty(data.getSyncName())) {
+            if (data.getSyncName().equals(mSyncName)) {
+                circleHolder.tvDelete.setVisibility(View.VISIBLE);
+                circleHolder.tvDelete.setClickable(true);
+            } else {
+                circleHolder.tvDelete.setVisibility(View.INVISIBLE);
+                circleHolder.tvDelete.setClickable(false);
+            }
         }
 
         circleHolder.tvLike.setText(""+data.getLikeCount());
         circleHolder.tvComplain.setText(""+data.getComplaintCount());
         circleHolder.tvCollected.setText(""+data.getCollectCount());
+
+        if (data.isCollect()){
+            circleHolder.tvCollected.setCompoundDrawablesWithIntrinsicBounds(context.getResources().getDrawable(R.drawable.icon_collect),null,null,null);
+        }else{
+            circleHolder.tvCollected.setCompoundDrawablesWithIntrinsicBounds(context.getResources().getDrawable(R.drawable.collect_nomal),null,null,null);
+        }
 
         circleHolder.tvLike.setOnClickListener(new PerfectClickListener() {
             @Override
@@ -153,14 +164,14 @@ public class CircleAdapter extends RecyclerView.Adapter {
         circleHolder.tvCollected.setOnClickListener(new PerfectClickListener() {
             @Override
             protected void onNoDoubleClick(View v) {
-                if (getDatas().get(position).isCollect()){
-                    if (context!=null) {
-                        NToast.shortToast(context, R.string.has_collect_circle);
-                    }
-                    return;
-                }
+//                if (getDatas().get(position).isCollect()){
+//                    if (context!=null) {
+//                        NToast.shortToast(context, R.string.has_collect_circle);
+//                    }
+//                    return;
+//                }
                 if (onCollectedClickListerner!=null){
-                    onCollectedClickListerner.onColleced(position);
+                    onCollectedClickListerner.onColleced(getDatas().get(position).isCollect(),position);
                 }
             }
         });
@@ -170,7 +181,7 @@ public class CircleAdapter extends RecyclerView.Adapter {
             public void onClick(View v) {
 
                 if (mOnDeleteListener != null){
-                    mOnDeleteListener.onDelete(data.getId());
+                    mOnDeleteListener.onDelete(position);
                 }
             }
         });
@@ -231,7 +242,7 @@ public class CircleAdapter extends RecyclerView.Adapter {
     }
 
     public interface OnDeleteListener{
-        void onDelete(long id);
+        void onDelete(int id);
     }
 
 
@@ -244,7 +255,7 @@ public class CircleAdapter extends RecyclerView.Adapter {
     }
 
     public interface  OnCollectedClickListerner{
-        void onColleced(int id);
+        void onColleced(boolean isCollected,int id);
     }
 
     public interface OnImageClickListener{

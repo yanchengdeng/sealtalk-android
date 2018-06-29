@@ -8,6 +8,7 @@ public class QRCodeBean {
 
     private int type;
     private String userId;
+    private String groupId;
 
     public int getType() {
         return type;
@@ -23,5 +24,13 @@ public class QRCodeBean {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
     }
 }

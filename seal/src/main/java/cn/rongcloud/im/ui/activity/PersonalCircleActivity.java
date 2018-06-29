@@ -1,7 +1,10 @@
 package cn.rongcloud.im.ui.activity;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -18,27 +21,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.rongcloud.im.SealConst;
+import cn.rongcloud.im.db.Friend;
+import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.network.http.HttpException;
+import cn.rongcloud.im.server.response.DeleteSelfCircleResponse;
 import cn.rongcloud.im.server.response.GetCircleResponse;
+import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.server.widget.LoadDialog;
 import cn.rongcloud.im.ui.adapter.CircleAdapter;
 import cn.rongcloud.im.ui.widget.AutoLoadListView;
 import cn.rongcloud.im.ui.widget.touchgallery.GalleryWidget.GalleryViewPager;
 import cn.rongcloud.im.ui.widget.touchgallery.GalleryWidget.UrlPagerAdapter;
 
-/**
-*
-* Author: 邓言诚  Create at : 2018/6/20  16:18
-* Email: yanchengdeng@gmail.com
-* Describle: 收藏列表
-*/
+public class PersonalCircleActivity extends BaseActivity {
 
-public class CollectionActivity extends BaseActivity {
 
-    private static final int GET_COLLECT = 60;
+    private static final int GET_CIRCLE = 55;
+    private static final int DELETE_CIRCLE = 33;
     private static final int LIKE_CIRCLE = 34;
     private static final int COMPLAIN_CIRCLE = 35;
-    private static final int CANCLE_COLLECTED = 37;
+    private static final int COLLECTED_CIRCLE = 36;
+
+    private static final int PAGE_SIZE = 20;
+    private static final int CANCLE_COLLECTED = 21;
+
     private SwipeRefreshLayout mRefreshLayout;
     private AutoLoadListView mLvCircle;
     private CircleAdapter mCirCleAdapter;
@@ -47,34 +53,56 @@ public class CollectionActivity extends BaseActivity {
     private boolean mIsComplete;
     private String mSyncName;
     private long mRequestTime;
-
+//    private long mDeleteId = -1;
     private GalleryViewPager mGalleryViewPager;
     private FrameLayout mLayoutBg;
     private List<String> mUrls = new ArrayList<>();
     private UrlPagerAdapter mUrlPagerAdapter;
-
-    private Paint mPaint;
-    private static final int PAGE_SIZE = 20;
-
     private int currentActionPosion = -1;//当前操作的行
 
+
+    private Paint mPaint;
+    private Friend friend;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_collections);
+        setContentView(R.layout.activity_personal_circle);
 
-        setTitle(R.string.baojia_collections_title, false);
+
+        setTitle(R.string.baojia_circlr_title, false);
 
         mSyncName = getSharedPreferences("config", MODE_PRIVATE).
                 getString(SealConst.BAOJIA_USER_SYNCNAME, "");
+
+        friend = getIntent().getExtras().getParcelable("friend");
 
         initView();
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mPaint.setColor(getResources().getColor(R.color.baojia_circle_decoration));
         mPaint.setStyle(Paint.Style.FILL);
 
+        BroadcastManager.getInstance(this).addAction(SealConst.BAOJIA_PUBLISH_CIRCLE, new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                mRequestTime = 0;
+                mIsComplete = false;
+                request(GET_CIRCLE);
+            }
+        });
+        request(GET_CIRCLE);
+    }
 
+    private void initView() {
+        mLvCircle = findViewById(R.id.lv_circle);
+        mRefreshLayout = findViewById(R.id.swipe_layout);
+        mGalleryViewPager = findViewById(R.id.gallery_image);
+        mLayoutBg = findViewById(R.id.fl_image_bg);
+        mUrlPagerAdapter = new UrlPagerAdapter(this, mUrls);
+        mGalleryViewPager.setOffscreenPageLimit(3);
+        mGalleryViewPager.setAdapter(mUrlPagerAdapter);
+
+      
         mGalleryViewPager.setOnItemClickListener(new GalleryViewPager.OnItemClickListener() {
             @Override
             public void onItemClicked(View view, int position) {
@@ -86,7 +114,7 @@ public class CollectionActivity extends BaseActivity {
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mLvCircle.setLayoutManager(layoutManager);
-        mCirCleAdapter = new CircleAdapter(CollectionActivity.this,mSyncName);
+        mCirCleAdapter = new CircleAdapter(PersonalCircleActivity.this, mSyncName);
         mLvCircle.setAdapter(mCirCleAdapter);
         mLvCircle.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
@@ -111,28 +139,27 @@ public class CollectionActivity extends BaseActivity {
             }
         });
 
-        //下拉
-        mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        mCirCleAdapter.setOnDeleteListener(new CircleAdapter.OnDeleteListener() {
             @Override
-            public void onRefresh() {
-                if (!mIsRefreshing) {
-                    mIsRefreshing = true;
-                    mRequestTime = 0;
-                    mIsComplete = false;
-                    request(GET_COLLECT);
-                }
-            }
-        });
+            public void onDelete(final int id) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(PersonalCircleActivity.this);
+                builder.setMessage("确定要删除吗？");
+                builder.setPositiveButton(R.string.baojia_delete_contact_sure, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        LoadDialog.show(PersonalCircleActivity.this);
+                        currentActionPosion = id;
+                        request(DELETE_CIRCLE);
+                    }
+                });
+                builder.setNegativeButton(R.string.baojia_delete_contact_cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
 
-        //上拉
-        mLvCircle.setOnloadMore(new AutoLoadListView.OnLoadMoreCallback() {
-            @Override
-            public void onLoadMore() {
-                if (mIsComplete) {
-                    return;
-                }
+                    }
+                });
 
-                request(GET_COLLECT);
+                builder.create().show();
             }
         });
 
@@ -140,7 +167,7 @@ public class CollectionActivity extends BaseActivity {
             @Override
             public void onImageClick(List<String> urls, int position) {
                 if (urls != null) {
-                    UrlPagerAdapter adapter = new UrlPagerAdapter(CollectionActivity.this, urls);
+                    UrlPagerAdapter adapter = new UrlPagerAdapter(PersonalCircleActivity.this, urls);
                     mGalleryViewPager.setAdapter(adapter);
                     mGalleryViewPager.setCurrentItem(position);
                     mLayoutBg.setVisibility(View.VISIBLE);
@@ -148,12 +175,13 @@ public class CollectionActivity extends BaseActivity {
             }
         });
 
+
         //点赞
         mCirCleAdapter.setLikeClickListener(new CircleAdapter.OnLikeClickListerner() {
             @Override
             public void onLike(int id) {
                 currentActionPosion = id;
-                LoadDialog.show(CollectionActivity.this);
+                LoadDialog.show(PersonalCircleActivity.this);
                 request(LIKE_CIRCLE);
             }
         });
@@ -166,45 +194,50 @@ public class CollectionActivity extends BaseActivity {
             }
         });
 
-        //取消收藏
+
+        //收藏
         mCirCleAdapter.setOnCollectedClickListerner(new CircleAdapter.OnCollectedClickListerner() {
             @Override
-            public void onColleced(boolean isCollected, int id) {
-                showCancleCollect(id);
-            }
-        });
-
-        request(GET_COLLECT);
-
-    }
-
-    //取消收藏提示框
-    private void showCancleCollect(final int id) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(CollectionActivity.this);
-        builder.setTitle("");
-        builder.setMessage("确定取消收藏吗?");
-        builder.setNeutralButton("确定", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.dismiss();
+            public void onColleced(boolean isColleced,int id) {
                 currentActionPosion = id;
-                LoadDialog.show(CollectionActivity.this);
-                request(CANCLE_COLLECTED);
+                LoadDialog.show(PersonalCircleActivity.this);
+                if (isColleced){
+                    request(CANCLE_COLLECTED);
+                }else {
+                    request(COLLECTED_CIRCLE);
+                }
 
             }
         });
-        builder.setPositiveButton("取消", new DialogInterface.OnClickListener() {
+
+        //下拉
+        mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.dismiss();
+            public void onRefresh() {
+                if (!mIsRefreshing) {
+                    mIsRefreshing = true;
+                    mRequestTime = 0;
+                    mIsComplete = false;
+                    request(GET_CIRCLE);
+                }
             }
         });
-        builder.create().setCanceledOnTouchOutside(false);
-        builder.create().show();
+
+        //上拉
+        mLvCircle.setOnloadMore(new AutoLoadListView.OnLoadMoreCallback() {
+            @Override
+            public void onLoadMore() {
+                if (mIsComplete) {
+                    return;
+                }
+
+                request(GET_CIRCLE);
+            }
+        });
     }
 
     private void showComplainDialog(final int id) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(CollectionActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(PersonalCircleActivity.this);
         builder.setTitle("");
         builder.setMessage("是否举报这条内容?");
         builder.setNeutralButton("确定", new DialogInterface.OnClickListener() {
@@ -212,7 +245,7 @@ public class CollectionActivity extends BaseActivity {
             public void onClick(DialogInterface dialogInterface, int i) {
                 dialogInterface.dismiss();
                 currentActionPosion = id;
-                LoadDialog.show(CollectionActivity.this);
+                LoadDialog.show(PersonalCircleActivity.this);
                 request(COMPLAIN_CIRCLE);
 
             }
@@ -229,29 +262,25 @@ public class CollectionActivity extends BaseActivity {
 
     }
 
-    private void initView() {
-        mLvCircle = findViewById(R.id.lv_circle);
-        mRefreshLayout = findViewById(R.id.swipe_layout);
-        mGalleryViewPager = findViewById(R.id.gallery_image);
-        mLayoutBg = findViewById(R.id.fl_image_bg);
-        mUrlPagerAdapter = new UrlPagerAdapter(this, mUrls);
-        mGalleryViewPager.setOffscreenPageLimit(3);
-        mGalleryViewPager.setAdapter(mUrlPagerAdapter);
-    }
-
     @Override
     public Object doInBackground(int requestCode, String id) throws HttpException {
         switch (requestCode) {
-            case GET_COLLECT:
-                return mAction.getCollected(mSyncName, mRequestTime, PAGE_SIZE);
+            case GET_CIRCLE:
+                return mAction.getCircleByUserName(friend.getUserId(),mSyncName, mRequestTime, PAGE_SIZE);
+            case DELETE_CIRCLE:
+                return mAction.deleteSelfCircle(mSyncName,  mCirCleAdapter.getDatas().get(currentActionPosion).getId());
             case LIKE_CIRCLE:
-                if (mCirCleAdapter.getDatas()==null){
+                if (mCirCleAdapter.getDatas() == null) {
                     return null;
                 }
-                return mAction.likeCircle(mSyncName,mCirCleAdapter.getDatas().get(currentActionPosion).getId() );
-
+                return mAction.likeCircle(mSyncName, mCirCleAdapter.getDatas().get(currentActionPosion).getId());
+            case COLLECTED_CIRCLE:
+                if (mCirCleAdapter.getDatas() == null) {
+                    return null;
+                }
+                return mAction.collectCircle(mSyncName, mCirCleAdapter.getDatas().get(currentActionPosion).getId());
             case COMPLAIN_CIRCLE:
-                if (mCirCleAdapter.getDatas()==null){
+                if (mCirCleAdapter.getDatas() == null) {
                     return null;
                 }
                 return mAction.complainCircle(mSyncName, mCirCleAdapter.getDatas().get(currentActionPosion).getId());
@@ -267,7 +296,7 @@ public class CollectionActivity extends BaseActivity {
     @Override
     public void onSuccess(int requestCode, Object result) {
         switch (requestCode) {
-            case GET_COLLECT:
+            case GET_CIRCLE:
                 LoadDialog.dismiss(this);
                 GetCircleResponse response = (GetCircleResponse) result;
                 if (response.getCode() == 100000) {
@@ -278,6 +307,12 @@ public class CollectionActivity extends BaseActivity {
                     }
                     mLvCircle.completeLoad();
                     mIsRefreshing = false;
+                    for (GetCircleResponse.ResultEntity items:datas){
+                        items.setSyncName(friend.getUserId());
+                        if (friend.getPortraitUri()!=null) {
+                            items.setPortrait(friend.getPortraitUri().toString());
+                        }
+                    }
 
                     mCirCleAdapter.addData(datas, mRequestTime == 0);
                     if (datas != null && datas.size() > 0) {
@@ -288,41 +323,74 @@ public class CollectionActivity extends BaseActivity {
                     }
                 }
                 break;
+            case DELETE_CIRCLE:
+                DeleteSelfCircleResponse deleteResponse = (DeleteSelfCircleResponse) result;
+                if (deleteResponse.getCode() == 100000) {
+                    mRequestTime = 0;
+                    mIsComplete = false;
+//                    request(GET_CIRCLE);
+                    mCirCleAdapter.getDatas().remove(currentActionPosion);
+                    mCirCleAdapter.notifyItemRemoved(currentActionPosion);
+                    NToast.shortToast(this, R.string.baojia_delete_circle_success);
+                } else {
+                    NToast.shortToast(this, deleteResponse.getMessage());
+                }
+                LoadDialog.dismiss(PersonalCircleActivity.this);
+                break;
             case LIKE_CIRCLE:
-                LoadDialog.dismiss(this);
-//                NToast.shortToast(this, R.string.baojia_delete_circle_success);
-                if (mCirCleAdapter.getDatas()==null) {
-                    return;
-                }
-
-                mCirCleAdapter.getDatas().get((int) currentActionPosion).setLikeCount(mCirCleAdapter.getDatas().get((int) currentActionPosion).getLikeCount()+1);
-                mCirCleAdapter.notifyItemChanged((int) currentActionPosion);
-                mCirCleAdapter.getDatas().get((int) currentActionPosion).setLike(true);
-                break;
-            case COMPLAIN_CIRCLE:
-//                NToast.shortToast(this, R.string.baojia_delete_circle_success);
-                LoadDialog.dismiss(this);
-                if (mCirCleAdapter.getDatas()==null) {
-                    return;
-                }
-                mCirCleAdapter.getDatas().get((int) currentActionPosion).setComplaintCount(mCirCleAdapter.getDatas().get((int) currentActionPosion).getComplaintCount()+1);
-                mCirCleAdapter.notifyItemChanged((int) currentActionPosion);
-                mCirCleAdapter.getDatas().get((int) currentActionPosion).setComplaint(true);
-                break;
-            case CANCLE_COLLECTED:
-                //针对个人收藏 取消收藏 等于删除改行
                 LoadDialog.dismiss(this);
 //                NToast.shortToast(this, R.string.baojia_delete_circle_success);
                 if (mCirCleAdapter.getDatas() == null) {
                     return;
                 }
 
-                mCirCleAdapter.getDatas().remove(currentActionPosion);
-                mCirCleAdapter.notifyItemRemoved(currentActionPosion);
+                mCirCleAdapter.getDatas().get((int) currentActionPosion).setLikeCount(mCirCleAdapter.getDatas().get((int) currentActionPosion).getLikeCount() + 1);
+                mCirCleAdapter.notifyItemChanged((int) currentActionPosion);
+                mCirCleAdapter.getDatas().get((int) currentActionPosion).setLike(true);
+                break;
+            case COLLECTED_CIRCLE:
+                LoadDialog.dismiss(this);
+//                NToast.shortToast(this, R.string.baojia_delete_circle_success);
+                if (mCirCleAdapter.getDatas() == null) {
+                    return;
+                }
 
+                mCirCleAdapter.getDatas().get(currentActionPosion).setCollectCount(mCirCleAdapter.getDatas().get(currentActionPosion).getCollectCount() + 1);
+                mCirCleAdapter.notifyItemChanged((int) currentActionPosion);
+                mCirCleAdapter.getDatas().get((int) currentActionPosion).setCollect(true);
+                break;
+
+            case COMPLAIN_CIRCLE:
+//                NToast.shortToast(this, R.string.baojia_delete_circle_success);
+                LoadDialog.dismiss(this);
+                if (mCirCleAdapter.getDatas() == null) {
+                    return;
+                }
+                mCirCleAdapter.getDatas().get((int) currentActionPosion).setComplaintCount(mCirCleAdapter.getDatas().get((int) currentActionPosion).getComplaintCount() + 1);
+                mCirCleAdapter.notifyItemChanged((int) currentActionPosion);
+                mCirCleAdapter.getDatas().get((int) currentActionPosion).setComplaint(true);
+                break;
+            case CANCLE_COLLECTED:
+                LoadDialog.dismiss(this);
+//                NToast.shortToast(this, R.string.baojia_delete_circle_success);
+                if (mCirCleAdapter.getDatas() == null) {
+                    return;
+                }
+
+                mCirCleAdapter.getDatas().get(currentActionPosion).setCollectCount(mCirCleAdapter.getDatas().get(currentActionPosion).getCollectCount() - 1);
+                mCirCleAdapter.notifyItemChanged((int) currentActionPosion);
+                mCirCleAdapter.getDatas().get((int) currentActionPosion).setCollect(false);
                 break;
         }
+
     }
+
+    @Override
+    public void onFailure(int requestCode, int state, Object result) {
+        super.onFailure(requestCode, state, result);
+        LoadDialog.dismiss(this);
+    }
+
 
 
     @Override
@@ -334,9 +402,5 @@ public class CollectionActivity extends BaseActivity {
         }
     }
 
-    @Override
-    public void onFailure(int requestCode, int state, Object result) {
-        super.onFailure(requestCode, state, result);
-        LoadDialog.dismiss(this);
-    }
+
 }

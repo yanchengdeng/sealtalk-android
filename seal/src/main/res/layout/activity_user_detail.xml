@@ -83,6 +83,35 @@
                 android:visibility="gone" />
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/ac_ll_circle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/btn_list_item_bg"
+            android:clickable="true"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:onClick="setDisplayName">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="14dp"
+                android:text="@string/baojia_circlr_title"
+                android:textColor="#353535"
+                android:textSize="16sp" />
+
+
+            <ImageView
+                android:id="@+id/iv_circle"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin" />
+
+        </LinearLayout>
+
 
         <LinearLayout
             android:id="@+id/ac_ll_note_name"
@@ -145,8 +174,8 @@
                 android:onClick="startVideo"
                 android:text="@string/start_video"
                 android:textColor="#363636"
-                android:visibility="gone"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:visibility="gone" />
 
             <!-- android:background="@drawable/contact_start_video"-->
             <Button
@@ -155,7 +184,7 @@
                 android:layout_marginLeft="14dp"
                 android:layout_marginRight="14dp"
                 android:layout_marginTop="20dp"
-               android:background="@android:color/holo_red_dark"
+                android:background="@android:color/holo_red_dark"
                 android:onClick="deleteContact"
                 android:text="@string/baojia_delete_contact"
                 android:textColor="@android:color/white"
@@ -189,8 +218,7 @@
             android:id="@+id/iv_image_show"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="fitCenter"
-            />
+            android:scaleType="fitCenter" />
 
     </FrameLayout>
 

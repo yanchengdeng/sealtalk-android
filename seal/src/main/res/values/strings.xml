@@ -444,4 +444,16 @@
     <string name="has_collect_circle">已收藏</string>
     <string name="baojia_create_group">创建群聊</string>
     <string name="edit_group_brief">群简介</string>
+    <string name="baojia_qrcode_group">群二维码</string>
+    <string name="refuse">拒&#160;&#160;&#160;绝</string>
+    <string name="mangage_not_agree">管理员拒绝了你的申请入群</string>
+    <string name="mangage_agree_you_join">管理员同意了你的申请入群</string>
+    <string name="friend_request_join_group">有朋友申请加入群组</string>
+    <string name="your_friends_invite_you">你的好友邀请你加入该群组</string>
+    <string name="tickout_from_group">踢出群组成员</string>
+    <string name="members_quit_group">群内成员主动退出群组</string>
+    <string name="friends_refuse_your_request">好友拒绝了你的加群邀请.</string>
+    <string name="friends_agree_your_request">好友同意了你的加群邀请</string>
+    <string name="system_msg">系统消息</string>
+    <string name="group_grade">群等级</string>
 </resources>

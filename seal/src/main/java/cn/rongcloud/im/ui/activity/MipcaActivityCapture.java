@@ -33,6 +33,7 @@ import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.db.Friend;
 import cn.rongcloud.im.model.QRCodeBean;
 import cn.rongcloud.im.server.network.http.HttpException;
+import cn.rongcloud.im.server.response.FriendInvitationResponse;
 import cn.rongcloud.im.server.response.FriendResponse;
 import cn.rongcloud.im.server.response.getAddFriendResponse;
 import cn.rongcloud.im.server.utils.NToast;
@@ -45,6 +46,7 @@ import io.rong.common.RLog;
  */
 public class MipcaActivityCapture extends BaseActivity implements Callback {
 
+    private static final int RQUEST_TO_GROUP = 232;
     private CaptureActivityHandler handler;
     private ViewfinderView viewfinderView;
     private boolean hasSurface;
@@ -66,6 +68,8 @@ public class MipcaActivityCapture extends BaseActivity implements Callback {
     private String friendId = "";
     private String addFriendMessage = "";
     private QRCodeBean bean;
+    private String mSyncName;
+    private String groupToken;
 
     /**
      * Called when the activity is first created.
@@ -74,6 +78,7 @@ public class MipcaActivityCapture extends BaseActivity implements Callback {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_capture);
+        mSyncName = getSharedPreferences("config", MODE_PRIVATE).getString(SealConst.BAOJIA_USER_SYNCNAME, "");
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         } else {
@@ -173,11 +178,16 @@ public class MipcaActivityCapture extends BaseActivity implements Callback {
             try {
                 bean = JsonUtils.objectFromJson(resultString, QRCodeBean.class);
                 userId = getSharedPreferences("config", MODE_PRIVATE).getString(SealConst.SEALTALK_LOGIN_ID, "");
-
                 if (bean != null) {
+                    groupToken = bean.getGroupId();
                     friendId = bean.getUserId();
+                    //申请加入群组
+                    if (bean.getType() == 2) {
+                        request(RQUEST_TO_GROUP);
+                    } else {
 
-                    request(USER_DETAILS);
+                        request(USER_DETAILS);
+                    }
 
                 }
             } catch (Exception e) {
@@ -295,6 +305,8 @@ public class MipcaActivityCapture extends BaseActivity implements Callback {
             case ADD_FRIEND:
 
                 return mAction.addFriend(userId, friendId);
+            case RQUEST_TO_GROUP:
+                return mAction.sendFriendInvitation(groupToken, mSyncName);
         }
         return super.doInBackground(requestCode, id);
     }
@@ -356,6 +368,20 @@ public class MipcaActivityCapture extends BaseActivity implements Callback {
                         LoadDialog.dismiss(mContext);
                     }
                     break;
+                case RQUEST_TO_GROUP:
+                    FriendInvitationResponse friendInvitationResponse = (FriendInvitationResponse) result;
+                    if (friendInvitationResponse.getCode() == 100000) {
+                        NToast.shortToast(mContext, getString(R.string.request_success));
+                        LoadDialog.dismiss(mContext);
+                    } else {
+                        RLog.w("SearchFriendActivity", "请求失败 错误码:" + friendInvitationResponse.getCode());
+                        NToast.shortToast(mContext, friendInvitationResponse.getMessage());
+                        LoadDialog.dismiss(mContext);
+                    }
+                    finish();
+                    break;
+
+
             }
 
             //            finish();
@@ -373,6 +399,11 @@ public class MipcaActivityCapture extends BaseActivity implements Callback {
 
                 NToast.shortToast(mContext, "你们已经是好友");
                 LoadDialog.dismiss(mContext);
+                break;
+            case RQUEST_TO_GROUP:
+                NToast.shortToast(mContext, "扫描失败");
+                LoadDialog.dismiss(mContext);
+                finish();
                 break;
         }
         //        finish();

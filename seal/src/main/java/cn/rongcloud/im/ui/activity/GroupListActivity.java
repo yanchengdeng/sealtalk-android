@@ -143,7 +143,7 @@ public class GroupListActivity extends BaseActivity {
                                 @Override
                                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                                     GroupListBaoResponse.ResultEntity bean = (GroupListBaoResponse.ResultEntity) adapter.getItem(position);
-                                    RongIM.getInstance().startGroupChat(GroupListActivity.this, bean.getId(), bean.getGroupName());
+                                    RongIM.getInstance().startGroupChat(GroupListActivity.this, bean.getGroupToken(), bean.getGroupName());
                                 }
                             });
                             mSearch.addTextChangedListener(new TextWatcher() {

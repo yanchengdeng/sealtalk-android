@@ -49,11 +49,11 @@ public class ContactNotificationMessageProvider extends IContainerItemProvider.M
                     e.printStackTrace();
                 } finally {
                     if (bean != null && !TextUtils.isEmpty(bean.getSourceUserNickname())) {
-                        if (content.getOperation().equals("AcceptResponse")) {
+                        if (content.getOperation().equals("acceptRequest")) {
                             viewHolder.contentTextView.setText(RongContext.getInstance().getResources().getString(R.string.contact_notification_someone_agree_your_request, bean.getSourceUserNickname()));
                         }
                     } else {
-                        if (content.getOperation().equals("AcceptResponse")) {
+                        if (content.getOperation().equals("acceptResponse")) {
                             viewHolder.contentTextView.setText(RongContext.getInstance().getResources().getString(R.string.contact_notification_agree_your_request));
                         }
                     }
@@ -83,17 +83,17 @@ public class ContactNotificationMessageProvider extends IContainerItemProvider.M
                 e.printStackTrace();
             }*/ finally {
                 if (bean != null && !TextUtils.isEmpty(bean.getSourceUserNickname())) {
-                    if (content.getOperation().equals("AcceptResponse")) {
+                    if (content.getOperation().equals("acceptRequest")) {
                         return new SpannableString(bean.getSourceUserNickname() + "已同意你的好友请求");
                     }
                 } else {
-                    if (content.getOperation().equals("AcceptResponse")) {
+                    if (content.getOperation().equals("acceptResponse")) {
                         return new SpannableString("对方已同意你的好友请求");
                     }
                 }
-                if (content.getOperation().equals("Request")) {
+//                if (content.getOperation().equals("Request")) {
                     return new SpannableString(content.getMessage());
-                }
+//                }
             }
         }
         return null;

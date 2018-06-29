@@ -653,7 +653,10 @@
         </provider>
 
         <activity android:name="cn.rongcloud.im.ui.activity.AmapAndGoogleLoactionActivity" />
-        <activity android:name="cn.rongcloud.im.ui.activity.PreGooglMapsLocationActivity"></activity>
+        <activity android:name="cn.rongcloud.im.ui.activity.PreGooglMapsLocationActivity" />
+        <activity android:name="cn.rongcloud.im.ui.activity.QRGroupCodeActivity" />
+        <activity android:name="cn.rongcloud.im.ui.activity.AllowGroupRequestActivity" />
+        <activity android:name="cn.rongcloud.im.ui.activity.PersonalCircleActivity"></activity>
     </application>
 
 </manifest>
