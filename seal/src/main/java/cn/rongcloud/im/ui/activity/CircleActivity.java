@@ -55,7 +55,6 @@ public class CircleActivity extends BaseActivity implements View.OnClickListener
     private boolean mIsComplete;
     private String mSyncName;
     private long mRequestTime;
-    private long mDeleteId = -1;
     private GalleryViewPager mGalleryViewPager;
     private FrameLayout mLayoutBg;
     private List<String> mUrls = new ArrayList<>();
@@ -140,14 +139,14 @@ public class CircleActivity extends BaseActivity implements View.OnClickListener
 
         mCirCleAdapter.setOnDeleteListener(new CircleAdapter.OnDeleteListener() {
             @Override
-            public void onDelete(int id) {
-                mDeleteId = id;
+            public void onDelete(final int id) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(CircleActivity.this);
                 builder.setMessage("确定要删除吗？");
                 builder.setPositiveButton(R.string.baojia_delete_contact_sure, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         LoadDialog.show(CircleActivity.this);
+                        currentActionPosion = id;
                         request(DELETE_CIRCLE);
                     }
                 });
@@ -267,7 +266,7 @@ public class CircleActivity extends BaseActivity implements View.OnClickListener
             case GET_CIRCLE:
                 return mAction.getCircle(mSyncName, mRequestTime, PAGE_SIZE);
             case DELETE_CIRCLE:
-                return mAction.deleteSelfCircle(mSyncName, mDeleteId);
+                return mAction.deleteSelfCircle(mSyncName, mCirCleAdapter.getDatas().get(currentActionPosion).getId());
             case LIKE_CIRCLE:
                 if (mCirCleAdapter.getDatas() == null) {
                     return null;

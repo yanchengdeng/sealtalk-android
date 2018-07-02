@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.dbcapp.club.R;
 
 import org.json.JSONArray;
@@ -144,6 +145,7 @@ public class GroupNotificationMessageItemProviderDIY extends MessageProvider<Gro
                                 }
                                 viewHolder.contentTextView.setText(R.string.tickout_from_group);
                             }
+                            viewHolder.contentTextView.setText(R.string.tickout_from_group);
                         }
                     } else if (operation.equals("Create")) {
                         new GroupNotificationMessageData();
@@ -276,6 +278,7 @@ public class GroupNotificationMessageItemProviderDIY extends MessageProvider<Gro
                         var17.printStackTrace();
                     }
                 } else if (operation.equals("kickOutGrpRequest")) {
+                    spannableStringSummary = new SpannableString(context.getString(R.string.tickout_from_group));
                     if (memberIdList != null) {
                         Iterator var15 = memberIdList.iterator();
 
@@ -346,6 +349,7 @@ public class GroupNotificationMessageItemProviderDIY extends MessageProvider<Gro
     }
 
     public void onItemClick(View view, int i, GroupNotificationMessage groupNotificationMessage, UIMessage uiMessage) {
+        LogUtils.w(uiMessage.getExtra()+uiMessage.getContent());
     }
 
     public void onItemLongClick(View view, int i, GroupNotificationMessage groupNotificationMessage, UIMessage uiMessage) {

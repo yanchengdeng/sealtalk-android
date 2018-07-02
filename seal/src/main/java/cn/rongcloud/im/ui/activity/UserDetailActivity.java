@@ -25,7 +25,6 @@ import com.dbcapp.club.R;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 import cn.rongcloud.im.App;
@@ -38,9 +37,9 @@ import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.pinyin.CharacterParser;
 import cn.rongcloud.im.server.response.DeleteContactResponse;
 import cn.rongcloud.im.server.response.FriendInvitationResponse;
-import cn.rongcloud.im.server.response.GetCircleResponse;
 import cn.rongcloud.im.server.response.GetFriendInfoByIDResponse;
 import cn.rongcloud.im.server.response.GetUserInfoByIdResponse;
+import cn.rongcloud.im.server.response.PersonCenterPicResponse;
 import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.server.utils.RongGenerate;
 import cn.rongcloud.im.server.widget.DialogWithYesOrNoUtils;
@@ -92,7 +91,7 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
     private boolean mIsFriendsRelationship;
     private String mSyncName;
 
-    private ImageView ivCircle;
+    private ImageView ivCircle, ivCircle1, ivCircle2, ivCircle3;
     private int mType;
     private static final int CLICK_CONVERSATION_USER_PORTRAIT = 1;
     private static final int CLICK_CONTACT_FRAGMENT_FRIEND = 2;
@@ -105,6 +104,9 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_detail);
         ivCircle = findViewById(R.id.iv_circle);
+        ivCircle1 = findViewById(R.id.iv_circle1);
+        ivCircle2 = findViewById(R.id.iv_circle2);
+        ivCircle3 = findViewById(R.id.iv_circle3);
         initView();
         initData();
         initBlackListStatusView();
@@ -221,6 +223,7 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
     }
 
     private void initBlackListStatusView() {
+        getHeadRightButton().setVisibility(View.GONE);
         if (mIsFriendsRelationship) {
             Button rightButton = getHeadRightButton();
             rightButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.main_activity_contact_more));
@@ -366,11 +369,12 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
                 break;
             case R.id.ac_ll_circle:
                 //个人圈圈
-
-
+                if (mFriend == null) {
+                    return;
+                }
                 Intent intent = new Intent(UserDetailActivity.this, PersonalCircleActivity.class);
                 Bundle bundle = new Bundle();
-                bundle.putParcelable("friend",mFriend);
+                bundle.putParcelable("friend", mFriend);
                 intent.putExtras(bundle);
                 startActivity(intent);
                 break;
@@ -408,7 +412,7 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
             case DELETE_CONTACT:
                 return mAction.deleteContact(mFriend.getUserId(), mSyncName);
             case GET_CIRCLE_CIRCLE:
-                return mAction.getCircleByUserName(mFriend.getUserId(), mSyncName, 0, 1);
+                return mAction.getCenterByUserName(mFriend.getUserId(), mSyncName);
         }
         return super.doInBackground(requestCode, id);
     }
@@ -539,15 +543,29 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
                     }
                     break;
                 case GET_CIRCLE_CIRCLE:
-                    GetCircleResponse response11 = (GetCircleResponse) result;
+                    PersonCenterPicResponse response11 = (PersonCenterPicResponse) result;
                     if (response11.getCode() == 100000) {
-                        List<GetCircleResponse.ResultEntity> datas = response11.getData();
-                        if (datas != null && datas.size() > 0) {
-                            if (datas.get(0).getCircleImagePath() != null) {
-                                if (datas.get(0).getCircleImagePath().size() > 0) {
-                                    ImageLoader.getInstance().displayImage(datas.get(0).getCircleImagePath().get(0), ivCircle);
-                                }
+                        String[] datas = response11.getData();
+                        if (datas != null && datas.length > 0) {
+                            if (datas.length == 1) {
+                                ImageLoader.getInstance().displayImage(datas[0], ivCircle);
                             }
+                            if (datas.length == 2) {
+                                ImageLoader.getInstance().displayImage(datas[0], ivCircle);
+                                ImageLoader.getInstance().displayImage(datas[1], ivCircle1);
+                            }
+                            if (datas.length == 3) {
+                                ImageLoader.getInstance().displayImage(datas[0], ivCircle);
+                                ImageLoader.getInstance().displayImage(datas[1], ivCircle1);
+                                ImageLoader.getInstance().displayImage(datas[2], ivCircle2);
+                            }
+                            if (datas.length == 4) {
+                                ImageLoader.getInstance().displayImage(datas[0], ivCircle);
+                                ImageLoader.getInstance().displayImage(datas[1], ivCircle1);
+                                ImageLoader.getInstance().displayImage(datas[2], ivCircle2);
+                                ImageLoader.getInstance().displayImage(datas[3], ivCircle3);
+                            }
+
                         }
                     }
                     break;

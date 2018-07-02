@@ -19,6 +19,7 @@ import cn.rongcloud.im.message.plugins.TransferExtensionModule;
 import cn.rongcloud.im.message.provider.ContactNotificationMessageProvider;
 import cn.rongcloud.im.message.provider.GroupNotificationMessageItemProviderDIY;
 import cn.rongcloud.im.message.provider.TestMessageProvider;
+import cn.rongcloud.im.message.provider.TextMessageItemProvider;
 import cn.rongcloud.im.server.utils.NLog;
 import cn.rongcloud.im.stetho.RongDatabaseDriver;
 import cn.rongcloud.im.stetho.RongDatabaseFilesProvider;
@@ -96,7 +97,7 @@ public class App extends MultiDexApplication {
                 RongIM.registerMessageType(TestMessage.class);
                 RongIM.registerMessageTemplate(new TestMessageProvider());
                 RongIM.registerMessageTemplate(new GroupNotificationMessageItemProviderDIY());
-//                RongIM.registerMessageTemplate(new TextMessageItemProvider());
+                RongIM.registerMessageTemplate(new TextMessageItemProvider());
 
 
             } catch (Exception e) {

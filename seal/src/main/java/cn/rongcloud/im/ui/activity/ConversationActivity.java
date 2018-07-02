@@ -20,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.dbcapp.club.R;
 
 import java.util.ArrayList;
@@ -33,6 +34,8 @@ import cn.rongcloud.im.SealConst;
 import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.db.GroupMember;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
+import cn.rongcloud.im.server.network.http.HttpException;
+import cn.rongcloud.im.server.response.GroupDetailBaoResponse;
 import cn.rongcloud.im.server.utils.NLog;
 import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.ui.fragment.ConversationFragmentEx;
@@ -47,6 +50,7 @@ import io.rong.imlib.RongIMClient;
 import io.rong.imlib.TypingMessage.TypingStatus;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.Discussion;
+import io.rong.imlib.model.Group;
 import io.rong.imlib.model.PublicServiceProfile;
 import io.rong.imlib.model.UserInfo;
 import io.rong.message.TextMessage;
@@ -63,6 +67,7 @@ import io.rong.message.VoiceMessage;
  */
 public class ConversationActivity extends BaseActivity implements View.OnClickListener {
 
+    private static final int UPLOAD_GROUPINFO_TO_RONGIM = 20;
     private String TAG = ConversationActivity.class.getSimpleName();
     /**
      * 对方id
@@ -98,6 +103,7 @@ public class ConversationActivity extends BaseActivity implements View.OnClickLi
     private RelativeLayout layout_announce;
     private TextView tv_announce;
     private ImageView iv_arrow;
+    private String mSyncName;
 
     @Override
     @TargetApi(23)
@@ -111,6 +117,8 @@ public class ConversationActivity extends BaseActivity implements View.OnClickLi
         layout_announce.setVisibility(View.GONE);
         tv_announce = (TextView) findViewById(R.id.tv_announce_msg);
 
+        mSyncName = getSharedPreferences("config", MODE_PRIVATE).
+                getString(SealConst.BAOJIA_USER_SYNCNAME, "");
         mRightButton = getHeadRightButton();
 
         Intent intent = getIntent();
@@ -132,6 +140,15 @@ public class ConversationActivity extends BaseActivity implements View.OnClickLi
 
         setActionBarTitle(mConversationType, mTargetId);
 
+
+        String sss = intent.getData().getPath();
+        LogUtils.w("dyc", sss);
+
+        if (!TextUtils.isEmpty(sss)) {
+            if (sss.equals("/conversation/group")) {
+                request(UPLOAD_GROUPINFO_TO_RONGIM);
+            }
+        }
 
         if (mConversationType.equals(Conversation.ConversationType.GROUP)) {
             mRightButton.setBackground(getResources().getDrawable(R.drawable.icon2_menu));
@@ -463,6 +480,31 @@ public class ConversationActivity extends BaseActivity implements View.OnClickLi
 
                     }
                 });
+    }
+
+    @Override
+    public Object doInBackground(int requestCode, String id) throws HttpException {
+        if (requestCode == UPLOAD_GROUPINFO_TO_RONGIM) {
+            return mAction.getGroupInfo(mTargetId, mSyncName);
+        }
+        return super.doInBackground(requestCode, id);
+    }
+
+    @Override
+    public void onSuccess(int requestCode, Object result) {
+        if (requestCode == UPLOAD_GROUPINFO_TO_RONGIM) {
+            GroupDetailBaoResponse response3 = (GroupDetailBaoResponse) result;
+            if (response3.getCode() == 100000) {
+                GroupDetailBaoResponse.ResultEntity bean = response3.getData();
+                RongIM.getInstance().refreshGroupInfoCache(new Group(mTargetId,
+                        bean.getGroupName(), Uri.parse(bean.getGroupIcon())));
+                if (!TextUtils.isEmpty(bean.getGroupName())) {
+                    setTitle(bean.getGroupName());
+//                    setActionBarTitle(mConversationType, bean.getGroupName());
+                }
+            }
+        }
+        super.onSuccess(requestCode, result);
     }
 
     /**

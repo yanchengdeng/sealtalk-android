@@ -1,5 +1,8 @@
 package cn.rongcloud.im.server.response;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.List;
 
 /**
@@ -36,7 +39,7 @@ public class GroupNumbersBaoResponse {
         this.data = data;
     }
 
-    public static class ResultEntity {
+    public static class ResultEntity implements Parcelable{
 
         private String createTime;// 2018-06-26T07;//08;//07.939Z,
         private String createTime1;// 0,
@@ -100,5 +103,47 @@ public class GroupNumbersBaoResponse {
         public void setUserName(String userName) {
             this.userName = userName;
         }
+
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeString(this.createTime);
+            dest.writeString(this.createTime1);
+            dest.writeString(this.id);
+            dest.writeString(this.memberRole);
+            dest.writeString(this.portrait);
+            dest.writeString(this.syncName);
+            dest.writeString(this.userName);
+        }
+
+        public ResultEntity() {
+        }
+
+        protected ResultEntity(Parcel in) {
+            this.createTime = in.readString();
+            this.createTime1 = in.readString();
+            this.id = in.readString();
+            this.memberRole = in.readString();
+            this.portrait = in.readString();
+            this.syncName = in.readString();
+            this.userName = in.readString();
+        }
+
+        public static final Creator<ResultEntity> CREATOR = new Creator<ResultEntity>() {
+            @Override
+            public ResultEntity createFromParcel(Parcel source) {
+                return new ResultEntity(source);
+            }
+
+            @Override
+            public ResultEntity[] newArray(int size) {
+                return new ResultEntity[size];
+            }
+        };
     }
 }

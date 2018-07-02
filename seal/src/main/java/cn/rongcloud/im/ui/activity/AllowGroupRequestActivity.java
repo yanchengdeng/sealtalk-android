@@ -1,5 +1,6 @@
 package cn.rongcloud.im.ui.activity;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -13,10 +14,13 @@ import cn.rongcloud.im.SealConst;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.response.FriendInvitationResponse;
+import cn.rongcloud.im.server.response.GroupDetailBaoResponse;
 import cn.rongcloud.im.server.utils.CommonUtils;
 import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.server.widget.LoadDialog;
 import cn.rongcloud.im.utils.PerfectClickListener;
+import io.rong.imkit.RongIM;
+import io.rong.imlib.model.Group;
 import io.rong.message.GroupNotificationMessage;
 
 /**
@@ -32,6 +36,7 @@ public class AllowGroupRequestActivity extends BaseActivity {
 
     private static final int INVITAION_JOIN_GROUP = 23;
     private static final int INVITATION_REFUSE_JOIN_GROUP = 24;
+    private static final int GET_GROUPINFO_BY_TOKEN = 25;
     private GroupNotificationMessage groupNotificationMessage;
     private TextView tvContent;
     private String groupToken, membersname;
@@ -111,6 +116,8 @@ public class AllowGroupRequestActivity extends BaseActivity {
                 return mAction.invitationFriendInvitation(groupToken, mSyncName);
             case INVITATION_REFUSE_JOIN_GROUP:
                 return mAction.invitaitonRefuseFriendInvitation(groupToken, mSyncName);
+            case GET_GROUPINFO_BY_TOKEN:
+                return mAction.getGroupInfo(groupToken,mSyncName);
         }
         return super.doInBackground(requestCode, id);
     }
@@ -134,22 +141,22 @@ public class AllowGroupRequestActivity extends BaseActivity {
                 FriendInvitationResponse friendInvitationResponse1 = (FriendInvitationResponse) result;
                 if (friendInvitationResponse1.getCode() == 100000) {
                     ToastUtils.showShort(friendInvitationResponse1.getMessage());
+                    request(GET_GROUPINFO_BY_TOKEN);
                 } else {
                     ToastUtils.showShort(friendInvitationResponse1.getMessage());
                 }
                 BroadcastManager.getInstance(mContext).sendBroadcast(SealAppContext.UPDATE_FRIEND);
                 LoadDialog.dismiss(AllowGroupRequestActivity.this);
-                finish();
                 return;
             case INVITAION_JOIN_GROUP:
                 FriendInvitationResponse friendInvitationResponse2 = (FriendInvitationResponse) result;
                 if (friendInvitationResponse2.getCode() == 100000) {
                     ToastUtils.showShort(friendInvitationResponse2.getMessage());
+                    request(GET_GROUPINFO_BY_TOKEN);
                 } else {
                     ToastUtils.showShort(friendInvitationResponse2.getMessage());
                 }
                 LoadDialog.dismiss(AllowGroupRequestActivity.this);
-                finish();
                 return;
             case INVITATION_REFUSE_JOIN_GROUP:
                 FriendInvitationResponse friendInvitationResponse3 = (FriendInvitationResponse) result;
@@ -160,6 +167,16 @@ public class AllowGroupRequestActivity extends BaseActivity {
                 }
                 LoadDialog.dismiss(AllowGroupRequestActivity.this);
                 finish();
+                return;
+            case GET_GROUPINFO_BY_TOKEN:
+                GroupDetailBaoResponse response3 = (GroupDetailBaoResponse) result;
+                if (response3.getCode() == 100000) {
+                    GroupDetailBaoResponse.ResultEntity bean = response3.getData();
+                    RongIM.getInstance().refreshGroupInfoCache(new Group(groupToken, bean.getGroupName(), Uri.parse(bean.getGroupIcon())));
+                    finish();
+                }else{
+                    ToastUtils.showShort(""+response3.getMessage());
+                }
                 return;
         }
         super.onSuccess(requestCode, result);

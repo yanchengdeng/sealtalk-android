@@ -2,6 +2,7 @@ package cn.rongcloud.im.ui.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -38,6 +39,7 @@ import cn.rongcloud.im.server.pinyin.PinyinComparator;
 import cn.rongcloud.im.server.pinyin.SideBar;
 import cn.rongcloud.im.server.response.AddGroupMemberResponse;
 import cn.rongcloud.im.server.response.DeleteGroupMemberResponse;
+import cn.rongcloud.im.server.response.GroupNumbersBaoResponse;
 import cn.rongcloud.im.server.utils.NLog;
 import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.server.widget.DialogWithYesOrNoUtils;
@@ -107,6 +109,7 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
     private boolean mIsRelay;
     private Message mRelayMessage;
     private String mSyncName;
+    private List<GroupNumbersBaoResponse.ResultEntity>   groupNumbers;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -126,6 +129,9 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
         groupId = getIntent().getStringExtra("GroupId");
         isAddGroupMember = getIntent().getBooleanExtra("isAddGroupMember", false);
         isDeleteGroupMember = getIntent().getBooleanExtra("isDeleteGroupMember", false);
+        if (isDeleteGroupMember){
+            groupNumbers = getIntent().getParcelableArrayListExtra("members");
+        }
         mIsRelay = getIntent().getBooleanExtra("relay", false);
         mRelayMessage = getIntent().getParcelableExtra("relay_message");
         mSyncName = getSharedPreferences("config", MODE_PRIVATE).
@@ -344,6 +350,16 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
     }
 
     private void fillSourceDataListForDeleteGroupMember() {
+
+        if (groupNumbers != null && groupNumbers.size() > 0) {
+            for (GroupNumbersBaoResponse.ResultEntity item : groupNumbers) {
+                if (!item.getSyncName().equals(mSyncName)) {
+                    deleteGroupMemberList.add(new GroupMember(item.getSyncName(), item.getUserName(), Uri.parse(item.getPortrait())));
+                }
+            }
+        }
+
+
         if (deleteGroupMemberList != null && deleteGroupMemberList.size() > 0) {
             for (GroupMember deleteMember : deleteGroupMemberList) {
                 if (deleteMember.getUserId().contains(getSharedPreferences("config", MODE_PRIVATE).getString(SealConst.SEALTALK_LOGIN_ID, ""))) {
@@ -358,6 +374,25 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
             updateAdapter();
         }
     }
+
+//
+//       SealUserInfoManager.getInstance().getGroupMembers(groupId, new SealUserInfoManager.ResultCallback<List<GroupMember>>() {
+//            @Override
+//            public void onSuccess(List<GroupMember> groupMembers) {
+//                if (groupMembers!=null && groupMembers.size()>0){
+//                    deleteGroupMemberList = groupMembers;
+//
+//            }
+//
+//            @Override
+//            public void onError(String errString) {
+//
+//            }
+//        });
+
+
+
+
 
 
     //用于存储CheckBox选中状态

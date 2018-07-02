@@ -14,6 +14,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.SPUtils;
@@ -36,6 +37,7 @@ import io.rong.imkit.RongIM;
  */
 public class SplashActivity extends Activity implements OnDataListener {
 
+    private static final String CURRENT_AD_TIME = "current_ad_url";
     private Context context;
     private android.os.Handler handler = new android.os.Handler();
     static public final int REQUEST_CODE_ASK_PERMISSIONS = 101;
@@ -51,6 +53,8 @@ public class SplashActivity extends Activity implements OnDataListener {
     private static final int GET_AD = 30;
     private BaojiaAction mAction;
     private CountDownTimer countDownTimer;
+    private long countTimelong = 5000;
+    private TextView tvJump;
 
 
     @Override
@@ -62,30 +66,20 @@ public class SplashActivity extends Activity implements OnDataListener {
         mAsyncTaskManager = AsyncTaskManager.getInstance(getApplicationContext());
         mAction = new BaojiaAction(this);
         ivAd = findViewById(R.id.iv_ad);
+        tvJump = findViewById(R.id.tv_jump);
 
-        countDownTimer = new CountDownTimer(1000, 3500) {
-            @Override
-            public void onTick(long l) {
 
-            }
+        if (SPUtils.getInstance().getLong(CURRENT_AD_TIME,0)>0){
+            countTimelong = SPUtils.getInstance().getLong(CURRENT_AD_TIME);
+        }
 
-            @Override
-            public void onFinish() {
-                SharedPreferences sp = getSharedPreferences("config", MODE_PRIVATE);
-                String cacheToken = sp.getString("loginToken", "");
-                if (!TextUtils.isEmpty(cacheToken)) {
-                    RongIM.connect(cacheToken, SealAppContext.getInstance().getConnectCallback());
-                    goToMain(true);
-                } else {
-                    goToLogin(true);
-                }
-            }
-        };
+        initCountDown();
+
 
         findViewById(R.id.tv_jump).setOnClickListener(new PerfectClickListener() {
             @Override
             protected void onNoDoubleClick(View v) {
-                if (countDownTimer!=null){
+                if (countDownTimer != null) {
                     countDownTimer.cancel();
                     countDownTimer = null;
                 }
@@ -118,6 +112,7 @@ public class SplashActivity extends Activity implements OnDataListener {
 
                         LogUtils.w("dyc", "onPermissionGranted");
                         request(GET_AD);
+                        setData();
                     }
 
                     @Override
@@ -151,10 +146,10 @@ public class SplashActivity extends Activity implements OnDataListener {
 //            if (!isGrant){
 //                doRequestQeuston();
 //            }else{
-            request(GET_AD);
 //            }
         }
-//        setData();
+        setData();
+        request(GET_AD);
 
 
     }
@@ -168,7 +163,34 @@ public class SplashActivity extends Activity implements OnDataListener {
 
     private void setData() {
         countDownTimer.start();
+        tvJump.setVisibility(View.VISIBLE);
 
+    }
+
+    private void initCountDown() {
+        tvJump.setText(countTimelong/1000+"秒");
+
+        countDownTimer = new CountDownTimer( countTimelong+100,1000) {
+            @Override
+            public void onTick(long l) {
+
+                if (l/1000!=0) {
+                    tvJump.setText(((int) l / 1000) + "秒");
+                }
+            }
+
+            @Override
+            public void onFinish() {
+                SharedPreferences sp = getSharedPreferences("config", MODE_PRIVATE);
+                String cacheToken = sp.getString("loginToken", "");
+                if (!TextUtils.isEmpty(cacheToken)) {
+                    RongIM.connect(cacheToken, SealAppContext.getInstance().getConnectCallback());
+                    goToMain(true);
+                } else {
+                    goToLogin(true);
+                }
+            }
+        };
     }
 
 
@@ -211,10 +233,14 @@ public class SplashActivity extends Activity implements OnDataListener {
                     if (adResponse.getData() != null) {
                         if (!TextUtils.isEmpty(adResponse.getData().getImagesPath())) {
                             SPUtils.getInstance().put(CURRENT_AD_URL, adResponse.getData().getImagesPath());
+//                            ImageLoader.getInstance().displayImage(adResponse.getData().getImagesPath(),ivAd);
+                        }
+                        if (adResponse.getData().getShowTime() > 0) {
+                            countTimelong = adResponse.getData().getShowTime() * 1000;
+                            SPUtils.getInstance().put(CURRENT_AD_TIME,countTimelong);
                         }
                     }
                 }
-                setData();
                 break;
         }
 
@@ -225,14 +251,12 @@ public class SplashActivity extends Activity implements OnDataListener {
         if (!TextUtils.isEmpty(SPUtils.getInstance().getString(CURRENT_AD_URL, ""))) {
             ImageLoader.getInstance().displayImage(SPUtils.getInstance().getString(CURRENT_AD_URL, ""), ivAd);
         }
-        setData();
-
     }
 
 
     @Override
     protected void onDestroy() {
-        if (countDownTimer!=null){
+        if (countDownTimer != null) {
             countDownTimer.cancel();
         }
         super.onDestroy();

@@ -43,12 +43,22 @@ public class AdResponse implements Serializable {
   "password": "string",
   "portrait": "string",
   "remarks": "string",
+  {"data":{"id":1,"imagesPath":"http://7vztps.com1.z0.glb.clouddn.com/FuUXezn8ulpOJN1AQjgd8XvDr0F_","showTime":8},"code":100000,"message":"执行成功."}
   "status": "1",
   "syncName": "string",
   "userName": "string",
   "userPhone": "string"*/
         private int id;
         private String imagesPath;
+        private long showTime;
+
+        public long getShowTime() {
+            return showTime;
+        }
+
+        public void setShowTime(long showTime) {
+            this.showTime = showTime;
+        }
 
         public int getId() {
             return id;

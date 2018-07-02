@@ -21,6 +21,7 @@ import cn.rongcloud.im.server.response.CreateGroupBaoResponse;
 import cn.rongcloud.im.server.response.DeleteContactResponse;
 import cn.rongcloud.im.server.response.DeleteGroupMemberResponse;
 import cn.rongcloud.im.server.response.DeleteSelfCircleResponse;
+import cn.rongcloud.im.server.response.DismissGroupResponse;
 import cn.rongcloud.im.server.response.FriendInvitationResponse;
 import cn.rongcloud.im.server.response.FriendResponse;
 import cn.rongcloud.im.server.response.GetCircleResponse;
@@ -39,6 +40,7 @@ import cn.rongcloud.im.server.response.GroupListBaoResponse;
 import cn.rongcloud.im.server.response.GroupNumbersBaoResponse;
 import cn.rongcloud.im.server.response.ModifyNameResponse;
 import cn.rongcloud.im.server.response.ModifyPortraitResponse;
+import cn.rongcloud.im.server.response.PersonCenterPicResponse;
 import cn.rongcloud.im.server.response.PublishCircleResponse;
 import cn.rongcloud.im.server.response.QuitGroupResponse;
 import cn.rongcloud.im.server.response.SearchContactListResponse;
@@ -316,6 +318,15 @@ public class BaojiaAction extends BaseAction {
         return response;
     }
 
+    /**
+     * 个人圈圈集合
+     * @param assignedName
+     * @param syncName
+     * @param time
+     * @param pageSize
+     * @return
+     * @throws HttpException
+     */
     public GetCircleResponse getCircleByUserName(String assignedName,String syncName, long time, int pageSize) throws HttpException {
         String url = String.format(BASE_URL + "/circle/assigned/list?assignedName=%s&pageSize=%d&startTime=%d&username=%s", assignedName,pageSize, time, syncName);
         RLog.v("getCircle", url);
@@ -328,6 +339,21 @@ public class BaojiaAction extends BaseAction {
 
         return response;
     }
+
+
+    public PersonCenterPicResponse getCenterByUserName(String assignedName, String syncName) throws HttpException {
+        String url = String.format(BASE_URL + "/circle/images?assignedName=%s&username=%s&pageSize=4", assignedName, syncName);
+        RLog.v("getCircle", url);
+        String responseStr = httpManager.get(url);
+        RLog.v("getCircle", responseStr);
+        PersonCenterPicResponse response = null;
+        if (!TextUtils.isEmpty(responseStr)) {
+            response = jsonToBean(responseStr, PersonCenterPicResponse.class);
+        }
+
+        return response;
+    }
+
 
 
     /**
@@ -856,9 +882,9 @@ public class BaojiaAction extends BaseAction {
         RLog.v("modifyPortrait", url);
         String responseStr = httpManager.post(url);
         RLog.v("modifyPortrait", responseStr);
-        GroupDetailBaoResponse response = null;
+        DismissGroupResponse response = null;
         if (!TextUtils.isEmpty(responseStr)) {
-            response = jsonToBean(responseStr, GroupDetailBaoResponse.class);
+            response = jsonToBean(responseStr, DismissGroupResponse.class);
         }
 
         return response;

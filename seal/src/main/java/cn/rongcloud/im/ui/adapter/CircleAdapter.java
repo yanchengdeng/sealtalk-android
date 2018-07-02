@@ -30,6 +30,7 @@ import io.rong.imageloader.core.ImageLoader;
 
 public class CircleAdapter extends RecyclerView.Adapter {
 
+    private  String displayname;
     private List<GetCircleResponse.ResultEntity> mDatas = new ArrayList<>();
     private String mSyncName;
     private OnDeleteListener mOnDeleteListener;
@@ -45,6 +46,13 @@ public class CircleAdapter extends RecyclerView.Adapter {
     public CircleAdapter(Activity context, String mSyncName) {
         this.mSyncName = mSyncName;
         this.context = context;
+
+    }
+
+    public CircleAdapter(Activity context, String mSyncName,String displayName) {
+        this.mSyncName = mSyncName;
+        this.context = context;
+        this.displayname = displayName;
 
     }
 
@@ -101,7 +109,7 @@ public class CircleAdapter extends RecyclerView.Adapter {
         ImageLoader.getInstance().displayImage(data.getPortrait(), circleHolder.ivPortrait, App.getOptions());
         circleHolder.tvContent.setText(data.getContent());
         circleHolder.tvTime.setText(CommonUtils.longToDate(data.getPublishTime(), "yyyy-MM-dd HH:mm"));
-        circleHolder.tvName.setText(data.getUserName());
+        circleHolder.tvName.setText(TextUtils.isEmpty(data.getUserName())?(TextUtils.isEmpty(displayname)?mSyncName:displayname):data.getUserName());
         if (data.getCircleImagePath() == null || data.getCircleImagePath().size() == 0){
             circleHolder.lvPhotos.setVisibility(View.GONE);
         }else {

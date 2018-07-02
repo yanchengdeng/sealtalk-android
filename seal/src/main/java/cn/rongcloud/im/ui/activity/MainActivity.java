@@ -109,7 +109,7 @@ public class MainActivity extends FragmentActivity implements
 
         }
 
-//        getGroupConversationList();
+        getGroupConversationList();
     }
 
     private void getGroupConversationList() {

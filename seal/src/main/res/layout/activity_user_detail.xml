@@ -106,9 +106,24 @@
 
             <ImageView
                 android:id="@+id/iv_circle"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
                 android:layout_marginLeft="@dimen/activity_horizontal_margin" />
+            <ImageView
+                android:id="@+id/iv_circle1"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginLeft="10dp" />
+            <ImageView
+                android:id="@+id/iv_circle2"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginLeft="10dp" />
+            <ImageView
+                android:id="@+id/iv_circle3"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginLeft="10dp" />
 
         </LinearLayout>
 

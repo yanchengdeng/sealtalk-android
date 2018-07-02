@@ -114,7 +114,7 @@ public class PersonalCircleActivity extends BaseActivity {
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mLvCircle.setLayoutManager(layoutManager);
-        mCirCleAdapter = new CircleAdapter(PersonalCircleActivity.this, mSyncName);
+        mCirCleAdapter = new CircleAdapter(PersonalCircleActivity.this, mSyncName,friend.getDisplayName());
         mLvCircle.setAdapter(mCirCleAdapter);
         mLvCircle.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
