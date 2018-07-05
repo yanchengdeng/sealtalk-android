@@ -275,6 +275,23 @@ public class BaojiaAction extends BaseAction {
 
     }
 
+
+    public AgreeFriendResponse refuseFriend(String user, String friend) throws HttpException {
+        String url = String.format(BASE_URL + "/friend/reject?friendname=%s&username=%s", friend, user);
+        RLog.v("agreeFriend", url);
+        String responseStr = httpManager.get(url);
+        RLog.v("agreeFriend", responseStr);
+        AgreeFriendResponse response = null;
+        if (!TextUtils.isEmpty(responseStr)) {
+            response = jsonToBean(responseStr, AgreeFriendResponse.class);
+        }
+
+        return response;
+
+    }
+
+
+
     /**
      * 修改昵称
      *

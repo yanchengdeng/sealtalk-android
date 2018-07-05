@@ -32,6 +32,7 @@ public class NewFriendListAdapter extends BaseAdapters {
             holder.mMessage = (TextView) convertView.findViewById(R.id.ship_message);
             holder.mHead = (SelectableRoundedImageView) convertView.findViewById(R.id.new_header);
             holder.mState = (TextView) convertView.findViewById(R.id.ship_state);
+            holder.mRefuseState = convertView.findViewById(R.id.ship_state_refuse);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
@@ -55,6 +56,15 @@ public class NewFriendListAdapter extends BaseAdapters {
             }
         });
 
+        holder.mRefuseState.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (onItemButtonRefuseClick != null) {
+                    onItemButtonRefuseClick.onButtonRefuseClick(position, v, bean.getStatus());
+                }
+            }
+        });
+
         return convertView;
     }
 
@@ -69,20 +79,33 @@ public class NewFriendListAdapter extends BaseAdapters {
     class ViewHolder {
         SelectableRoundedImageView mHead;
         TextView mName;
-        TextView mState;
+        TextView mState,mRefuseState;
         //        TextView mtime;
         TextView mMessage;
     }
 
     OnItemButtonClick mOnItemButtonClick;
 
+    OnItemButtonRefuseClick onItemButtonRefuseClick;
+
 
     public void setOnItemButtonClick(OnItemButtonClick onItemButtonClick) {
         this.mOnItemButtonClick = onItemButtonClick;
     }
 
+
+    public void setOnItemButtonRefuseClick(OnItemButtonRefuseClick onItemButtonClick) {
+        this.onItemButtonRefuseClick = onItemButtonClick;
+    }
+
     public interface OnItemButtonClick {
         boolean onButtonClick(int position, View view, int status);
+
+    }
+
+
+    public interface OnItemButtonRefuseClick {
+        boolean onButtonRefuseClick(int position, View view, int status);
 
     }
 }

@@ -50,6 +50,21 @@
 
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/ship_state_refuse"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginRight="14dp"
+        android:paddingBottom="5dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="5dp"
+        android:text="@string/refuse"
+        android:background="@drawable/baojia_newfriend_accept_bg"
+        android:textColor="#ff0000"
+        android:textSize="14sp" />
+
 
     <TextView
         android:id="@+id/ship_state"
@@ -62,7 +77,7 @@
         android:paddingRight="10dp"
         android:paddingTop="5dp"
         android:text="@string/agree"
-        android:background="@drawable/baojia_newfriend_accept_bg"
+        android:background="@drawable/baojia_publish_add_photo_bg"
         android:textColor="#999999"
         android:textSize="14sp" />
 

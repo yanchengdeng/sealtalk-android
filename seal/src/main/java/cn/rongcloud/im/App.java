@@ -67,7 +67,7 @@ public class App extends MultiDexApplication {
 
             //            LeakCanary.install(this);//内存泄露检测
             RongPushClient.registerHWPush(this);
-            RongPushClient.registerMiPush(this, "2882303761517817929", "5571781787929");
+            RongPushClient.registerMiPush(this, "2882303761517833668", "5211783353668");
             try {
                 RongPushClient.registerFCM(this);
             } catch (RongException e) {

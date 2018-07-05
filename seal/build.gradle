@@ -75,8 +75,8 @@ dependencies {
     compile 'com.google.code.gson:gson:2.8.2'
     compile 'com.bm.photoview:library:1.4.1'
     implementation 'com.blankj:utilcode:1.16.4'
-    compile 'com.amap.api:3dmap:latest.integration'
-    compile 'com.amap.api:location:latest.integration'
+    compile 'com.amap.api:3dmap:6.3.0'
+    compile 'com.amap.api:location:4.1.0'
     implementation 'com.google.android.gms:play-services-maps:11.6.2'
 
 }

@@ -59,4 +59,8 @@
     <color name="possible_result_points">#c0ffff00</color>
     <color name="possible_blue">#0580FE</color>
     <color name="province_line_border">#C7C7C7</color>
+    <color name="rc_map_list_text_color">#666666</color>
+    <color name="rc_map_list_divider_color">#cccccc</color>
+    <color name="rc_map_list_text_grey_color">#C7C7C7</color>
+
 </resources>

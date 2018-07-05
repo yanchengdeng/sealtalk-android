@@ -124,6 +124,7 @@
     <string name="chatroom3">聊天室 III</string>
     <string name="chatroom4">聊天室 IV</string>
     <string name="agreed_friend">已同意好友关系</string>
+    <string name="reject_friend">已拒绝好友关系</string>
     <string name="agree">接&#160;&#160;&#160;受</string>
     <string name="request">已请求</string>
     <string name="ignore">已忽略</string>

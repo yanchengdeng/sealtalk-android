@@ -243,4 +243,5 @@
     <string name="rc_cs_leave_message">留言</string>
     <string name="rc_cs_submit_message">提交留言</string>
     <string name="rc_cs_message_submited">您的留言已提交</string>
+    <string name="rc_plugin_location_mix">混合地图</string>
 </resources>

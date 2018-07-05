@@ -30,11 +30,12 @@ import cn.rongcloud.im.server.widget.LoadDialog;
 import cn.rongcloud.im.ui.adapter.NewFriendListAdapter;
 
 
-public class NewFriendListActivity extends BaseActivity implements NewFriendListAdapter.OnItemButtonClick, View.OnClickListener {
+public class NewFriendListActivity extends BaseActivity implements NewFriendListAdapter.OnItemButtonClick,NewFriendListAdapter.OnItemButtonRefuseClick, View.OnClickListener {
 
     private static final int GET_ALL = 11;
     private static final int AGREE_FRIENDS = 12;
     public static final int FRIEND_LIST_REQUEST_CODE = 1001;
+    private static final int REUFSE_FRIENDS = 13;
 
     private ListView shipListView;
     private NewFriendListAdapter adapter;
@@ -77,6 +78,8 @@ public class NewFriendListActivity extends BaseActivity implements NewFriendList
                 return mAction.getRaletionFriend(mSyncName, mRequestTime);
             case AGREE_FRIENDS:
                 return mAction.agreeFriend(mSyncName, mFriendSync);
+            case REUFSE_FRIENDS:
+                return mAction.refuseFriend(mSyncName,mFriendSync);
         }
         return super.doInBackground(requestCode, id);
     }
@@ -114,6 +117,7 @@ public class NewFriendListActivity extends BaseActivity implements NewFriendList
 
                     adapter.notifyDataSetChanged();
                     adapter.setOnItemButtonClick(this);
+                    adapter.setOnItemButtonRefuseClick(this);
                     LoadDialog.dismiss(mContext);
                     break;
                 case AGREE_FRIENDS:
@@ -133,6 +137,31 @@ public class NewFriendListActivity extends BaseActivity implements NewFriendList
                     NToast.shortToast(mContext, R.string.agreed_friend);
                     LoadDialog.dismiss(mContext);
                     BroadcastManager.getInstance(mContext).sendBroadcast(SealAppContext.UPDATE_FRIEND);
+                    userRelationshipResponse.getData().remove(index);
+                    adapter.setDataSet(userRelationshipResponse.getData());
+                    adapter.notifyDataSetChanged();
+                    request(GET_ALL); //刷新 UI 按钮
+                    break;
+                case REUFSE_FRIENDS:
+                    GetRelationFriendResponse.ResultEntity bean1 = userRelationshipResponse.getData().get(index);
+                    SealUserInfoManager.getInstance().deleteFriend(new Friend(bean1.getSyncName(),
+                            bean1.getUserName(),
+                            Uri.parse(bean1.getPortrait() + ""),
+                            bean1.getUserName(),
+                            String.valueOf(bean1.getStatus()),
+                            null,
+                            null,
+                            null,
+                            CharacterParser.getInstance().getSpelling(bean1.getUserName()),
+                            CharacterParser.getInstance().getSpelling(bean1.getUserName())));
+
+                    // 通知好友列表刷新数据
+                    NToast.shortToast(mContext, R.string.reject_friend);
+                    LoadDialog.dismiss(mContext);
+                    BroadcastManager.getInstance(mContext).sendBroadcast(SealAppContext.UPDATE_FRIEND);
+                    userRelationshipResponse.getData().remove(index);
+                    adapter.setDataSet(userRelationshipResponse.getData());
+                    adapter.notifyDataSetChanged();
                     request(GET_ALL); //刷新 UI 按钮
                     break;
             }
@@ -168,9 +197,12 @@ public class NewFriendListActivity extends BaseActivity implements NewFriendList
             NToast.shortToast(mContext, R.string.check_network);
             return false;
         }
-        LoadDialog.show(mContext);
-        mFriendSync = userRelationshipResponse.getData().get(position).getSyncName();
-        request(AGREE_FRIENDS);
+
+        if (position<userRelationshipResponse.getData().size()) {
+            LoadDialog.show(mContext);
+            mFriendSync = userRelationshipResponse.getData().get(position).getSyncName();
+            request(AGREE_FRIENDS);
+        }
         return false;
     }
 
@@ -191,5 +223,21 @@ public class NewFriendListActivity extends BaseActivity implements NewFriendList
     public void onClick(View v) {
         Intent intent = new Intent(NewFriendListActivity.this, SearchFriendActivity.class);
         startActivityForResult(intent, FRIEND_LIST_REQUEST_CODE);
+    }
+
+    @Override
+    public boolean onButtonRefuseClick(int position, View view, int status) {
+        index = position;
+        if (!CommonUtils.isNetworkConnected(mContext)) {
+            NToast.shortToast(mContext, R.string.check_network);
+            return false;
+        }
+
+        if (position<userRelationshipResponse.getData().size()) {
+            LoadDialog.show(mContext);
+            mFriendSync = userRelationshipResponse.getData().get(position).getSyncName();
+            request(REUFSE_FRIENDS);
+        }
+        return false;
     }
 }
