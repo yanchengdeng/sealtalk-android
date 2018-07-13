@@ -110,7 +110,6 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
         initView();
         initData();
         initBlackListStatusView();
-        request(GET_CIRCLE_CIRCLE);
     }
 
     private void initView() {
@@ -216,9 +215,13 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
         if (mIsFriendsRelationship) {
             String userId = mFriend.getUserId();
             mFriend = SealUserInfoManager.getInstance().getFriendByID(userId);
-            request(SYNC_FRIEND_INFO, true);
+            request(SYN_USER_INFO, true);
+            request(GET_CIRCLE_CIRCLE);
         } else {
             request(SYN_USER_INFO, true);
+            findViewById(R.id.ac_ll_circle).setVisibility(View.GONE);
+            mUserNickName.setVisibility(View.GONE);
+            mUserPhone.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -406,7 +409,7 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
             case ADD_FRIEND:
                 return mAction.sendFriendInvitation(groupid, mFriend.getName());
             case SYN_USER_INFO:
-                return action.getUserInfoById(mFriend.getUserId());
+                return mAction.userDetail( mSyncName,mFriend.getUserId());
             case SYNC_FRIEND_INFO:
                 return action.getFriendInfoByID(mFriend.getUserId());
             case DELETE_CONTACT:

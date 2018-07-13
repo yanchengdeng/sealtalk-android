@@ -2,6 +2,7 @@ package cn.rongcloud.im.ui.adapter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -19,6 +20,7 @@ import java.util.List;
 import cn.rongcloud.im.App;
 import cn.rongcloud.im.server.response.GetCircleResponse;
 import cn.rongcloud.im.server.utils.NToast;
+import cn.rongcloud.im.ui.activity.CircleUserDetailActivity;
 import cn.rongcloud.im.ui.widget.linkpreview.GridItemDecoration;
 import cn.rongcloud.im.utils.CommonUtils;
 import cn.rongcloud.im.utils.PerfectClickListener;
@@ -153,6 +155,18 @@ public class CircleAdapter extends RecyclerView.Adapter {
             }
         });
 
+
+
+        circleHolder.ivPortrait.setOnClickListener(new PerfectClickListener() {
+            @Override
+            protected void onNoDoubleClick(View v) {
+                Intent intent = new Intent(context, CircleUserDetailActivity.class);
+                intent.putExtra("name",TextUtils.isEmpty(data.getUserName())?displayname:data.getUserName());
+                intent.putExtra("icon",data.getPortrait());
+                context.startActivity(intent);
+            }
+        });
+
         circleHolder.tvComplain.setOnClickListener(new PerfectClickListener() {
             @Override
             public void onNoDoubleClick(View view) {
@@ -190,6 +204,7 @@ public class CircleAdapter extends RecyclerView.Adapter {
 
                 if (mOnDeleteListener != null){
                     mOnDeleteListener.onDelete(position);
+
                 }
             }
         });

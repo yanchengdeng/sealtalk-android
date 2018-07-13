@@ -21,6 +21,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.dbcapp.club.R;
 import com.qiniu.android.http.ResponseInfo;
 import com.qiniu.android.storage.UpCompletionHandler;
@@ -342,8 +343,11 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
     }
 
     private void displayImage(String imagePath) {
-        mFiles.add(new File(imagePath));
-        mPublishImageAdapter.addData(imagePath);
+        File file = new File(imagePath);
+        if (file!=null && file.length()>0) {
+            mFiles.add(new File(imagePath));
+            mPublishImageAdapter.addData(imagePath);
+        }
     }
 
     private String getImagePath(Uri uri, String selection) {

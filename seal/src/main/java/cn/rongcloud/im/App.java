@@ -41,6 +41,9 @@ public class App extends MultiDexApplication {
 
     private static DisplayImageOptions options;
 
+    //TODO  每次打包记得更改设置时间：APP.PACKAGE_TIME
+    public static String  PACKAGE_TIME = "2018-07-13 03:30";
+
     @Override
     public void onCreate() {
 
@@ -68,6 +71,7 @@ public class App extends MultiDexApplication {
             //            LeakCanary.install(this);//内存泄露检测
             RongPushClient.registerHWPush(this);
             RongPushClient.registerMiPush(this, "2882303761517833668", "5211783353668");
+            RongPushClient.registerMZPush(this,"ab602b5f143847efa549ac807c44cbfe","1a393ea2810c47bca0ea0cc3f7bf474d");
             try {
                 RongPushClient.registerFCM(this);
             } catch (RongException e) {

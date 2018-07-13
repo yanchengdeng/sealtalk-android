@@ -19,6 +19,7 @@ import cn.rongcloud.im.server.response.GetPlatformAmmountResponse;
 import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.server.widget.LoadDialog;
 import cn.rongcloud.im.utils.CommonUtils;
+import cn.rongcloud.im.utils.PerfectClickListener;
 
 /**
  * Created by star1209 on 2018/5/16.
@@ -54,6 +55,13 @@ public class MineWalletActivity extends BaseActivity {
         initView();
         LoadDialog.show(this);
         request(REQUEST_AMMOUNT);
+
+        findViewById(R.id.btn_recharge_history).setOnClickListener(new PerfectClickListener() {
+            @Override
+            protected void onNoDoubleClick(View v) {
+                startActivity(new Intent(MineWalletActivity.this,AcountHistoryActivity.class));
+            }
+        });
     }
 
     private void initView() {

@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.net.Uri;
-import android.os.Bundle;
 import android.text.ClipboardManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -32,10 +31,9 @@ import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.pinyin.CharacterParser;
 import cn.rongcloud.im.server.response.ContactNotificationMessageData;
 import cn.rongcloud.im.server.utils.NLog;
-import cn.rongcloud.im.ui.activity.AllowGroupRequestActivity;
 import cn.rongcloud.im.ui.activity.MainActivity;
-import cn.rongcloud.im.ui.activity.NewFriendListActivity;
 import cn.rongcloud.im.ui.activity.SelectFriendsActivity;
+import cn.rongcloud.im.ui.activity.SubConversationListActivity;
 import cn.rongcloud.im.ui.activity.UserDetailActivity;
 import cn.rongcloud.im.ui.activity.loginWebActivity;
 import io.rong.calllib.RongCallClient;
@@ -241,6 +239,7 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
 
     @Override
     public boolean onConversationClick(Context context, View view, UIConversation uiConversation) {
+//        return  false;
         MessageContent messageContent = uiConversation.getMessageContent();
         if (messageContent instanceof ContactNotificationMessage) {
             ContactNotificationMessage contactNotificationMessage = (ContactNotificationMessage) messageContent;
@@ -255,30 +254,29 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
                         e.printStackTrace();
                     }
                     RongIM.getInstance().startPrivateChat(context, uiConversation.getConversationSenderId(), bean.getSourceUserNickname());
-
                 }
             } else {
-                context.startActivity(new Intent(context, NewFriendListActivity.class));
+                context.startActivity(new Intent(context, SubConversationListActivity.class));
+                return true;
             }
-            return true;
         } else if (messageContent instanceof GroupNotificationMessage) {
             GroupNotificationMessage groupNotificationMessage = (GroupNotificationMessage) messageContent;
             NLog.e("onReceived:" + groupNotificationMessage.getMessage());
 
             if (groupNotificationMessage.getOperation().equals("joinRequest")) {
-                Intent intent = new Intent(context, AllowGroupRequestActivity.class);
-                Bundle bundle= new Bundle();
-                groupNotificationMessage.setOperatorUserId(uiConversation.getConversationTargetId());
-                bundle.putParcelable("data",groupNotificationMessage);
-                intent.putExtras(bundle);
+                Intent intent = new Intent(context, SubConversationListActivity.class);
+//                Bundle bundle= new Bundle();
+//                groupNotificationMessage.setOperatorUserId(uiConversation.getConversationTargetId());
+//                bundle.putParcelable("data",groupNotificationMessage);
+//                intent.putExtras(bundle);
                 context.startActivity(intent);
                 return true;
             }else if (groupNotificationMessage.getOperation().equals("invitationRequest")){
-                Intent intent = new Intent(context, AllowGroupRequestActivity.class);
-                Bundle bundle= new Bundle();
-                groupNotificationMessage.setOperatorUserId(uiConversation.getConversationTargetId());
-                bundle.putParcelable("data",groupNotificationMessage);
-                intent.putExtras(bundle);
+                Intent intent = new Intent(context, SubConversationListActivity.class);
+//                Bundle bundle= new Bundle();
+//                groupNotificationMessage.setOperatorUserId(uiConversation.getConversationTargetId());
+//                bundle.putParcelable("data",groupNotificationMessage);
+//                intent.putExtras(bundle);
                 context.startActivity(intent);
                 return true;
             }else if (groupNotificationMessage.getOperation().equals("acceptInvitationGrpRequest")){

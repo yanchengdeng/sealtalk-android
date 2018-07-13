@@ -113,4 +113,17 @@
         android:textColor="#fff"
         android:text="@string/baojia_recharge"/>
 
+
+    <Button
+        android:id="@+id/btn_recharge_history"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="40dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:background="@drawable/transfer_sure_btn_bg"
+        android:textColor="#fff"
+        android:text="@string/baojia_history"/>
+
 </LinearLayout>

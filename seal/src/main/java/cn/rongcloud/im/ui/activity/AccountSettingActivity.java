@@ -7,11 +7,13 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.dbcapp.club.R;
 
 import java.io.File;
 
+import cn.rongcloud.im.App;
 import cn.rongcloud.im.SealConst;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.utils.NToast;
@@ -28,6 +30,7 @@ public class AccountSettingActivity extends BaseActivity implements View.OnClick
 
     private boolean isDebug;
     private final static String TAG = "AccountSettingActivity";
+    private TextView tvPackageTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +38,9 @@ public class AccountSettingActivity extends BaseActivity implements View.OnClick
         setContentView(R.layout.activity_account_set);
         isDebug = getSharedPreferences("config", MODE_PRIVATE).getBoolean("isDebug", false);
         setTitle(R.string.account_setting);
+        tvPackageTime = findViewById(R.id.tv_package_time);
         initViews();
+        tvPackageTime.setText(String.format(getString(R.string.pakage_time), App.PACKAGE_TIME));
     }
 
     private void initViews() {

@@ -21,6 +21,8 @@ public class ConversationListAdapterEx extends ConversationListAdapter {
         return super.newView(context, position, group);
     }
 
+
+
     @Override
     protected void bindView(View v, int position, UIConversation data) {
         if (data != null) {

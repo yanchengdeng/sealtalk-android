@@ -69,7 +69,7 @@ public class SplashActivity extends Activity implements OnDataListener {
         tvJump = findViewById(R.id.tv_jump);
 
 
-        if (SPUtils.getInstance().getLong(CURRENT_AD_TIME,0)>0){
+        if (SPUtils.getInstance().getLong(CURRENT_AD_TIME, 0) > 0) {
             countTimelong = SPUtils.getInstance().getLong(CURRENT_AD_TIME);
         }
 
@@ -83,7 +83,58 @@ public class SplashActivity extends Activity implements OnDataListener {
                     countDownTimer.cancel();
                     countDownTimer = null;
                 }
+
+
                 SharedPreferences sp = getSharedPreferences("config", MODE_PRIVATE);
+                //Todo ---》开始 测试
+
+
+               /* final GetLoginStatusResponse.ResultEntiry mUserData = new GetLoginStatusResponse.ResultEntiry();
+
+
+                mUserData.setId(11);
+                mUserData.setImToken("p86Uk5TIUVTrL3xGhAXR97pSdrzeM/fR4iyV/CxpKUi3sl0zAhM5Vv8bDil+XFBb3HdvMgNLCP9DoylKuwNsG3ORLEyEYM6w");
+                mUserData.setLoginName("testapp");
+                mUserData.setSyncName("lzs825737835");
+                mUserData.setUserName("小林1");
+                mUserData.setPortrait("http://7vztps.com1.z0.glb.clouddn.com/Fq3fUvp-RIkjmdrGZn7njBFEOo8n");
+
+                final SharedPreferences.Editor editor = sp.edit();
+
+                editor.putString(SealConst.SEALTALK_LOGIN_ID, String.valueOf(mUserData.getId()));
+                editor.commit();
+                editor.putString(SealConst.BAOJIA_USER_SYNCNAME, mUserData.getSyncName());
+                editor.putString(SealConst.SEALTALK_LOGIN_NAME, mUserData.getUserName());
+                editor.putString(SealConst.SEALTALK_LOGING_PORTRAIT, mUserData.getPortrait());
+                editor.putString("loginToken", mUserData.getImToken());
+                editor.commit();
+
+                RongIM.connect(mUserData.getImToken(), new RongIMClient.ConnectCallback() {
+                    @Override
+                    public void onTokenIncorrect() {
+                        NLog.e("connect", "onTokenIncorrect");
+                    }
+
+                    @Override
+                    public void onSuccess(String s) {
+                        SealUserInfoManager.getInstance().openDB();
+                        RongIM.getInstance().refreshUserInfoCache(new UserInfo(s, mUserData.getUserName(), Uri.parse(mUserData.getPortrait())));
+                        //不继续在login界面同步好友,群组,群组成员信息
+                        SealUserInfoManager.getInstance().getAllUserInfo();
+                    }
+
+                    @Override
+                    public void onError(RongIMClient.ErrorCode errorCode) {
+                        NLog.e("connect", "onError errorcode:" + errorCode.getValue());
+                    }
+                });*/
+
+
+
+
+                //Todo ---->结束测试
+
+
                 String cacheToken = sp.getString("loginToken", "");
                 mAction.httpManager.cancelRequests(SplashActivity.this, true);
                 if (!TextUtils.isEmpty(cacheToken)) {
@@ -168,13 +219,13 @@ public class SplashActivity extends Activity implements OnDataListener {
     }
 
     private void initCountDown() {
-        tvJump.setText(countTimelong/1000+"秒");
+        tvJump.setText(countTimelong / 1000 + "秒");
 
-        countDownTimer = new CountDownTimer( countTimelong+100,1000) {
+        countDownTimer = new CountDownTimer(countTimelong + 100, 1000) {
             @Override
             public void onTick(long l) {
 
-                if (l/1000!=0) {
+                if (l / 1000 != 0) {
                     tvJump.setText(((int) l / 1000) + "秒");
                 }
             }
@@ -237,7 +288,7 @@ public class SplashActivity extends Activity implements OnDataListener {
                         }
                         if (adResponse.getData().getShowTime() > 0) {
                             countTimelong = adResponse.getData().getShowTime() * 1000;
-                            SPUtils.getInstance().put(CURRENT_AD_TIME,countTimelong);
+                            SPUtils.getInstance().put(CURRENT_AD_TIME, countTimelong);
                         }
                     }
                 }

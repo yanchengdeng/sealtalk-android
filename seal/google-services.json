@@ -1,20 +1,27 @@
 {
   "project_info": {
-    "project_number": "396364826160",
-    "project_id": "sealtalk-4be99"
+    "project_number": "636169228503",
+    "firebase_url": "https://baoplus-1528471032080.firebaseio.com",
+    "project_id": "baoplus-1528471032080",
+    "storage_bucket": "baoplus-1528471032080.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:396364826160:android:a10a4a74ea61b328",
+        "mobilesdk_app_id": "1:636169228503:android:28ab93b750044524",
         "android_client_info": {
           "package_name": "com.dbcapp.club"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "636169228503-mra9pt2dts5q3vg1ge74t0v5udujkrgl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyD9oaYejQ4_Cit4-u8RSkKCjAmsZ0HtU6E"
+          "current_key": "AIzaSyAaiX4e5wauLP95A01c_PYg5QV47EbBKVk"
         }
       ],
       "services": {
@@ -26,7 +33,7 @@
           "other_platform_oauth_client": []
         },
         "ads_service": {
-          "status": 1
+          "status": 2
         }
       }
     }

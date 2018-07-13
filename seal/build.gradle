@@ -8,8 +8,8 @@ android {
         applicationId "com.dbcapp.club"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 1223
-        versionName "1.2.23"
+        versionCode 1224
+        versionName "1.2.24"
 
         multiDexEnabled true
         ndk {
@@ -78,6 +78,9 @@ dependencies {
     compile 'com.amap.api:3dmap:6.3.0'
     compile 'com.amap.api:location:4.1.0'
     implementation 'com.google.android.gms:play-services-maps:11.6.2'
+    compile 'com.meizu.flyme.internet:push-internal:3.6.7'
+//    compile 'com.google.android.gms:play-services-gcm:10.0.1'
+//    compile 'com.google.firebase:firebase-messaging:10.0.1'
 
 }
 apply plugin: 'com.google.gms.google-services'

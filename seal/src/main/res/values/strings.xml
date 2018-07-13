@@ -125,7 +125,7 @@
     <string name="chatroom4">聊天室 IV</string>
     <string name="agreed_friend">已同意好友关系</string>
     <string name="reject_friend">已拒绝好友关系</string>
-    <string name="agree">接&#160;&#160;&#160;受</string>
+    <string name="agree">接受</string>
     <string name="request">已请求</string>
     <string name="ignore">已忽略</string>
     <string name="added">已添加</string>
@@ -446,7 +446,7 @@
     <string name="baojia_create_group">创建群聊</string>
     <string name="edit_group_brief">群简介</string>
     <string name="baojia_qrcode_group">群二维码</string>
-    <string name="refuse">拒&#160;&#160;&#160;绝</string>
+    <string name="refuse">拒绝</string>
     <string name="mangage_not_agree">管理员拒绝了你的申请入群</string>
     <string name="mangage_agree_you_join">管理员同意了你的申请入群</string>
     <string name="friend_request_join_group">有朋友申请加入群组</string>
@@ -457,4 +457,7 @@
     <string name="friends_agree_your_request">好友同意了你的加群邀请</string>
     <string name="system_msg">系统消息</string>
     <string name="group_grade">群等级</string>
+    <string name="pakage_time">打包时间：%s</string>
+    <string name="baojia_history">账单</string>
+    <string name="baojia_account_history">账单</string>
 </resources>

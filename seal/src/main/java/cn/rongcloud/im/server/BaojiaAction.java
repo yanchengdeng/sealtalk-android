@@ -13,6 +13,7 @@ import java.util.List;
 
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.request.CompleteInfoRequest;
+import cn.rongcloud.im.server.response.AccountHistoryResponse;
 import cn.rongcloud.im.server.response.AdResponse;
 import cn.rongcloud.im.server.response.AddGroupMemberResponse;
 import cn.rongcloud.im.server.response.AgreeFriendResponse;
@@ -191,7 +192,7 @@ public class BaojiaAction extends BaseAction {
 
 
     /**
-     * 添加好友邀请
+     * 查询好友关系
      *
      * @param user
      * @param friend
@@ -1156,6 +1157,21 @@ public class BaojiaAction extends BaseAction {
         FriendInvitationResponse response = null;
         if (!TextUtils.isEmpty(responseStr)) {
             response = jsonToBean(responseStr, FriendInvitationResponse.class);
+        }
+        return response;
+    }
+
+    ///account/history
+
+
+    public Object accountHistory(long  startTime, String username,int pagesize) throws HttpException{
+        String url = String.format(BASE_URL + "/account/history?startTime=%d&username=%s&pageSize=%d",startTime, username,pagesize );
+        RLog.v("modifyPortrait", url);
+        String responseStr = httpManager.get(url);
+        RLog.v("modifyPortrait", responseStr);
+        AccountHistoryResponse response = null;
+        if (!TextUtils.isEmpty(responseStr)) {
+            response = jsonToBean(responseStr, AccountHistoryResponse.class);
         }
         return response;
     }

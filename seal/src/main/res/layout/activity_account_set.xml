@@ -241,4 +241,16 @@
 
     </RelativeLayout>
 
+
+    <TextView
+        android:id="@+id/tv_package_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:padding="10dp"
+        android:text="@string/pakage_time"
+        android:layout_marginTop="@dimen/activity_horizontal_margin"
+        android:textColor="@color/text_color"
+        android:textSize="16sp" />
+
 </LinearLayout>
