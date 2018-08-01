@@ -42,6 +42,8 @@ public class SoftWareActivity extends BaseActivity {
         mWebSofrware.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
         // 开启 DOM storage API 功能
         mWebSofrware.getSettings().setDomStorageEnabled(true);
+        mWebSofrware.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NARROW_COLUMNS);
+        mWebSofrware.getSettings().setUseWideViewPort(true);
         mWebSofrware.setWebViewClient(new WebViewClient() {
             //覆盖shouldOverrideUrlLoading 方法
             @Override

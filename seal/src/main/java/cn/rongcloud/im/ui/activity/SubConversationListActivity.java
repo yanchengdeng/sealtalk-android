@@ -5,16 +5,26 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dbcapp.club.R;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import cn.rongcloud.im.SealAppContext;
 import cn.rongcloud.im.SealConst;
+import cn.rongcloud.im.SealUserInfoManager;
+import cn.rongcloud.im.db.Friend;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.network.http.HttpException;
+import cn.rongcloud.im.server.pinyin.CharacterParser;
+import cn.rongcloud.im.server.response.AgreeFriendResponse;
 import cn.rongcloud.im.server.response.FriendInvitationResponse;
-import cn.rongcloud.im.server.response.GetRelationFriendResponse;
+import cn.rongcloud.im.server.response.FriendResponse;
+import cn.rongcloud.im.server.response.GetGroupMemberResponse;
 import cn.rongcloud.im.server.response.GroupDetailBaoResponse;
+import cn.rongcloud.im.server.response.GroupNumbersBaoResponse;
 import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.server.widget.LoadDialog;
 import cn.rongcloud.im.ui.adapter.SubConversationListAdapterDYC;
@@ -43,14 +53,23 @@ public class SubConversationListActivity extends BaseActivity {
     private static final int ACCEPT_JOIN_GROUP = 21;
 
 
+    //获取好友信息
+    private static final int SYN_USER_INFO_ADD = 10087;
+    private static final int SYN_USER_INFO_DELATE = 10088;
+
+
     private static final int INVITAION_JOIN_GROUP = 23;
     private static final int INVITATION_REFUSE_JOIN_GROUP = 24;
     private static final int GET_GROUPINFO_BY_TOKEN = 25;
 
-    private GetRelationFriendResponse userRelationshipResponse;
-    private String mSyncName,mFriendSync,groupToken,membersname;
-    private String mFriedndsName;
+    private static final int GET_GROUP_NUMBERS = 41;
 
+
+    private String mSyncName, mFriendSync, groupToken, membersname;
+    private String mFriedndsName;
+    private MessageContent messageContent;
+
+    private Friend friend;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,35 +78,38 @@ public class SubConversationListActivity extends BaseActivity {
         setContentView(R.layout.activity_rong);
         mSyncName = getSharedPreferences("config", MODE_PRIVATE).getString(SealConst.BAOJIA_USER_SYNCNAME, "");
         SubConversationListFragmentNew fragment = new SubConversationListFragmentNew();
-        adapterDYC =   new SubConversationListAdapterDYC(RongContext.getInstance());
+        adapterDYC = new SubConversationListAdapterDYC(RongContext.getInstance());
         fragment.setAdapter(adapterDYC);
 
         adapterDYC.setActionLisener(new SubConversationListAdapterDYC.DoActionLisener() {
             @Override
             public void onAcitonLisener(int action, UIConversation data) {
-                MessageContent messageContent = data.getMessageContent();
+                messageContent = data.getMessageContent();
                 if (messageContent instanceof ContactNotificationMessage) {
                     mFriendSync = ((ContactNotificationMessage) messageContent).getSourceUserId();
                     mFriedndsName = ((ContactNotificationMessage) messageContent).getExtra();
-                    if (action==0){
-                        request(REUFSE_FRIENDS);
-                    }else{
-                        request(AGREE_FRIENDS);
+                    LoadDialog.show(mContext);
+                    if (action == 0) {
+                        request(SYN_USER_INFO_DELATE);
+                    } else {
+                        request(SYN_USER_INFO_ADD);
                     }
-                }else if (messageContent instanceof GroupNotificationMessage){
+                } else if (messageContent instanceof GroupNotificationMessage) {
                     GroupNotificationMessage groupNotificationMessage = (GroupNotificationMessage) messageContent;
                     groupToken = groupNotificationMessage.getExtra();
                     membersname = groupNotificationMessage.getOperatorUserId();
                     if (groupNotificationMessage.getOperation().equals("joinRequest")) {
-                        if (action==0){
+                        LoadDialog.show(mContext);
+                        if (action == 0) {
                             request(REFUSE_JOIN_GROUP);
-                        }else{
+                        } else {
                             request(ACCEPT_JOIN_GROUP);
                         }
-                    }else if (groupNotificationMessage.getOperation().equals("invitationRequest")) {
-                        if (action==0){
+                    } else if (groupNotificationMessage.getOperation().equals("invitationRequest")) {
+                        LoadDialog.show(mContext);
+                        if (action == 0) {
                             request(INVITATION_REFUSE_JOIN_GROUP);
-                        }else {
+                        } else {
                             request(INVITAION_JOIN_GROUP);
                         }
 
@@ -130,10 +152,14 @@ public class SubConversationListActivity extends BaseActivity {
     @Override
     public Object doInBackground(int requestCode, String id) throws HttpException {
         switch (requestCode) {
+            case SYN_USER_INFO_DELATE:
+                return mAction.userDetail(mSyncName, ((ContactNotificationMessage) messageContent).getSourceUserId());
+            case SYN_USER_INFO_ADD:
+                return mAction.userDetail(mSyncName, ((ContactNotificationMessage) messageContent).getSourceUserId());
             case AGREE_FRIENDS:
                 return mAction.agreeFriend(mSyncName, mFriendSync);
             case REUFSE_FRIENDS:
-                return mAction.refuseFriend(mSyncName,mFriendSync);
+                return mAction.refuseFriend(mSyncName, mFriendSync);
             case ACCEPT_JOIN_GROUP:
                 return mAction.acceptetFriendInvitation(membersname, groupToken, mSyncName);
             case REFUSE_JOIN_GROUP:
@@ -143,7 +169,9 @@ public class SubConversationListActivity extends BaseActivity {
             case INVITATION_REFUSE_JOIN_GROUP:
                 return mAction.invitaitonRefuseFriendInvitation(groupToken, mSyncName);
             case GET_GROUPINFO_BY_TOKEN:
-                return mAction.getGroupInfo(groupToken,mSyncName);
+                return mAction.getGroupInfo(groupToken, mSyncName);
+            case GET_GROUP_NUMBERS:
+                return mAction.getGroupNumbers(groupToken, mSyncName);
         }
         return super.doInBackground(requestCode, id);
     }
@@ -153,41 +181,62 @@ public class SubConversationListActivity extends BaseActivity {
     public void onSuccess(int requestCode, Object result) {
         if (result != null) {
             switch (requestCode) {
+                //用于删除好友
+                case SYN_USER_INFO_DELATE:
+                    FriendResponse friendResponseREFUSE = (FriendResponse) result;
+                    FriendResponse.ResultEntity beanRE = friendResponseREFUSE.getData();
+                    if (beanRE == null) {
+                        return;
+                    }
+                    friend = new Friend(beanRE.getSyncName(),
+                            beanRE.getUserName(),
+                            Uri.parse(beanRE.getPortrait() + ""),
+                            beanRE.getUserName(),
+                            String.valueOf(beanRE.getStatus()),
+                            null,
+                            null,
+                            null,
+                            CharacterParser.getInstance().getSpelling(beanRE.getUserName()),
+                            CharacterParser.getInstance().getSpelling(beanRE.getUserName()));
+                    request(REUFSE_FRIENDS);
+                    break;
+                //获取  添加好友
+                case SYN_USER_INFO_ADD:
+                    FriendResponse friendResponse = (FriendResponse) result;
+                    FriendResponse.ResultEntity bean = friendResponse.getData();
+                    if (bean == null) {
+                        return;
+                    }
+                    friend = new Friend(bean.getSyncName(),
+                            bean.getUserName(),
+                            Uri.parse(bean.getPortrait() + ""),
+                            bean.getUserName(),
+                            String.valueOf(bean.getStatus()),
+                            null,
+                            null,
+                            null,
+                            CharacterParser.getInstance().getSpelling(bean.getUserName()),
+                            CharacterParser.getInstance().getSpelling(bean.getUserName()));
+                    request(AGREE_FRIENDS);
+
+                    break;
                 case AGREE_FRIENDS:
-//                    AgreeFriendResponse response = (AgreeFriendResponse) result;
-//                    GetRelationFriendResponse.ResultEntity bean = userRelationshipResponse.getData().get(index);
-//                    SealUserInfoManager.getInstance().addFriend(new Friend(bean.getSyncName(),
-//                            bean.getUserName(),
-//                            Uri.parse(bean.getPortrait() + ""),
-//                            bean.getUserName(),
-//                            String.valueOf(bean.getStatus()),
-//                            null,
-//                            null,
-//                            null,
-//                            CharacterParser.getInstance().getSpelling(bean.getUserName()),
-//                            CharacterParser.getInstance().getSpelling(bean.getUserName())));
+                    AgreeFriendResponse agreeFriendResponse = (AgreeFriendResponse) result;
+                    LogUtils.w("dyc", agreeFriendResponse);
+                    SealUserInfoManager.getInstance().addFriend(friend);
+
                     // 通知好友列表刷新数据
                     NToast.shortToast(mContext, R.string.agreed_friend);
                     LoadDialog.dismiss(mContext);
                     BroadcastManager.getInstance(mContext).sendBroadcast(SealAppContext.UPDATE_FRIEND);
-                    RongIM.getInstance().startPrivateChat(SubConversationListActivity.this,mFriendSync,mFriedndsName);
+                    RongIM.getInstance().startPrivateChat(SubConversationListActivity.this, mFriendSync, mFriedndsName);
                     finish();
-
-
                     break;
                 case REUFSE_FRIENDS:
-//                    GetRelationFriendResponse.ResultEntity bean1 = userRelationshipResponse.getData().get(index);
-//                    SealUserInfoManager.getInstance().deleteFriend(new Friend(bean1.getSyncName(),
-//                            bean1.getUserName(),
-//                            Uri.parse(bean1.getPortrait() + ""),
-//                            bean1.getUserName(),
-//                            String.valueOf(bean1.getStatus()),
-//                            null,
-//                            null,
-//                            null,
-//                            CharacterParser.getInstance().getSpelling(bean1.getUserName()),
-//                            CharacterParser.getInstance().getSpelling(bean1.getUserName())));
+                    AgreeFriendResponse response1 = (AgreeFriendResponse) result;
 
+
+                    SealUserInfoManager.getInstance().deleteFriend(friend);
                     // 通知好友列表刷新数据
                     NToast.shortToast(mContext, R.string.reject_friend);
                     LoadDialog.dismiss(mContext);
@@ -240,14 +289,44 @@ public class SubConversationListActivity extends BaseActivity {
                 case GET_GROUPINFO_BY_TOKEN:
                     GroupDetailBaoResponse response3 = (GroupDetailBaoResponse) result;
                     if (response3.getCode() == 100000) {
-                        GroupDetailBaoResponse.ResultEntity bean = response3.getData();
-                        RongIM.getInstance().refreshGroupInfoCache(new Group(groupToken, bean.getGroupName(), Uri.parse(bean.getGroupIcon())));
-                        RongIM.getInstance().startGroupChat(SubConversationListActivity.this,groupToken,bean.getGroupName());
+                        GroupDetailBaoResponse.ResultEntity beantoken = response3.getData();
+                        RongIM.getInstance().refreshGroupInfoCache(new Group(groupToken, beantoken.getGroupName(), Uri.parse(beantoken.getGroupIcon())));
+                        RongIM.getInstance().startGroupChat(SubConversationListActivity.this,groupToken,beantoken.getGroupName());
                         finish();
                     }else{
                         ToastUtils.showShort(""+response3.getMessage());
                     }
-                    return;
+
+                    break;
+                case GET_GROUP_NUMBERS:
+                    GroupNumbersBaoResponse groupNumbersBaoResponse = (GroupNumbersBaoResponse) result;
+                    if (groupNumbersBaoResponse.getCode() == 100000) {
+                        if (groupNumbersBaoResponse.getData() != null && groupNumbersBaoResponse.getData().size() > 0) {
+                            ArrayList<GroupNumbersBaoResponse.ResultEntity> mGroupMember = (ArrayList<GroupNumbersBaoResponse.ResultEntity>) groupNumbersBaoResponse.getData();
+
+
+                            List<GetGroupMemberResponse.ResultEntity> list = new ArrayList<>();
+                            if (mGroupMember != null && mGroupMember.size() > 0) {
+                                for (GroupNumbersBaoResponse.ResultEntity item : mGroupMember) {
+                                    GetGroupMemberResponse.ResultEntity resultEntity = new GetGroupMemberResponse.ResultEntity();
+                                    GetGroupMemberResponse.ResultEntity.UserEntity userEntity = new GetGroupMemberResponse.ResultEntity.UserEntity();
+                                    resultEntity.setCreatedAt(item.getCreateTime1());
+                                    resultEntity.setRole(Integer.parseInt(item.getMemberRole()));
+                                    userEntity.setId(item.getId());
+                                    resultEntity.setDisplayName(item.getUserName());
+                                    userEntity.setNickname(item.getSyncName());
+                                    userEntity.setPortraitUri(item.getPortrait());
+                                    resultEntity.setUser(userEntity);
+                                    list.add(resultEntity);
+
+                                }
+                            }
+
+                            SealUserInfoManager.getInstance().addGroupMembers(list, groupToken);
+                            request(GET_GROUPINFO_BY_TOKEN);
+                        }
+                    }
+                    break;
             }
         }
     }

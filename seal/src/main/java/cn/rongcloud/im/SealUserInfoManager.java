@@ -888,7 +888,7 @@ public class SealUserInfoManager implements OnDataListener {
      * @param groupID 群组ID
      * @return List<GroupMember> 群组成员列表
      */
-    private List<GroupMember> addGroupMembers(final List<GetGroupMemberResponse.ResultEntity> list, final String groupID) {
+    public List<GroupMember> addGroupMembers(final List<GetGroupMemberResponse.ResultEntity> list, final String groupID) {
         if (list != null && list.size() > 0) {
             List<GroupMember> groupsMembersList = setCreatedToTop(list, groupID);
             if (groupsMembersList != null && groupsMembersList.size() > 0) {

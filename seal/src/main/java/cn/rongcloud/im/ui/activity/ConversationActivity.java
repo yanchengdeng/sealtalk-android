@@ -36,6 +36,7 @@ import cn.rongcloud.im.db.GroupMember;
 import cn.rongcloud.im.server.broadcast.BroadcastManager;
 import cn.rongcloud.im.server.network.http.HttpException;
 import cn.rongcloud.im.server.response.GroupDetailBaoResponse;
+import cn.rongcloud.im.server.response.GroupNumbersBaoResponse;
 import cn.rongcloud.im.server.utils.NLog;
 import cn.rongcloud.im.server.utils.NToast;
 import cn.rongcloud.im.ui.fragment.ConversationFragmentEx;
@@ -68,6 +69,7 @@ import io.rong.message.VoiceMessage;
 public class ConversationActivity extends BaseActivity implements View.OnClickListener {
 
     private static final int UPLOAD_GROUPINFO_TO_RONGIM = 20;
+    private static final int GET_GROUP_NUMBERS = 41;
     private String TAG = ConversationActivity.class.getSimpleName();
     /**
      * 对方id
@@ -104,6 +106,7 @@ public class ConversationActivity extends BaseActivity implements View.OnClickLi
     private TextView tv_announce;
     private ImageView iv_arrow;
     private String mSyncName;
+    List<UserInfo> list;
 
     @Override
     @TargetApi(23)
@@ -224,6 +227,20 @@ public class ConversationActivity extends BaseActivity implements View.OnClickLi
                 getGroupMembersForCall();
                 mCallMemberResult = result;
                 return null;
+            }
+        });
+
+
+//        getGroupMembersForCall();
+
+        request(GET_GROUP_NUMBERS);
+
+        RongIM.getInstance().setGroupMembersProvider(new RongIM.IGroupMembersProvider() {
+            @Override
+            public void getGroupMembers(String groupId, RongIM.IGroupMemberCallback callback) {
+                if (list!=null) {
+                    callback.onGetGroupMembersResult(list); // 调用 callback 的 onGetGroupMembersResult 回传群组信息
+                }
             }
         });
 
@@ -410,7 +427,7 @@ public class ConversationActivity extends BaseActivity implements View.OnClickLi
         fragment.setUri(uri);
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        //xxx 为你要加载的 id
+        //xxx 为你要加载的 idonve
         transaction.add(R.id.rong_content, fragment);
         transaction.commitAllowingStateLoss();
     }
@@ -486,6 +503,8 @@ public class ConversationActivity extends BaseActivity implements View.OnClickLi
     public Object doInBackground(int requestCode, String id) throws HttpException {
         if (requestCode == UPLOAD_GROUPINFO_TO_RONGIM) {
             return mAction.getGroupInfo(mTargetId, mSyncName);
+        }else if (requestCode==GET_GROUP_NUMBERS){
+                return mAction.getGroupNumbers(mTargetId,mSyncName);
         }
         return super.doInBackground(requestCode, id);
     }
@@ -503,6 +522,21 @@ public class ConversationActivity extends BaseActivity implements View.OnClickLi
 //                    setActionBarTitle(mConversationType, bean.getGroupName());
                 }
             }
+        }else if (requestCode==GET_GROUP_NUMBERS){
+                GroupNumbersBaoResponse groupNumbersBaoResponse = (GroupNumbersBaoResponse) result;
+                if (groupNumbersBaoResponse.getCode() == 100000) {
+                    if (groupNumbersBaoResponse.getData()!=null && groupNumbersBaoResponse.getData().size()>0) {
+                        ArrayList<GroupNumbersBaoResponse.ResultEntity>    mGroupMember = (ArrayList<GroupNumbersBaoResponse.ResultEntity>) groupNumbersBaoResponse.getData();
+
+                        if (mGroupMember!=null && mGroupMember.size()>0){
+                            list = new ArrayList<>();
+                            for (GroupNumbersBaoResponse.ResultEntity item:mGroupMember){
+                                UserInfo userInfo = new UserInfo(item.getId(),item.getUserName(),Uri.parse(item.getPortrait()));
+                                list.add(userInfo);
+                            }
+                        }
+                    }
+                }
         }
         super.onSuccess(requestCode, result);
     }

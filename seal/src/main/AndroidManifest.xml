@@ -694,7 +694,7 @@
         <activity android:name="cn.rongcloud.im.ui.activity.AllowGroupRequestActivity" />
         <activity android:name="cn.rongcloud.im.ui.activity.PersonalCircleActivity" />
         <activity android:name="cn.rongcloud.im.ui.activity.CircleUserDetailActivity" />
-        <activity android:name="cn.rongcloud.im.ui.activity.AcountHistoryActivity"></activity>
+        <activity android:name="cn.rongcloud.im.ui.activity.AcountHistoryActivity" />
     </application>
 
 </manifest>

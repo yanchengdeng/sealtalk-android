@@ -4,10 +4,13 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.dbcapp.club.R;
 
+import cn.rongcloud.im.SealConst;
+import cn.rongcloud.im.SealUserInfoManager;
 import cn.rongcloud.im.server.response.ContactNotificationMessageData;
 import cn.rongcloud.im.server.utils.NLog;
 import cn.rongcloud.im.server.widget.SelectableRoundedImageView;
@@ -26,6 +29,7 @@ public class SubConversationListAdapterDYC  extends ConversationListAdapter {
     LayoutInflater mInflater;
     Context mContext;
     private DoActionLisener doActionLisener;
+    private String mSyncName;
 
     public long getItemId(int position) {
         UIConversation conversation = (UIConversation) this.getItem(position);
@@ -36,6 +40,7 @@ public class SubConversationListAdapterDYC  extends ConversationListAdapter {
         super(context);
         this.mContext = context;
         this.mInflater = LayoutInflater.from(this.mContext);
+        this.mSyncName  = context.getSharedPreferences("config", context.MODE_PRIVATE).getString(SealConst.BAOJIA_USER_SYNCNAME, "");;
     }
 
     protected View newView(Context context, int position, ViewGroup group) {
@@ -47,12 +52,17 @@ public class SubConversationListAdapterDYC  extends ConversationListAdapter {
         holder.mRefuseState = convertView.findViewById(R.id.ship_state_refuse);
         holder.mMessage = convertView.findViewById(R.id.tv_request_content);
         holder.llUIView = convertView.findViewById(R.id.ll_ui_view);
+        holder.unReadMsgCount = convertView.findViewById(R.id.rc_unread_message);
+        holder.unReadMsgCountIcon = convertView.findViewById(R.id.rc_unread_message_icon);
+        holder.tvShipTips = convertView.findViewById(R.id.tv_ship_tips);
+
         convertView.setTag(holder);
+
         return convertView;
     }
 
     protected void bindView(View contentView, int position, final UIConversation data) {
-        SubConversationListAdapterDYC.ViewHolder holder = (SubConversationListAdapterDYC.ViewHolder) contentView.getTag();
+        final SubConversationListAdapterDYC.ViewHolder holder = (SubConversationListAdapterDYC.ViewHolder) contentView.getTag();
 //        IContainerItemProvider provider = RongContext.getInstance().getConversationTemplate(data.getConversationType().getName());
 //        View view = holder.contentView.inflate(provider);
 //        provider.bindView(view, position, data);
@@ -61,9 +71,29 @@ public class SubConversationListAdapterDYC  extends ConversationListAdapter {
 
 
 
+        if (data.getUnReadMessageCount() > 0) {
+            holder.unReadMsgCountIcon.setVisibility(View.VISIBLE);
+            if (data.getUnReadType().equals(UIConversation.UnreadRemindType.REMIND_WITH_COUNTING)) {
+                if (data.getUnReadMessageCount() > 99) {
+                    holder.unReadMsgCount.setText(this.mContext.getResources().getString(io.rong.imkit.R.string.rc_message_unread_count));
+                } else {
+                    holder.unReadMsgCount.setText(Integer.toString(data.getUnReadMessageCount()));
+                }
+
+                holder.unReadMsgCount.setVisibility(View.VISIBLE);
+                holder.unReadMsgCountIcon.setImageResource(io.rong.imkit.R.drawable.rc_unread_count_bg);
+            } else {
+                holder.unReadMsgCount.setVisibility(View.GONE);
+                holder.unReadMsgCountIcon.setImageResource(io.rong.imkit.R.drawable.rc_unread_remind_list_count);
+            }
+        } else {
+            holder.unReadMsgCountIcon.setVisibility(View.GONE);
+            holder.unReadMsgCount.setVisibility(View.GONE);
+        }
+
 
         if (data.getIconUrl()!=null) {
-            ImageLoader.getInstance().displayImage(data.getIconUrl().getPath(), holder.mHead);
+            ImageLoader.getInstance().displayImage(data.getIconUrl().toString(), holder.mHead);
         }
 
         if (messageContent instanceof ContactNotificationMessage) {
@@ -73,6 +103,8 @@ public class SubConversationListAdapterDYC  extends ConversationListAdapter {
             if (contactNotificationMessage.getOperation().equals("acceptRequest")) {
                 holder.mState.setVisibility(View.GONE);
                 holder.mRefuseState.setVisibility(View.GONE);
+                holder.tvShipTips.setVisibility(View.VISIBLE);
+                holder.tvShipTips.setText("已接受");
                 // 被加方同意请求后
                 if (contactNotificationMessage.getExtra() != null) {
                     ContactNotificationMessageData bean = null;
@@ -92,6 +124,7 @@ public class SubConversationListAdapterDYC  extends ConversationListAdapter {
                 }
             }else if(contactNotificationMessage.getOperation().equals("friendRequest")){
 
+
                 if (doActionLisener!=null){
                     holder.mState.setVisibility(View.VISIBLE);
                     holder.mRefuseState.setVisibility(View.VISIBLE);
@@ -109,7 +142,27 @@ public class SubConversationListAdapterDYC  extends ConversationListAdapter {
                         }
                     });
                 }
-            } else {
+                if (SealUserInfoManager.getInstance().isFriendsRelationship(contactNotificationMessage.getSourceUserId())){
+                    holder.mState.setVisibility(View.GONE);
+                    holder.mRefuseState.setVisibility(View.GONE);
+                    holder.tvShipTips.setVisibility(View.VISIBLE);
+                    holder.tvShipTips.setText("已接受");
+                    holder.llUIView.setOnClickListener(new PerfectClickListener() {
+                        @Override
+                        protected void onNoDoubleClick(View v) {
+                            RongIM.getInstance().startPrivateChat(mContext, data.getConversationSenderId(), data.getExtra());
+                        }
+                    });
+                }else{
+                    holder.tvShipTips.setVisibility(View.GONE);
+                }
+            }else if (contactNotificationMessage.getOperation().equals("relieveRequest")){
+                holder.mState.setVisibility(View.GONE);
+                holder.mRefuseState.setVisibility(View.GONE);
+                holder.tvShipTips.setVisibility(View.VISIBLE);
+                holder.tvShipTips.setText("已解除");
+            }else {
+                holder.tvShipTips.setText("已拒绝");
                 holder.mState.setVisibility(View.GONE);
                 holder.mRefuseState.setVisibility(View.GONE);
             }
@@ -153,6 +206,38 @@ public class SubConversationListAdapterDYC  extends ConversationListAdapter {
 //                bundle.putParcelable("data",groupNotificationMessage);
 //                intent.putExtras(bundle);
 //                mContext.startActivity(intent);
+
+               /* SealUserInfoManager.getInstance().getGroupMembers(groupNotificationMessage.getExtra(), new SealUserInfoManager.ResultCallback<List<GroupMember>>() {
+                    @Override
+                    public void onSuccess(List<GroupMember> groupMembers) {
+                        LogUtils.w("dyc",groupMembers);
+                        boolean isExist = false;
+                        if (groupMembers!=null && groupMembers.size()>0){
+                            for (GroupMember groupItme:groupMembers){
+                                if (mSyncName.equals(groupItme.getName())){
+                                    isExist = true;
+                                }
+                            }
+                        }
+
+                        if (isExist){
+                            holder.mState.setVisibility(View.GONE);
+                            holder.mRefuseState.setVisibility(View.GONE);
+                            holder.tvShipTips.setVisibility(View.VISIBLE);
+                            holder.tvShipTips.setText("已同意");
+                        }else{
+                            holder.mState.setVisibility(View.VISIBLE);
+                            holder.mRefuseState.setVisibility(View.VISIBLE);
+                            holder.tvShipTips.setVisibility(View.GONE);
+                        }
+                    }
+
+                    @Override
+                    public void onError(String errString) {
+                        LogUtils.w("dyc",errString);
+
+                    }
+                });*/
                 if (doActionLisener!=null){
                     holder.mRefuseState.setOnClickListener(new PerfectClickListener() {
                         @Override
@@ -209,6 +294,9 @@ public class SubConversationListAdapterDYC  extends ConversationListAdapter {
         TextView mState, mRefuseState;
         //        TextView mtime;
         TextView mMessage;
+        public TextView unReadMsgCount;
+        public ImageView unReadMsgCountIcon;
+        TextView tvShipTips;
 
     }
 

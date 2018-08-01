@@ -20,10 +20,11 @@
 
     <application>
 
-        <!-- imlib config begin -->
+        <!-- imlib config begin  android:value="qf3d5gbjqh7hh"-->
         <meta-data
             android:name="RONG_CLOUD_APP_KEY"
-            android:value="qf3d5gbjqh7hh" />
+            android:value="qf3d5gbjqh7hh"
+             />
 
         <service
             android:name="io.rong.imlib.ipc.RongService"
